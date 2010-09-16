@@ -8,9 +8,14 @@ from django import forms
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
-    price_per_kilo_entry = models.FloatField()
+    price_per_kilo_per_entry = models.FloatField()
     def __unicode__(self):
         return u"%s @ %s for %s" % (self.id, self.arrival_date, self.customer)
+
+def entry_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.price_per_kilo_per_entry = instance.customer.price_per_kilo_per_entry
+pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
     entry = models.ForeignKey(Entry)
@@ -29,7 +34,6 @@ class EntryRow(models.Model):
 
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
-
 
 
 class Withdrawal(models.Model):

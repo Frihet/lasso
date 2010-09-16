@@ -49,7 +49,7 @@ class EntryAdminForm(forms.ModelForm):
 class EntryAdmin(admin.ModelAdmin):
     inlines = [EntryRowInline,]
     date_hierarchy = 'arrival_date'
-    dields = ('customer', 'arrival_date', 'price_per_kilo_entry', 'locations')
+    exclude = ('price_per_kilo_per_entry',)
     form = EntryAdminForm
 
 admin.site.register(Entry, EntryAdmin)
