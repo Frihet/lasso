@@ -2,17 +2,18 @@
 from django.db import models
 from lasso.lasso_customer.models import *
 from django.contrib import admin
+from django.db.models.signals import *
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
+    price_per_kilo_entry = models.FloatField()
     def __unicode__(self):
         return u"%s @ %s for %s" % (self.id, self.arrival_date, self.customer)
 
 class EntryRow(models.Model):
     entry = models.ForeignKey(Entry)
     product_description = models.CharField(max_length=400)
-    price_per_kilo_entry = models.FloatField()
     arrival_temperature = models.FloatField()
     use_before = models.DateField()
     nett_weight = models.FloatField()
@@ -28,7 +29,7 @@ class EntryRow(models.Model):
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
 
-class EntryRowInline(admin.TabularInline):
+class EntryRowInline(admin.StackedInline):
     model = EntryRow
 
 class EntryAdmin(admin.ModelAdmin):
@@ -50,6 +51,7 @@ class Withdrawal(models.Model):
 class WithdrawalRow(models.Model):
     withdrawal = models.ForeignKey(Withdrawal)
     entry_row = models.ForeignKey(EntryRow)
+    old_units = models.IntegerField()
     units = models.IntegerField()
 
     @property
@@ -59,8 +61,28 @@ class WithdrawalRow(models.Model):
     def __unicode__(self):
         return u"%s (%s @ %s from %s)" % (self.id_str, self.units, self.withdrawal.withdrawal_date, self.entry_row)
 
+def withdrawal_row_post_init(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.old_units = 0
+pre_save.connect(withdrawal_row_post_init, sender=WithdrawalRow)
+
+def withdrawal_row_pre_save(sender, instance, **kwargs):
+    instance.entry_row.units_left -= instance.units - instance.old_units
+    instance.entry_row.save()
+    instance.old_units = instance.units
+pre_save.connect(withdrawal_row_pre_save, sender=WithdrawalRow)
+
+def withdrawal_row_pre_delete(sender, instance, **kwargs):
+    instance.entry_row.units_left += instance.old_units
+    instance.entry_row.save()
+pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
+
 class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow
+    fieldsets = ((None, {
+            'fields': ('withdrawal', 'entry_row', 'units')
+        }),
+        )
 
 class WithdrawalAdmin(admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
