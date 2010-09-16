@@ -3,6 +3,7 @@ from django.db import models
 from lasso.lasso_customer.models import *
 from django.contrib import admin
 from django.db.models.signals import *
+from django import forms
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
@@ -28,15 +29,6 @@ class EntryRow(models.Model):
 
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
-
-class EntryRowInline(admin.StackedInline):
-    model = EntryRow
-
-class EntryAdmin(admin.ModelAdmin):
-    inlines = [EntryRowInline,]
-    date_hierarchy = 'arrival_date'
-
-admin.site.register(Entry, EntryAdmin)
 
 
 
@@ -77,16 +69,6 @@ def withdrawal_row_pre_delete(sender, instance, **kwargs):
     instance.entry_row.save()
 pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 
-class WithdrawalRowInline(admin.TabularInline):
-    model = WithdrawalRow
-    exclude = ('old_units',)
-
-class WithdrawalAdmin(admin.ModelAdmin):
-    inlines = [WithdrawalRowInline,]
-    date_hierarchy = 'withdrawal_date'
-
-admin.site.register(Withdrawal, WithdrawalAdmin)
-
 
 class UnitWork(models.Model):
     customer = models.ForeignKey(Customer)
@@ -96,8 +78,3 @@ class UnitWork(models.Model):
 
     def __unicode__(self):
         return u"%s of %s @ %s for %s" % (self.work_type, self.units, self.date, self.customer)
-
-class UnitWorkAdmin(admin.ModelAdmin):
-        date_hierarchy = 'date'
-
-admin.site.register(UnitWork, UnitWorkAdmin)
