@@ -79,10 +79,7 @@ pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 
 class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow
-    fieldsets = ((None, {
-            'fields': ('withdrawal', 'entry_row', 'units')
-        }),
-        )
+    exclude = ('old_units',)
 
 class WithdrawalAdmin(admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
