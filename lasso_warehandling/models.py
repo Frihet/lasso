@@ -81,10 +81,15 @@ pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 
 
 class UnitWork(models.Model):
-    customer = models.ForeignKey(Customer)
-    work_type = models.ForeignKey(UnitWorkType)
+    work_type = models.ForeignKey(UnitWorkPrices)
+    price_per_unit = models.FloatField()
     date = models.DateField()
     units = models.IntegerField()
 
     def __unicode__(self):
-        return u"%s of %s @ %s for %s" % (self.work_type, self.units, self.date, self.customer)
+        return u"%s of %s @ %s for %s" % (self.work_type.work_type, self.units, self.date, self.work_type.customer)
+
+def unitwork_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.price_per_unit = instance.work_type.price_per_unit
+pre_save.connect(unitwork_pre_save, sender=UnitWork)

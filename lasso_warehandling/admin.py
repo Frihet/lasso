@@ -68,6 +68,7 @@ admin.site.register(Withdrawal, WithdrawalAdmin)
 
 
 class UnitWorkAdmin(admin.ModelAdmin):
-        date_hierarchy = 'date'
+    date_hierarchy = 'date'
+    exclude = ('price_per_unit',)
 
 admin.site.register(UnitWork, UnitWorkAdmin)
