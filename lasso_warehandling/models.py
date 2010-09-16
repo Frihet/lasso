@@ -37,12 +37,18 @@ class EntryRow(models.Model):
 
 
 class Withdrawal(models.Model):
-    price_per_kilo_out = models.FloatField()
+    customer = models.ForeignKey(Customer)
+    price_per_kilo_per_withdrawal = models.FloatField()
     withdrawal_date = models.DateField()
     arrival_date = models.DateField()
 
     def __unicode__(self):
         return u"%s @ %s" % (self.id, self.withdrawal_date)
+
+def withdrawal_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.price_per_kilo_per_withdrawal = instance.customer.price_per_kilo_per_withdrawal
+pre_save.connect(withdrawal_pre_save, sender=Withdrawal)
 
 class WithdrawalRow(models.Model):
     withdrawal = models.ForeignKey(Withdrawal)

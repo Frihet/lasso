@@ -62,6 +62,7 @@ class WithdrawalRowInline(admin.TabularInline):
 class WithdrawalAdmin(admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
+    exclude = ('price_per_kilo_per_withdrawal',)
 
 admin.site.register(Withdrawal, WithdrawalAdmin)
 
