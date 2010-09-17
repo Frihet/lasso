@@ -27,4 +27,5 @@ class PalletSpace(models.Model):
 
     def __unicode__(self):
         return "%s-%s in %s" % (self.row.name, self.name, self.row.warehouse.name)
+
 admin.site.register(PalletSpace)

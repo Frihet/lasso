@@ -20,15 +20,24 @@ pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
     entry = models.ForeignKey(Entry)
-    product_description = models.CharField(max_length=400)
-    arrival_temperature = models.FloatField()
-    use_before = models.DateField()
-    nett_weight = models.FloatField()
-    gross_weight = models.FloatField()
+    custom_handling_date = models.DateField()
+    customs_receipt_nr = models.CharField(max_length=200)
+    customs_testimony_nr = models.CharField(max_length=200)
+    transporter = models.CharField(max_length=200)
+    product_nr = models.CharField(max_length=400)
     uom = models.CharField(max_length=200)
     units = models.IntegerField()
     units_left = models.IntegerField()
+    nett_weight = models.FloatField()
+    gross_weight = models.FloatField()
+    product_value= models.FloatField()
 
+    use_before = models.DateField()
+    product_description = models.CharField(max_length=400)
+    product_state = models.CharField(max_length=200)
+    comment = models.TextField()
+    arrival_temperature = models.FloatField()
+    
     @property
     def id_str(self):
         return "%s.%s" % (self.entry.id, self.id)
@@ -40,8 +49,23 @@ class EntryRow(models.Model):
 class Withdrawal(models.Model):
     customer = models.ForeignKey(Customer)
     price_per_kilo_per_withdrawal = models.FloatField()
+
+    reference_nr = models.CharField(max_length=200)
+    responsible = models.CharField(max_length=200)
+    place_of_departure = models.CharField(max_length=200)
+    
+    insurance = models.CharField(max_length=200)
+    transport_condition = models.CharField(max_length=200)
+    transport_nr = models.CharField(max_length=200)
+    order_nr = models.CharField(max_length=200)
+
+    destination_address = models.TextField()
     withdrawal_date = models.DateField()
     arrival_date = models.DateField()
+    vehicle_type = models.CharField(max_length=200)
+    opening_hours = models.CharField(max_length=200)
+    transporter = models.CharField(max_length=200)
+    comment = models.TextField()
 
     def __unicode__(self):
         return u"%s @ %s" % (self.id, self.withdrawal_date)
