@@ -4,6 +4,7 @@ from lasso.lasso_customer.models import *
 from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
+import datetime
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
@@ -93,3 +94,23 @@ def unitwork_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.price_per_unit = instance.work_type.price_per_unit
 pre_save.connect(unitwork_pre_save, sender=UnitWork)
+
+
+
+class StorageLog(models.Model):
+    entry_row = models.ForeignKey(EntryRow)
+    date = models.DateField()
+    price_per_kilo_per_day = models.FloatField()
+    units_left = models.IntegerField()
+
+    def __unicode__(self):
+        return u"%s for %s: %s à %s" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day)
+
+def storagelog_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.date = datetime.datetime.now()
+        instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
+        instance.units_left = instance.entry_row.units_left
+pre_save.connect(storagelog_pre_save, sender=StorageLog)
+
+admin.site.register(StorageLog)
