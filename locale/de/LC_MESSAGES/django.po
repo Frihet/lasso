@@ -1,0 +1,197 @@
+# German translation of Lasso
+# Copyright (C) 2010
+# This file is distributed under the same license as the Lasso package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-01 18:23+0200\n"
+"PO-Revision-Date: 2008-05-26 11:15+0200\n"
+"Last-Translator: Egil Möller <egil.moller@freecode.no>\n"
+"Language-Team: Lasso I18N <lasso@freecode.no>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Deutch\n"
+"X-Poedit-Country: SWITZERLAND\n"
+
+################################################################################
+msgid "Lasso_Customer"
+msgstr "Kunden"
+
+#------------------------------------------------------------------------------#
+msgid "Customers"
+msgstr "Kunden"
+
+msgid "customer"
+msgstr "Kunde"
+
+msgid "Customer"
+msgstr "Kunde"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Price per kilo per day"
+msgstr "Preis pro Kilo pro Tag"
+
+msgid "Price per kilo per entry"
+msgstr "Preis pro Kilo pro Einlagerung"
+
+msgid "Price per kilo per withdrawal"
+msgstr "Preis pro Kilo pro Auslagerung"
+
+msgid "Unit work pricess"
+msgstr "Referat Arbeit Preise"
+
+msgid "Work type"
+msgstr "Arbeit Type"
+
+msgid "Price per unit"
+msgstr "Preis pro Einheit"
+
+#------------------------------------------------------------------------------#
+msgid "Unit work types"
+msgstr "Referat Arbeit Typen"
+
+msgid "unit work type"
+msgstr "Referat Arbeit Type"
+
+msgid "Unit work type"
+msgstr "Referat Arbeit Type"
+
+################################################################################
+msgid "Lasso_Warehandling"
+msgstr "Güterumschlag"
+
+#------------------------------------------------------------------------------#
+msgid "Entrys"
+msgstr "Einlagerung"
+
+msgid "entry"
+msgstr "Einlagerung"
+
+msgid "Entry"
+msgstr "Einlagerung"
+
+msgid "Arrival date"
+msgstr "Eingangsdatum"
+
+msgid "Locations"
+msgstr "Palettenplätzen"
+
+msgid "Entry Rows"
+msgstr "Produkt einlagerung"
+
+msgid "Product description"
+msgstr "Artikelbezeichnung"
+
+msgid "Arrival temperature"
+msgstr "Temp. beim Eingang (°C)"
+
+msgid "Use before"
+msgstr "Haltbarkeitsdatum"
+
+msgid "Nett weight"
+msgstr "Gewicht netto"
+
+msgid "Gross weight"
+msgstr "Gewicht brutto"
+
+msgid "Uom"
+msgstr "Maßeinheiten"
+
+msgid "Units"
+msgstr "Einheiten"
+
+msgid "Units left"
+msgstr "Einheit Saldo"
+
+#------------------------------------------------------------------------------#
+msgid "Storage logs"
+msgstr "Lagerung Geschichte"
+
+msgid "storage log"
+msgstr "Lagerung Log-Eintrag"
+
+msgid "Storage log"
+msgstr "Lagerung Log-Eintrag"
+
+msgid "Entry row"
+msgstr "Produkt einlagerung"
+
+#------------------------------------------------------------------------------#
+msgid "Unit works"
+msgstr "Referat Arbeit"
+
+msgid "unit work"
+msgstr "Referat Arbeit"
+
+msgid "Unit work"
+msgstr "Referat Arbeit"
+
+msgid "Date"
+msgstr "Datum"
+
+#------------------------------------------------------------------------------#
+msgid "Withdrawals"
+msgstr "Auslagerung"
+
+msgid "withdrawal"
+msgstr "Auslagerung"
+
+msgid "Withdrawal"
+msgstr "Auslagerung"
+
+msgid "Withdrawal date"
+msgstr "Ausgangsdatum"
+
+msgid "Withdrawal rows"
+msgstr "Produkt auslagerung"
+
+################################################################################
+msgid "Lasso_Warehouse"
+msgstr "Lagerhaus"
+
+#------------------------------------------------------------------------------#
+msgid "Pallet spaces"
+msgstr "Palettenplätzen"
+
+msgid "pallet space"
+msgstr "Palettenplätze"
+
+msgid "Pallet space"
+msgstr "Palettenplätze"
+
+msgid "Size w"
+msgstr "Breite"
+
+msgid "Size h"
+msgstr "Höhe"
+
+msgid "Size d"
+msgstr "Tiefe"
+
+
+#------------------------------------------------------------------------------#
+msgid "Rows"
+msgstr "Regale"
+
+msgid "row"
+msgstr "Regal"
+
+msgid "Row"
+msgstr "Regal"
+
+#------------------------------------------------------------------------------#
+msgid "Warehouses"
+msgstr "Hallen"
+
+msgid "warehouse"
+msgstr "Halle"
+
+msgid "Warehouse"
+msgstr "Halle"
+
