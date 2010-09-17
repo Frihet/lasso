@@ -16,4 +16,6 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 
     (r'^rosetta/', include('rosetta.urls')),
+
+    (r'^i18n/', include('django.conf.urls.i18n')),
 )
