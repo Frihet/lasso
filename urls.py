@@ -18,4 +18,7 @@ urlpatterns = patterns('',
     (r'^rosetta/', include('rosetta.urls')),
 
     (r'^i18n/', include('django.conf.urls.i18n')),
+
+    (r'costlog/(?P<year>\d+)/(?P<month>\d+)', 'lasso.lasso_warehandling.views.costlog'),
+
 )

@@ -37,7 +37,27 @@ class EntryRow(models.Model):
     product_state = models.CharField(max_length=200)
     comment = models.TextField()
     arrival_temperature = models.FloatField()
-    
+
+    @property
+    def cost(self):
+        return self.gross_weight * self.entry.price_per_kilo_per_entry
+
+    @property
+    def nett_weight_per_unit(self):
+        return self.nett_weight / self.units
+
+    @property
+    def gross_weight_per_unit(self):
+        return self.gross_weight / self.units
+
+    @property
+    def nett_weight_left(self):
+        return self.nett_weight_per_unit * self.units_left
+
+    @property
+    def gross_weight_left(self):
+        return self.gross_weight_per_unit * self.units_left
+
     @property
     def id_str(self):
         return "%s.%s" % (self.entry.id, self.id)
@@ -80,6 +100,18 @@ class WithdrawalRow(models.Model):
     entry_row = models.ForeignKey(EntryRow)
     old_units = models.IntegerField()
     units = models.IntegerField()
+
+    @property
+    def cost(self):
+        return self.gross_weight * self.withdrawal.price_per_kilo_per_withdrawal
+
+    @property
+    def nett_weight(self):
+        return self.entry_row.nett_weight_per_unit * self.units
+
+    @property
+    def gross_weight(self):
+        return self.entry_row.gross_weight_per_unit * self.units
 
     @property
     def id_str(self):
@@ -126,6 +158,18 @@ class StorageLog(models.Model):
     date = models.DateField()
     price_per_kilo_per_day = models.FloatField()
     units_left = models.IntegerField()
+
+    @property
+    def cost(self):
+        return self.gross_weight_left * self.price_per_kilo_per_day
+
+    @property
+    def nett_weight_left(self):
+        return self.entry_row.nett_weight_per_unit * self.units_left
+
+    @property
+    def gross_weight_left(self):
+        return self.entry_row.gross_weight_per_unit * self.units_left
 
     def __unicode__(self):
         return u"%s for %s: %s à %s" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day)
