@@ -61,6 +61,11 @@ class EntryRow(models.Model):
     def id_str(self):
         return "%s.%s" % (self.entry.id, self.id)
 
+    def log(self):
+        if not list(StorageLog.objects.filter(entry_row = self, date = datetime.date.today())):
+            return StorageLog(entry_row = self).save()
+        return None
+
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
 
@@ -175,7 +180,7 @@ class StorageLog(models.Model):
 
 def storagelog_pre_save(sender, instance, **kwargs):
     if instance.id is None:
-        instance.date = datetime.datetime.now()
+        instance.date = datetime.date.today()
         instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
         instance.units_left = instance.entry_row.units_left
 pre_save.connect(storagelog_pre_save, sender=StorageLog)

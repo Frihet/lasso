@@ -60,10 +60,10 @@
 	      <td>{{ items_for_date.sum_in.units|separateminus:items_for_date.sum_out.units }}</td>
 	      <td>
 		{% for entry in items_for_date.entry_items.values %}
-		  <a href="{% url admin:lasso_warehandling_entry_change object_id=entry.entry.id %}">E:{{ entry.id_str }}</a>
+		  <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">E:{{ entry.id_str }}</a>
 		{% endfor %}
 		{% for entry in items_for_date.withdrawal_items.values %}
-		  <a href="{% url admin:lasso_warehandling_withdrawal_change object_id=entry.withdrawal.id %}">W:{{ entry.id_str }}</a>
+		  <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">W:{{ entry.id_str }}</a>
 		{% endfor %}
 	      </td>
 	      <td>{{ items_for_date.sum_in.cost|add:items_for_date.sum_out.cost }}</td>
