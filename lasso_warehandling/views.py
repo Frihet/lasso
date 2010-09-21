@@ -6,12 +6,21 @@ from django.shortcuts import *
 from django.contrib.admin.views.decorators import *
 from django import template
 from django.core.urlresolvers import *
+import datetime
 import calendar
 
 @staff_member_required
 def costlog(request, *arg, **kw):
     if request.GET:
         kw.update(dict(request.GET.items())) # This is required since request.GET is rather... magical
+        if 'year' in kw and not kw['year']: del kw['year']
+        if 'month' in kw and not kw['month']: del kw['month']
+        return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
+
+    if 'year' in kw and kw['year'] == '0':
+        today = datetime.date.today()
+        kw['year'] = today.year
+        kw['month'] = today.month
         return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
 
     info = kw
