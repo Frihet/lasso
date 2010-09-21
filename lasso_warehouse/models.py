@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib import admin
 from lasso.lasso_warehandling.models import *
 
 class Warehouse(models.Model):
@@ -7,7 +6,6 @@ class Warehouse(models.Model):
 
     def __unicode__(self):
         return self.name
-admin.site.register(Warehouse)
 
 class Row(models.Model):
     warehouse = models.ForeignKey(Warehouse)
@@ -15,7 +13,6 @@ class Row(models.Model):
 
     def __unicode__(self):
         return "%s in %s" % (self.name, self.warehouse.name)
-admin.site.register(Row)
 
 class PalletSpace(models.Model):
     row = models.ForeignKey(Row)
@@ -27,5 +24,3 @@ class PalletSpace(models.Model):
 
     def __unicode__(self):
         return "%s-%s in %s" % (self.row.name, self.name, self.row.warehouse.name)
-
-admin.site.register(PalletSpace)
