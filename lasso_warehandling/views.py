@@ -2,6 +2,7 @@
 
 from django.http import *
 from lasso.lasso_warehandling.models import *
+from lasso.lasso_customer.models import *
 from django.shortcuts import *
 from django.contrib.admin.views.decorators import *
 from django import template
@@ -9,12 +10,21 @@ from django.core.urlresolvers import *
 import datetime
 import calendar
 
+class CostlogForm(forms.Form):
+    year = forms.IntegerField(label="Year", required=False)
+    month = forms.IntegerField(label="Month", required=False)
+    customer = forms.ModelChoiceField(queryset = Customer.objects.all(), label="Customer", required=False)
+    entry = forms.ModelChoiceField(queryset = Entry.objects.all(), label="Entry", required=False)
+
 @staff_member_required
 def costlog(request, *arg, **kw):
     if request.GET:
-        kw.update(dict(request.GET.items())) # This is required since request.GET is rather... magical
-        if 'year' in kw and not kw['year']: del kw['year']
-        if 'month' in kw and not kw['month']: del kw['month']
+        for name, value in request.GET.items():
+            if value == '':
+                 if name in kw:
+                     del kw[name]
+            else:
+                kw[name] = value
         return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
 
     if 'year' in kw and kw['year'] == '0':
@@ -23,8 +33,9 @@ def costlog(request, *arg, **kw):
         kw['month'] = today.month
         return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
 
-    info = kw
-    info.update({'sum_in': {'units': 0,
+    info = dict(kw)
+    info.update({'config_form': CostlogForm(kw),
+                 'sum_in': {'units': 0,
                             'nett_weight':0,
                             'gross_weight':0,
                             'cost':0},
@@ -53,6 +64,16 @@ def costlog(request, *arg, **kw):
             storage_filter['date__month'] = kw['month']
             months = [int(kw['month'])]
          
+        if 'customer' in kw:
+            entry_filter['entry__customer__id'] = kw['customer']
+            withdrawal_filter['withdrawal__customer__id'] = kw['customer']
+            storage_filter['entry_row__entry__customer__id'] = kw['customer']
+
+        if 'entry' in kw:
+            entry_filter['entry__id'] = kw['entry']
+            withdrawal_filter['entry_row__entry__id'] = kw['entry']
+            storage_filter['entry_row__entry__id'] = kw['entry']
+
         for month in months:
             for day in xrange(1, calendar.monthrange(year, month)[1]+1):
                 info['dates'].append(datetime.date(year, month, day) )

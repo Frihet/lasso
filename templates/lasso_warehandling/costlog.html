@@ -30,8 +30,7 @@
 
 {% block content %}
   <form method="GET" action="{% url lasso_warehandling.views.costlog %}">
-    <label for="year">Year:</label> <input type="text" name="year" value="{{ year }}">
-    <label for="month">Month:</label> <input type="text" name="month" value="{{ month }}">
+    {{ config_form.as_p }}
     <input type="submit" value="{% trans "Go" %}">
   </form>
 
