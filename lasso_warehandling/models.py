@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from lasso.lasso_customer.models import *
-from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
 import datetime
@@ -180,5 +179,3 @@ def storagelog_pre_save(sender, instance, **kwargs):
         instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
         instance.units_left = instance.entry_row.units_left
 pre_save.connect(storagelog_pre_save, sender=StorageLog)
-
-admin.site.register(StorageLog)
