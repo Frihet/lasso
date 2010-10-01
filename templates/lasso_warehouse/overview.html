@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% load adminmedia %}
+{% load admin_list %}
+{% load i18n %}
+{% load i18next %}
+{% load datatypes %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/dashboard.css" />
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}lasso_warehouse/overview.css" />
+{% endblock %}
+
+{% block extrascript %}
+  {{ block.super }}
+  <script src="{% url lasso_warehouse.views.overview_js %}"></script>
+{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block bodyclass %}overview{% endblock %}
+
+{% if not is_popup %}
+  {% block breadcrumbs %}
+    <div class="breadcrumbs">
+      <a href="{% url admin:index %}">
+        {% trans "Home" %}
+      </a>
+       &rsaquo; 
+       <a href="{% url admin:app_list app_label="lasso_warehouse" %}">
+         {{ "Warehouse"|_ }}
+      </a>
+      &rsaquo; 
+      {{ "Storage overview"|_ }}
+    </div>
+  {% endblock %}
+{% endif %}
+
+{% block content_title %}<h1>{% trans "Storage overview" %}</h1>{% endblock %}
+
+{% block content %}
+  <object id="overview-image" data="{{ MEDIA_URL }}lasso_warehouse/overview.svg" type="image/svg+xml"/>
+{% endblock %}
