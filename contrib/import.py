@@ -32,6 +32,37 @@ for filename in filewalk('./'):
             customers[customer_id] = {'entries': {}, 'withdrawals':{}}
 
     if entry_re.search(filename):
+        header_transform = {"Warenwert": "product_value",
+                            "Produkte Nr.": "product_nr",
+                            "Temp. beim Eingang": "arrival_temperature",
+                            "Äusseres Aussehen": "product_state",
+                            #"Karton à ": "",
+                            #"AP/ KG": "",
+                            "Verzollungsdatum": "custom_handling_date",
+                            "Firma": "customer",
+                            "Gewicht netto": "nett_weight",
+                            "Gewicht brutto": "gross_weight",
+                            "Artikelbezeichnung": "product_description",
+                            "Anzahl Karton": "units",
+                            "Eingangsdatum": "arrival_date",
+                            "Bemerkung zu Mängel": "comment",
+                            "Haltbarkeitsdatum": "use_before",
+                            "Lieferant": "transporter",
+                            "Zollquittungs Nr.": "customs_receipt_nr",
+                            "Zeugnis Nr.": "customs_testimony_nr"}
+        month_transform = {"Januar": 1,
+                           "Februar": 2,
+                           "März": 3,
+                           "April": 4,
+                           "Mai": 5,
+                           "Juni": 6,
+                           "Juli": 7,
+                           "August": 8,
+                           "September": 9,
+                           "Oktober": 10,
+                           "November": 11,
+                           "Dezember": 12}
+
         f = csv.reader(open(filename), dialect="excel")
 
         # Read header:
@@ -49,11 +80,16 @@ for filename in filewalk('./'):
                     header[row[0]] = row[3]
                 elif row[2] == 'Lager Nr.:':
                     header['entry_id'] = "%s-%s" % (row[6][1:], row[4]) # Ignoring company id row[7]
+                    if '.' not in header['entry_id']:
+                        header['entry_id'] += '.00'
                 elif row[0] != '':
                     value = row[3]
                     if row[0].endswith('datum'):
                         value = value_to_date(value)
-                    header[row[0]] = value
+                    name = row[0]
+                    if name in header_transform:
+                        name = header_transform[name]
+                        header[name] = value
             elif mode[-1] == 'comment':
                 if row[3] == '':
                     del mode[-1]
@@ -61,22 +97,37 @@ for filename in filewalk('./'):
                     header['Bemerkung'] += '\n' + row[3]
             elif mode[-1] == 'months':
                 if row[0] == 'Monat:':
-                    month = row[1]
+                    month = month_transform[row[1].strip()]
                     months[month] = {}
                     mode.append('month')
             elif mode[-1] == 'month':
                 if row[0] == 'Auslagerung':
                     del mode[-1]
                 elif row[0] == 'Ein- und Auslagerung:':
-                    months[month]['entry_price'] = row[3]
+                    assert 'price_per_kilo_per_entry' not in header
+                    header['price_per_kilo_per_entry'] = row[3]
                 elif row[0] == 'Lagergeld:':
                     months[month]['storage_price'] = row[3]
-        if header['Firma']:
+        if header['customer']:
             if 'name' not in customers[customer_id]:
-                customers[customer_id]['name'] = header['Firma'].split(',')[0]
+                customers[customer_id]['name'] = header['customer'].split(',')[0]
             if 'address' not in customers[customer_id]:
-                customers[customer_id]['address'] = header['Firma'].replace(',', '\n')
-        customers[customer_id]['entries'][header['entry_id']] = {'header': header, 'months': months}
+                customers[customer_id]['address'] = header['customer'].replace(',', '\n')
+        entry_id, entry_row_id = header['entry_id'].split('.')
+        if entry_id not in customers[customer_id]['entries']:
+            customers[customer_id]['entries'][entry_id] = {'header': {}, 'rows': {}}
+        entry = customers[customer_id]['entries'][entry_id]
+        if 'price_per_kilo_per_entry' in entry['header']:
+            assert entry['header']['price_per_kilo_per_entry'] == header['price_per_kilo_per_entry']
+        elif header.get('price_per_kilo_per_entry', '') != "":
+            entry['header']['price_per_kilo_per_entry'] = header['price_per_kilo_per_entry']
+        del header['price_per_kilo_per_entry']
+        if 'arrival_date' in entry['header']:
+            assert entry['header']['arrival_date'] == header['arrival_date']
+        elif header.get('arrival_date', '') != "":
+            entry['header']['arrival_date'] = header['arrival_date']
+        del header['arrival_date']
+        entry['rows'][entry_row_id] = {'header': header, 'months': months}
 
     elif withdrawal_re.search(filename):
         f = list(csv.reader(open(filename), dialect="excel"))
@@ -119,7 +170,7 @@ for filename in filewalk('./'):
             if f[row_nr][0] == '':
                 break
             row = {}
-            row['entry_row_id'] = f[row_nr][0]
+            row['entry_row_id'] = "%s-%s" % (header['arrival_date'].year, f[row_nr][0])
             row['units'] = f[row_nr][7]
             row['origin'] = f[row_nr][6]
             rows.append(row)
@@ -129,6 +180,22 @@ for filename in filewalk('./'):
         if header['customer_address']:
             customers[customer_id]['address'] = header['customer_address']
         customers[customer_id]['withdrawals'][header['withdrawal_id']] = {'header': header, 'rows': rows}
+
+
+# More integrity checks and intra-structure mangling:
+
+for name, customer in customers.iteritems():
+    for withdrawal_id, withdrawal in customer['withdrawals'].iteritems():
+        for row in withdrawal['rows']:
+            entry_id, entry_row_id = row['entry_row_id'].split('.')
+            assert entry_id in customer['entries']
+            assert entry_row_id in customer['entries'][entry_id]['rows']
+            entry_row = customer['entries'][entry_id]['rows'][entry_row_id]
+            if 'origin' in entry_row['header']:
+                assert entry_row['header']['origin'] == row['origin']
+            else:
+                entry_row['header']['origin'] = row['origin']
+            del row['origin']
 
 for name, customer in customers.iteritems():
     print "%s" % (name,)
@@ -143,16 +210,23 @@ for name, customer in customers.iteritems():
         print "        %s" % (entry_id,)
         
 #        continue
-
         for name, value in entry['header'].iteritems():
-            print "            %s: %s" % (name, str(value).replace('\n', '\n                    '))
-
+            print "            %s: %s" % (name, str(value).replace('\n', '\n                        '))
+        
         print
 
-        for month_name, values in entry['months'].iteritems():
-           print "            %s" % (month_name,)
-           for name, value in values.iteritems():
-               print "                %s: %s" % (name, str(value).replace('\n', '\n                    '))
+        for entry_row_id, entry_row in entry['rows'].iteritems():
+            print "            %s" % (entry_row_id,)
+
+            for name, value in entry_row['header'].iteritems():
+                print "                %s: %s" % (name, str(value).replace('\n', '\n                        '))
+
+            print
+
+            for month_name, values in entry_row['months'].iteritems():
+               print "                %s" % (month_name,)
+               for name, value in values.iteritems():
+                   print "                    %s: %s" % (name, str(value).replace('\n', '\n                        '))
 
     print "    Withdrawals"
     for withdrawal_id, withdrawal in customer['withdrawals'].iteritems():

@@ -29,13 +29,15 @@ class EntryRow(models.Model):
     units_left = models.IntegerField()
     nett_weight = models.FloatField()
     gross_weight = models.FloatField()
-    product_value= models.FloatField()
+    product_value = models.FloatField()
 
     use_before = models.DateField()
     product_description = models.CharField(max_length=400)
     product_state = models.CharField(max_length=200)
     comment = models.TextField()
     arrival_temperature = models.FloatField()
+
+    origin = models.CharField(max_length=200)
 
     @property
     def cost(self):
