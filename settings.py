@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'lasso.lasso_warehouse',
     'lasso.lasso_customer',
     'lasso.lasso_warehandling',
+    'lasso.lasso_import',
     'lasso.i18next',
     'django.contrib.admin',
     'django.contrib.auth',
