@@ -51,7 +51,8 @@ class EntryAdmin(admin.ModelAdmin):
     date_hierarchy = 'arrival_date'
     exclude = ('price_per_kilo_per_entry',)
     form = EntryAdminForm
-
+    list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
+    
 admin.site.register(Entry, EntryAdmin)
 
 
@@ -63,6 +64,7 @@ class WithdrawalAdmin(admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
     exclude = ('price_per_kilo_per_withdrawal',)
+    list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
 
 admin.site.register(Withdrawal, WithdrawalAdmin)
 

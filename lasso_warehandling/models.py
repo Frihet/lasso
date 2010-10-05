@@ -9,6 +9,35 @@ class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
     price_per_kilo_per_entry = models.FloatField(blank=True)
+
+    @property
+    def nett_weight(self):
+        return sum([row.nett_weight for row in self.rows.all()])
+
+    @property
+    def gross_weight(self):
+        return sum([row.gross_weight for row in self.rows.all()])
+
+    @property
+    def nett_weight_left(self):
+        return sum([row.nett_weight_left for row in self.rows.all()])
+
+    @property
+    def gross_weight_left(self):
+        return sum([row.gross_weight_left for row in self.rows.all()])
+
+    @property
+    def product_value(self):
+        return sum([row.product_value for row in self.rows.all() if row.product_value])
+
+    @property
+    def product_value_left(self):
+        return sum([row.product_value_left for row in self.rows.all() if row.product_value_left])
+
+    @property
+    def product_description(self):
+        return '; '.join(["%s %s %s" % (row.units, row.uom, row.product_description) for row in self.rows.all() if row.product_description])
+
     def __unicode__(self):
         return u"%s @ %s for %s" % (self.id, self.arrival_date, self.customer)
 
@@ -18,7 +47,7 @@ def entry_pre_save(sender, instance, **kwargs):
 pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
-    entry = models.ForeignKey(Entry)
+    entry = models.ForeignKey(Entry, related_name="rows")
     custom_handling_date = models.DateField(null=True, blank=True)
     customs_receipt_nr = models.CharField(max_length=200, blank=True)
     customs_testimony_nr = models.CharField(max_length=200, blank=True)
@@ -52,12 +81,22 @@ class EntryRow(models.Model):
         return self.gross_weight / self.units
 
     @property
+    def product_value_per_unit(self):
+        if self.product_value is None: return None
+        return self.product_value / self.units
+
+    @property
     def nett_weight_left(self):
         return self.nett_weight_per_unit * self.units_left
 
     @property
     def gross_weight_left(self):
         return self.gross_weight_per_unit * self.units_left
+
+    @property
+    def product_value_left(self):
+        if self.product_value_per_unit is None: return None
+        return self.product_value_per_unit * self.units_left
 
     @property
     def id_str(self):
@@ -97,6 +136,18 @@ class Withdrawal(models.Model):
     transporter = models.CharField(max_length=200, blank=True)
     comment = models.TextField(null=True, blank=True)
 
+    @property
+    def nett_weight(self):
+        return sum([row.nett_weight for row in self.rows.all()])
+
+    @property
+    def gross_weight(self):
+        return sum([row.gross_weight for row in self.rows.all()])
+
+    @property
+    def product_description(self):
+        return '; '.join(["%s %s %s" % (row.units, row.entry_row.uom, row.entry_row.product_description) for row in self.rows.all() if row.entry_row.product_description])
+
     def __unicode__(self):
         return u"%s @ %s" % (self.id, self.withdrawal_date)
 
@@ -106,8 +157,8 @@ def withdrawal_pre_save(sender, instance, **kwargs):
 pre_save.connect(withdrawal_pre_save, sender=Withdrawal)
 
 class WithdrawalRow(models.Model):
-    withdrawal = models.ForeignKey(Withdrawal)
-    entry_row = models.ForeignKey(EntryRow)
+    withdrawal = models.ForeignKey(Withdrawal, related_name="rows")
+    entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows")
     old_units = models.IntegerField(blank=True)
     units = models.IntegerField()
 
