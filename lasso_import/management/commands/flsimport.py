@@ -38,18 +38,6 @@ class Command(BaseCommand):
 
 	customers = {}
 
-	def value_to_date(value):
-	    try:
-		if '/' in value:
-		    parts = [int(x) for x in value.strip().split('/')]
-		    return datetime.date(parts[2], parts[0], parts[1])
-		else:
-		    # Don't ask me why; but this is how date formatting works in XLS documents...
-		    return datetime.date(1899, 12, 30) + datetime.timedelta(int(value.strip()), 0, 0)
-	    except:
-		# Ok, no number neither, so ignore it!
-		return None
-
 	errors = []
 	
         def signal_error(msg, etype='generic'):
@@ -82,12 +70,56 @@ class Command(BaseCommand):
 
         def obj_from_dict(model, dct):
             obj = model()
-            if 'header' in dct:
-                dct = dct['header']
-            for key, value in dct.iteritems():
+            header = dct
+            if 'header' in header:
+                header = header['header']
+            for key, value in header.iteritems():
                 setattr(obj, key, value)
             dct['obj'] = obj
             return obj
+
+	def value_to_date(value):
+            value = value.strip()
+            if value in ("", "x", "X"): return None
+	    try:
+		if '/' in value:
+		    parts = [int(x) for x in value.strip().split('/')]
+		    return datetime.date(parts[2], parts[0], parts[1])
+		else:
+		    # Don't ask me why; but this is how date formatting works in XLS documents...
+		    return datetime.date(1899, 12, 30) + datetime.timedelta(int(value.strip()), 0, 0)
+	    except:
+                signal_error("'%s' is not a date" % (value,), "valueformat")
+		return None
+
+	def value_to_int(value):
+            value = value.strip()
+            if value in ("", "x", "X"): return None
+	    try:
+                return int(value)
+	    except:
+                signal_error("'%s' is not an integer" % (value,), "valueformat")
+		return None
+
+	def value_to_float(origvalue):
+            value = origvalue.strip()
+            if value in ("", "x", "X"): return None
+            value = value.replace(" ", "").replace("°", ".").replace(",", ".").replace("'", "")
+            if value.startswith("ca."):
+                value = value[3:]
+            if value.startswith("CHF"):
+                value = value[3:]
+            if value.startswith("Minus"):
+                value = "-" + value[5:]
+            if value.endswith("C"):
+                value = value[:-1]
+            if value.endswith("."):
+                value = value[:-1]
+	    try:
+                return float(value)
+	    except:
+                signal_error("'%s' is not a float" % (origvalue,), "valueformat")
+		return None
 
 	for filename in filewalk('./'):
 	    if entry_re.search(filename) or withdrawal_re.search(filename):
@@ -96,24 +128,24 @@ class Command(BaseCommand):
 		    customers[customer_id] = {'header': {}, 'entries': {}, 'withdrawals':{}}
 
 	    if entry_re.search(filename):
-		header_transform = {"Warenwert": "product_value",
-				    "Produkte Nr.": "product_nr",
-				    "Temp. beim Eingang": "arrival_temperature",
-				    "Äusseres Aussehen": "product_state",
-				    #"Karton à ": "",
-				    #"AP/ KG": "",
-				    "Verzollungsdatum": "custom_handling_date",
-				    "Firma": "customer",
-				    "Gewicht netto": "nett_weight",
-				    "Gewicht brutto": "gross_weight",
-				    "Artikelbezeichnung": "product_description",
-				    "Anzahl Karton": "units",
-				    "Eingangsdatum": "arrival_date",
-				    "Bemerkung zu Mängel": "comment",
-				    "Haltbarkeitsdatum": "use_before",
-				    "Lieferant": "transporter",
-				    "Zollquittungs Nr.": "customs_receipt_nr",
-				    "Zeugnis Nr.": "customs_testimony_nr"}
+		header_transform = {"Warenwert": ("product_value", value_to_float),
+				    "Produkte Nr.": ("product_nr", str),
+				    "Temp. beim Eingang": ("arrival_temperature", value_to_float),
+				    "Äusseres Aussehen": ("product_state", str),
+				    #"Karton à ": ("", str),
+				    #"AP/ KG": ("", str),
+				    "Verzollungsdatum": ("custom_handling_date", value_to_date),
+				    "Firma": ("customer", str),
+				    "Gewicht netto": ("nett_weight", value_to_float),
+				    "Gewicht brutto": ("gross_weight", value_to_float),
+				    "Artikelbezeichnung": ("product_description", str),
+				    "Anzahl Karton": ("units", value_to_int),
+				    "Eingangsdatum": ("arrival_date", value_to_date),
+				    "Bemerkung zu Mängel": ("comment", str),
+				    "Haltbarkeitsdatum": ("use_before", value_to_date),
+				    "Lieferant": ("transporter", str),
+				    "Zollquittungs Nr.": ("customs_receipt_nr", str),
+				    "Zeugnis Nr.": ("customs_testimony_nr", str)}
 		month_transform = {"Januar": 1,
 				   "Februar": 2,
 				   "März": 3,
@@ -147,13 +179,10 @@ class Command(BaseCommand):
 			    if '.' not in header['entry_id']:
 				header['entry_id'] += '.00'
 			elif row[0] != '':
-			    value = row[3]
-			    if row[0].endswith('datum'):
-				value = value_to_date(value)
 			    name = row[0]
 			    if name in header_transform:
-				name = header_transform[name]
-				header[name] = value
+				name, t = header_transform[name]
+				header[name] = t(row[3])
 		    elif mode[-1] == 'comment':
 			if row[3] == '':
 			    del mode[-1]
@@ -171,16 +200,17 @@ class Command(BaseCommand):
 			    mergeset(header, 'price_per_kilo_per_entry', row[3])
 			elif row[0] == 'Lagergeld:':
 			    months[month]['price_per_kilo_per_day'] = row[3]
-		if header['customer']:
-		    mergeset(customers[customer_id]['header'], 'name', header['customer'].split(',')[0].strip())
-		    mergeset(customers[customer_id]['header'], 'address', '\n'.join(item.strip() for item in header['customer'].split(',')))
-		entry_id, entry_row_id = header['entry_id'].split('.')
-		if entry_id not in customers[customer_id]['entries']:
-		    customers[customer_id]['entries'][entry_id] = {'header': {}, 'rows': {}}
-		entry = customers[customer_id]['entries'][entry_id]
-		movemerge(header, 'price_per_kilo_per_entry', entry['header'], 'price_per_kilo_per_entry')
-		movemerge(header, 'arrival_date', entry['header'], 'arrival_date')
-		entry['rows'][entry_row_id] = {'header': header, 'months': months}
+                if header['units'] != None:
+                    if header['customer']:
+                        mergeset(customers[customer_id]['header'], 'name', header['customer'].split(',')[0].strip())
+                        mergeset(customers[customer_id]['header'], 'address', '\n'.join(item.strip() for item in header['customer'].split(',')))
+                    entry_id, entry_row_id = header['entry_id'].split('.')
+                    if entry_id not in customers[customer_id]['entries']:
+                        customers[customer_id]['entries'][entry_id] = {'header': {}, 'rows': {}}
+                    entry = customers[customer_id]['entries'][entry_id]
+                    movemerge(header, 'price_per_kilo_per_entry', entry['header'], 'price_per_kilo_per_entry')
+                    movemerge(header, 'arrival_date', entry['header'], 'arrival_date')
+                    entry['rows'][entry_row_id] = {'header': header, 'months': months}
 
 	    elif withdrawal_re.search(filename):
 		f = list(csv.reader(open(filename), dialect="excel"))
@@ -224,7 +254,7 @@ class Command(BaseCommand):
 			break
 		    row = {}
 		    row['entry_row_id'] = "%s-%s" % (header['arrival_date'].year, f[row_nr][0])
-		    row['units'] = f[row_nr][7]
+		    row['units'] = value_to_int(f[row_nr][7])
 		    row['origin'] = f[row_nr][6]
 		    rows.append(row)
 
@@ -243,6 +273,7 @@ class Command(BaseCommand):
             last_price_per_kilo_per_entry_date = None
             last_price_per_kilo_per_entry = 0.0
             for entry_id, entry in customer['entries'].iteritems():
+                assert_integrity('arrival_date' in entry['header'], "Arrival date not in entry %s for %s" % (entry_id, name))
                 if ('price_per_kilo_per_entry' in entry['header']
                     and (last_price_per_kilo_per_entry_date is None
                          or (    'arrival_date' in entry['header']
