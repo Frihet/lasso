@@ -52,6 +52,7 @@ class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     exclude = ('price_per_kilo_per_entry',)
     form = EntryAdminForm
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
+    search_fields = ('customer__name', 'arrival_date', 'rows__product_description')
     owner_field = "customer"
 
 admin.site.register(Entry, EntryAdmin)
@@ -66,6 +67,7 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     date_hierarchy = 'withdrawal_date'
     exclude = ('price_per_kilo_per_withdrawal',)
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
+    search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
     owner_field = "customer"
 
 admin.site.register(Withdrawal, WithdrawalAdmin)

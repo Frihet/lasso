@@ -14,5 +14,6 @@ class UnitWorkPricesInline(admin.TabularInline):
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [UnitWorkPricesInline,]
     exclude = ('username', 'first_name', 'last_name', 'is_superuser','user_permissions', 'last_login', 'date_joined', 'is_staff')
+    search_fields = ('name',)
 
 admin.site.register(Customer, CustomerAdmin)
