@@ -228,6 +228,11 @@ class StorageLog(models.Model):
     price_per_kilo_per_day = models.FloatField()
     units_left = models.IntegerField()
 
+
+    class Meta:
+        permissions = (("view_storagelog", "View"),
+                       ("view_own_storagelog", "View own"))
+
     @property
     def cost(self):
         return self.gross_weight_left * self.price_per_kilo_per_day

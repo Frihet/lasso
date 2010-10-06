@@ -66,6 +66,7 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     date_hierarchy = 'withdrawal_date'
     exclude = ('price_per_kilo_per_withdrawal',)
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
+    owner_field = "customer"
 
 admin.site.register(Withdrawal, WithdrawalAdmin)
 
