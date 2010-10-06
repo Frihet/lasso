@@ -10,6 +10,10 @@ class Entry(models.Model):
     arrival_date = models.DateField()
     price_per_kilo_per_entry = models.FloatField(blank=True)
 
+    class Meta:
+        permissions = (("view_entry", "View"),
+                       ("view_own_entry", "View own"))
+
     @property
     def nett_weight(self):
         return sum([row.nett_weight for row in self.rows.all()])
@@ -135,6 +139,10 @@ class Withdrawal(models.Model):
     opening_hours = models.CharField(max_length=200, blank=True)
     transporter = models.CharField(max_length=200, blank=True)
     comment = models.TextField(null=True, blank=True)
+
+    class Meta:
+        permissions = (("view_withdrawal", "View"),
+                       ("view_own_withdrawal", "View own"))
 
     @property
     def nett_weight(self):

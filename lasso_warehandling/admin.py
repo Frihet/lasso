@@ -6,6 +6,7 @@ from lasso.lasso_customer.models import *
 from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
+from extendable_permissions import *
 
 class EntryRowInline(admin.StackedInline):
     model = EntryRow
@@ -45,14 +46,14 @@ class EntryAdminForm(forms.ModelForm):
 
     save.alters_data = True
 
-
-class EntryAdmin(admin.ModelAdmin):
+class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [EntryRowInline,]
     date_hierarchy = 'arrival_date'
     exclude = ('price_per_kilo_per_entry',)
     form = EntryAdminForm
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
-    
+    owner_field = "customer"
+
 admin.site.register(Entry, EntryAdmin)
 
 
@@ -60,7 +61,7 @@ class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow
     exclude = ('old_units',)
 
-class WithdrawalAdmin(admin.ModelAdmin):
+class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
     exclude = ('price_per_kilo_per_withdrawal',)
