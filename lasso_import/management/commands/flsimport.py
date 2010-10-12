@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
+from lasso.utils import *
 
 class Command(BaseCommand):
     args = ''
@@ -325,21 +327,48 @@ class Command(BaseCommand):
                         entry_row_obj.entry = entry_obj
                         entry_row_obj.save()
 
+                        entry_row['next_storagelog'] = entry['header']['arrival_date']
+
 			#for month_name, values in entry_row['months'].iteritems():
                         #    for name, value in values.iteritems():
                         #        pass
 
-		for withdrawal_id, withdrawal in customer['withdrawals'].iteritems():
+                withdrawals =  customer['withdrawals'].values()
+                withdrawals.sort(lambda a, b: cmp(a['header']['withdrawal_date'], b['header']['withdrawal_date']))
+
+		for withdrawal in withdrawals:
                     withdrawal_obj = obj_from_dict(lasso.lasso_warehandling.models.Withdrawal, withdrawal)
                     withdrawal_obj.customer = customer_obj
                     withdrawal_obj.save()
 
 		    for withdrawal_row in withdrawal['rows']:
+                        entry_id, entry_row_id = withdrawal_row['entry_row_id'].split('.')
+                        entry = customer['entries'][entry_id]
+                        entry_row = entry['rows'][entry_row_id]
+
                         withdrawal_row_obj = obj_from_dict(lasso.lasso_warehandling.models.WithdrawalRow, withdrawal_row)
                         withdrawal_row_obj.withdrawal = withdrawal_obj
-                        entry_id, entry_row_id = withdrawal_row['entry_row_id'].split('.')
-                        withdrawal_row_obj.entry_row = customer['entries'][entry_id]['rows'][entry_row_id]['obj']
+                        withdrawal_row_obj.entry_row = entry_row['obj']
                         withdrawal_row_obj.save()
+                        
+                        for storage_date in xdaterange(entry_row['next_storagelog'], withdrawal_obj.withdrawal_date + datetime.timedelta(1)):
+                            log_item = lasso.lasso_warehandling.models.StorageLog()
+                            log_item.date = storage_date
+                            log_item.entry_row = entry_row['obj']
+                            log_item.price_per_kilo_per_day = entry_row['months'][storage_date.month]['price_per_kilo_per_day']
+                            log_item.save()
+                        entry_row['next_storagelog'] = withdrawal_obj.withdrawal_date + datetime.timedelta(1)
+
+		for entry_id, entry in customer['entries'].iteritems():
+		    for entry_row_id, entry_row in entry['rows'].iteritems():
+                        tomorrow =  datetime.date.today() + datetime.timedelta(1)
+                        for storage_date in xdaterange(entry_row['next_storagelog'], tomorrow):
+                            log_item = lasso.lasso_warehandling.models.StorageLog()
+                            log_item.date = storage_date
+                            log_item.entry_row = entry_row['obj']
+                            log_item.price_per_kilo_per_day = entry_row['months'][storage_date.month]['price_per_kilo_per_day']
+                            log_item.save()
+                        entry_row['next_storagelog'] = tomorrow
 
 	else:
 	    for name, customer in customers.iteritems():
