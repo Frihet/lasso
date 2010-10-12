@@ -4,6 +4,7 @@ from lasso.lasso_customer.models import *
 from django.db.models.signals import *
 from django import forms
 import datetime
+from lasso.utils import *
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
@@ -106,10 +107,42 @@ class EntryRow(models.Model):
     def id_str(self):
         return "%s.%s" % (self.entry.id, self.id)
 
-    def log(self):
-        if not list(StorageLog.objects.filter(entry_row = self, date = datetime.date.today())):
-            return StorageLog(entry_row = self).save()
-        return None
+    def log(self, until = None):
+        # Note: Don't log today until tomorrow, stuff might be added afterwards!
+        # Units left doesn't change until the day after a withdrawal, but on the same day for an entry!
+
+        if until is None: until = datetime.date.today()
+
+        log_items = []
+
+        try:
+            last_log = StorageLog.objects.filter(entry_row = self).order_by("-date")[0]
+            units_left = last_log.units_left
+            last_date = last_log.date + datetime.timedelta(1)
+        except IndexError:
+            last_date = entry_row.entry.arrival_date
+            units_left = entry_row.units
+
+        steps = [(withdrawal.withdrawal_date + datetime.timedelta(1), withdrawal.units)
+                       for withdrawal in WithdrawalRow.objects.filter(entry_row = self,
+                                                                      withdrawal__withdrawal_date__gte = last_date,
+                                                                      withdrawal__withdrawal_date__lt = until
+                                                                      ).order_by("withdrawal__withdrawal_date")]
+        steps += [(until, 0)]
+
+        for (next_date, units) in steps:
+            for storage_date in xdaterange(last_date, next_date):
+                log_item = lasso.lasso_warehandling.models.StorageLog()
+                log_item.units_left = units_left
+                log_item.date = storage_date
+                log_item.entry_row = self
+                log_item.price_per_kilo_per_day = self.entry.customer.price_per_kilo_per_day
+                log_item.save()
+                log_items.append(log_item)
+            last_date = next_date
+            units_left -= units
+
+        return log_items
 
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
@@ -249,8 +282,7 @@ class StorageLog(models.Model):
         return u"%s for %s: %s à %s" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day)
 
 def storagelog_pre_save(sender, instance, **kwargs):
-    if instance.id is None:
-        instance.date = datetime.date.today()
-        instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
-        instance.units_left = instance.entry_row.units_left
+    if getattr(instance, 'date', None) is None: instance.date = datetime.date.today()
+    if getattr(instance, 'price_per_kilo_per_day', None) is None: instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
+    if getattr(instance, 'units_left', None) is None: instance.units_left = instance.entry_row.units_left
 pre_save.connect(storagelog_pre_save, sender=StorageLog)
