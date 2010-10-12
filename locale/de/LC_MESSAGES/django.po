@@ -1,27 +1,26 @@
 # German translation of Lasso
 # Copyright (C) 2010
 # This file is distributed under the same license as the Lasso package.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-01 18:23+0200\n"
-"PO-Revision-Date: 2008-05-26 11:15+0200\n"
-"Last-Translator: Egil Möller <egil.moller@freecode.no>\n"
+"PO-Revision-Date: 2010-09-22 16:56\n"
+"Last-Translator: <admin@admin.com>\n"
 "Language-Team: Lasso I18N <lasso@freecode.no>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Translated-Using: django-rosetta 0.5.6\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Language: Deutch\n"
 "X-Poedit-Country: SWITZERLAND\n"
 
-################################################################################
 msgid "Lasso_Customer"
 msgstr "Kunden"
 
-#------------------------------------------------------------------------------#
 msgid "Customers"
 msgstr "Kunden"
 
@@ -35,38 +34,35 @@ msgid "Name"
 msgstr "Name"
 
 msgid "Price per kilo per day"
-msgstr "Preis pro Kilo pro Tag"
+msgstr "Preis pro Kilo und Tag"
 
 msgid "Price per kilo per entry"
-msgstr "Preis pro Kilo pro Einlagerung"
+msgstr "Preis pro Kilo und Einlagerung"
 
 msgid "Price per kilo per withdrawal"
-msgstr "Preis pro Kilo pro Auslagerung"
+msgstr "Preis pro Kilo und Auslagerung"
 
 msgid "Unit work pricess"
-msgstr "Referat Arbeit Preise"
+msgstr "Preis pro Leistung"
 
 msgid "Work type"
-msgstr "Arbeit Type"
+msgstr "Leistung"
 
 msgid "Price per unit"
 msgstr "Preis pro Einheit"
 
-#------------------------------------------------------------------------------#
 msgid "Unit work types"
-msgstr "Referat Arbeit Typen"
+msgstr "Leistungsarten"
 
 msgid "unit work type"
-msgstr "Referat Arbeit Type"
+msgstr "Leistungsart"
 
 msgid "Unit work type"
-msgstr "Referat Arbeit Type"
+msgstr "Leistungsart"
 
-################################################################################
 msgid "Lasso_Warehandling"
 msgstr "Güterumschlag"
 
-#------------------------------------------------------------------------------#
 msgid "Entrys"
 msgstr "Einlagerung"
 
@@ -80,37 +76,37 @@ msgid "Arrival date"
 msgstr "Eingangsdatum"
 
 msgid "Locations"
-msgstr "Palettenplätzen"
+msgstr "Position"
 
 msgid "Entry Rows"
-msgstr "Produkt einlagerung"
+msgstr "Produkteingang"
 
 msgid "Entry Row"
-msgstr "Produkt einlagerung"
+msgstr "Produkteingang"
 
 msgid "Custom handling date"
 msgstr "Verzollungsdatum"
 
 msgid "Customs receipt nr"
-msgstr "Zollquittungs Nr."
+msgstr "Zollquittungsnr."
 
 msgid "Customs testimony nr"
-msgstr "Zeugnis Nr."
+msgstr "Zeugnisnr."
 
 msgid "Transporter"
 msgstr "Lieferant"
 
 msgid "Product nr"
-msgstr "Produkte Nr."
+msgstr "Produktenr."
 
 msgid "Uom"
-msgstr "Maßeinheiten"
+msgstr "Masseinheite"
 
 msgid "Units"
-msgstr "Einheiten"
+msgstr "Anzahl / Menge"
 
 msgid "Units left"
-msgstr "Einheit Saldo"
+msgstr "Anzahl / Menge (Saldo)"
 
 msgid "Nett weight"
 msgstr "Gewicht netto"
@@ -133,35 +129,32 @@ msgstr "Äusseres Aussehen"
 msgid "Arrival temperature"
 msgstr "Temp. beim Eingang (°C)"
 
-#------------------------------------------------------------------------------#
 msgid "Storage logs"
-msgstr "Lagerung Geschichte"
+msgstr "Lagerung Logeinträge"
 
 msgid "storage log"
-msgstr "Lagerung Log-Eintrag"
+msgstr "Lagerung Logeintrag"
 
 msgid "Storage log"
-msgstr "Lagerung Log-Eintrag"
+msgstr "Lagerung Logeintrag"
 
 msgid "Entry row"
-msgstr "Produkt einlagerung"
+msgstr "Produkteingang"
 
-#------------------------------------------------------------------------------#
 msgid "Unit works"
-msgstr "Referat Arbeit"
+msgstr "Leistungen"
 
 msgid "unit work"
-msgstr "Referat Arbeit"
+msgstr "Leistung"
 
 msgid "Unit work"
-msgstr "Referat Arbeit"
+msgstr "Leistung"
 
 msgid "Date"
 msgstr "Datum"
 
-#------------------------------------------------------------------------------#
 msgid "Withdrawals"
-msgstr "Auslagerung"
+msgstr "Auslagerungen"
 
 msgid "withdrawal"
 msgstr "Auslagerung"
@@ -169,15 +162,14 @@ msgstr "Auslagerung"
 msgid "Withdrawal"
 msgstr "Auslagerung"
 
-
 msgid "Withdrawal rows"
-msgstr "Produkt auslagerung"
+msgstr "Produktausgang"
 
 msgid "Reference nr"
-msgstr "Referenz"
+msgstr "Referenznr"
 
 msgid "Responsible"
-msgstr "Zustandig"
+msgstr "Zuständig"
 
 msgid "Place of departure"
 msgstr "Abgangsort"
@@ -186,13 +178,13 @@ msgid "Insurance"
 msgstr "Versicherung"
 
 msgid "Transport condition"
-msgstr "Kondition"
+msgstr "Transportkonditionen"
 
 msgid "Transport nr"
-msgstr "Liefershein Nr."
+msgstr "Lieferscheinnr."
 
 msgid "Order nr"
-msgstr "Bestell-Nr."
+msgstr "Bestellnr."
 
 msgid "Destination address"
 msgstr "Zieladresse"
@@ -206,20 +198,17 @@ msgstr "Transportmittel"
 msgid "Opening hours"
 msgstr "Öffnungzseiten"
 
-
-################################################################################
 msgid "Lasso_Warehouse"
-msgstr "Lagerhaus"
+msgstr "Lager"
 
-#------------------------------------------------------------------------------#
 msgid "Pallet spaces"
-msgstr "Palettenplätzen"
+msgstr "Palettenplätze"
 
 msgid "pallet space"
-msgstr "Palettenplätze"
+msgstr "Palettenplatz"
 
 msgid "Pallet space"
-msgstr "Palettenplätze"
+msgstr "Palettenplatz"
 
 msgid "Size w"
 msgstr "Breite"
@@ -230,8 +219,6 @@ msgstr "Höhe"
 msgid "Size d"
 msgstr "Tiefe"
 
-
-#------------------------------------------------------------------------------#
 msgid "Rows"
 msgstr "Regale"
 
@@ -241,13 +228,11 @@ msgstr "Regal"
 msgid "Row"
 msgstr "Regal"
 
-#------------------------------------------------------------------------------#
 msgid "Warehouses"
-msgstr "Hallen"
+msgstr "Lager"
 
 msgid "warehouse"
-msgstr "Halle"
+msgstr "Lager"
 
 msgid "Warehouse"
-msgstr "Halle"
-
+msgstr "Lager"
