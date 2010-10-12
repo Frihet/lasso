@@ -8,7 +8,40 @@ import datetime
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
-    price_per_kilo_per_entry = models.FloatField()
+    price_per_kilo_per_entry = models.FloatField(blank=True)
+
+    class Meta:
+        permissions = (("view_entry", "View"),
+                       ("view_own_entry", "View own"))
+
+    @property
+    def nett_weight(self):
+        return sum([row.nett_weight for row in self.rows.all()])
+
+    @property
+    def gross_weight(self):
+        return sum([row.gross_weight for row in self.rows.all()])
+
+    @property
+    def nett_weight_left(self):
+        return sum([row.nett_weight_left for row in self.rows.all()])
+
+    @property
+    def gross_weight_left(self):
+        return sum([row.gross_weight_left for row in self.rows.all()])
+
+    @property
+    def product_value(self):
+        return sum([row.product_value for row in self.rows.all() if row.product_value])
+
+    @property
+    def product_value_left(self):
+        return sum([row.product_value_left for row in self.rows.all() if row.product_value_left])
+
+    @property
+    def product_description(self):
+        return '; '.join(["%s %s %s" % (row.units, row.uom, row.product_description) for row in self.rows.all() if row.product_description])
+
     def __unicode__(self):
         return u"%s @ %s for %s" % (self.id, self.arrival_date, self.customer)
 
@@ -18,24 +51,26 @@ def entry_pre_save(sender, instance, **kwargs):
 pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
-    entry = models.ForeignKey(Entry)
-    custom_handling_date = models.DateField()
-    customs_receipt_nr = models.CharField(max_length=200)
-    customs_testimony_nr = models.CharField(max_length=200)
-    transporter = models.CharField(max_length=200)
-    product_nr = models.CharField(max_length=400)
-    uom = models.CharField(max_length=200)
+    entry = models.ForeignKey(Entry, related_name="rows")
+    custom_handling_date = models.DateField(null=True, blank=True)
+    customs_receipt_nr = models.CharField(max_length=200, blank=True)
+    customs_testimony_nr = models.CharField(max_length=200, blank=True)
+    transporter = models.CharField(max_length=200, blank=True)
+    product_nr = models.CharField(max_length=400, blank=True)
+    uom = models.CharField(max_length=200, blank=True)
     units = models.IntegerField()
-    units_left = models.IntegerField()
+    units_left = models.IntegerField(blank=True)
     nett_weight = models.FloatField()
     gross_weight = models.FloatField()
-    product_value= models.FloatField()
+    product_value = models.FloatField(null=True, blank=True)
 
-    use_before = models.DateField()
-    product_description = models.CharField(max_length=400)
-    product_state = models.CharField(max_length=200)
-    comment = models.TextField()
-    arrival_temperature = models.FloatField()
+    use_before = models.DateField(null=True, blank=True)
+    product_description = models.CharField(max_length=400, blank=True)
+    product_state = models.CharField(max_length=200, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    arrival_temperature = models.FloatField(null=True, blank=True)
+
+    origin = models.CharField(max_length=200, blank=True)
 
     @property
     def cost(self):
@@ -50,12 +85,22 @@ class EntryRow(models.Model):
         return self.gross_weight / self.units
 
     @property
+    def product_value_per_unit(self):
+        if self.product_value is None: return None
+        return self.product_value / self.units
+
+    @property
     def nett_weight_left(self):
         return self.nett_weight_per_unit * self.units_left
 
     @property
     def gross_weight_left(self):
         return self.gross_weight_per_unit * self.units_left
+
+    @property
+    def product_value_left(self):
+        if self.product_value_per_unit is None: return None
+        return self.product_value_per_unit * self.units_left
 
     @property
     def id_str(self):
@@ -69,27 +114,47 @@ class EntryRow(models.Model):
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
 
+def entry_row_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.units_left = instance.units
+pre_save.connect(entry_row_pre_save, sender=EntryRow)
 
 class Withdrawal(models.Model):
     customer = models.ForeignKey(Customer)
-    price_per_kilo_per_withdrawal = models.FloatField()
+    price_per_kilo_per_withdrawal = models.FloatField(blank=True)
 
-    reference_nr = models.CharField(max_length=200)
-    responsible = models.CharField(max_length=200)
-    place_of_departure = models.CharField(max_length=200)
+    reference_nr = models.CharField(max_length=200, blank=True)
+    responsible = models.CharField(max_length=200, blank=True)
+    place_of_departure = models.CharField(max_length=200, blank=True)
     
-    insurance = models.CharField(max_length=200)
-    transport_condition = models.CharField(max_length=200)
-    transport_nr = models.CharField(max_length=200)
-    order_nr = models.CharField(max_length=200)
+    insurance = models.CharField(max_length=200, blank=True)
+    transport_condition = models.CharField(max_length=200, blank=True)
+    transport_nr = models.CharField(max_length=200, blank=True)
+    order_nr = models.CharField(max_length=200, blank=True)
 
-    destination_address = models.TextField()
+    destination_address = models.TextField(null=True, blank=True)
     withdrawal_date = models.DateField()
-    arrival_date = models.DateField()
-    vehicle_type = models.CharField(max_length=200)
-    opening_hours = models.CharField(max_length=200)
-    transporter = models.CharField(max_length=200)
-    comment = models.TextField()
+    arrival_date = models.DateField(null=True, blank=True)
+    vehicle_type = models.CharField(max_length=200, blank=True)
+    opening_hours = models.CharField(max_length=200, blank=True)
+    transporter = models.CharField(max_length=200, blank=True)
+    comment = models.TextField(null=True, blank=True)
+
+    class Meta:
+        permissions = (("view_withdrawal", "View"),
+                       ("view_own_withdrawal", "View own"))
+
+    @property
+    def nett_weight(self):
+        return sum([row.nett_weight for row in self.rows.all()])
+
+    @property
+    def gross_weight(self):
+        return sum([row.gross_weight for row in self.rows.all()])
+
+    @property
+    def product_description(self):
+        return '; '.join(["%s %s %s" % (row.units, row.entry_row.uom, row.entry_row.product_description) for row in self.rows.all() if row.entry_row.product_description])
 
     def __unicode__(self):
         return u"%s @ %s" % (self.id, self.withdrawal_date)
@@ -100,9 +165,9 @@ def withdrawal_pre_save(sender, instance, **kwargs):
 pre_save.connect(withdrawal_pre_save, sender=Withdrawal)
 
 class WithdrawalRow(models.Model):
-    withdrawal = models.ForeignKey(Withdrawal)
-    entry_row = models.ForeignKey(EntryRow)
-    old_units = models.IntegerField()
+    withdrawal = models.ForeignKey(Withdrawal, related_name="rows")
+    entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows")
+    old_units = models.IntegerField(blank=True)
     units = models.IntegerField()
 
     @property
@@ -143,7 +208,7 @@ pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 
 class UnitWork(models.Model):
     work_type = models.ForeignKey(UnitWorkPrices)
-    price_per_unit = models.FloatField()
+    price_per_unit = models.FloatField(blank=True)
     date = models.DateField()
     units = models.IntegerField()
 
@@ -162,6 +227,11 @@ class StorageLog(models.Model):
     date = models.DateField()
     price_per_kilo_per_day = models.FloatField()
     units_left = models.IntegerField()
+
+
+    class Meta:
+        permissions = (("view_storagelog", "View"),
+                       ("view_own_storagelog", "View own"))
 
     @property
     def cost(self):

@@ -1,10 +1,11 @@
 {% extends "admin/base_site.html" %}
-{% load adminmedia admin_list %}
+{% load adminmedia %}
+{% load admin_list %}
 {% load i18n %}
 {% load i18next %}
 {% load datatypes %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
 
 {% block coltype %}flex{% endblock %}
 
