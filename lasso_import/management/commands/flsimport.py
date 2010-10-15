@@ -39,6 +39,7 @@ class Command(BaseCommand):
 	withdrawal_re = re.compile(r"Lieferscheine.*\.csv")
 
 	customers = {}
+        transporters = {}
 
 	errors = []
 	
@@ -123,6 +124,9 @@ class Command(BaseCommand):
                 signal_error("'%s' is not a float" % (origvalue,), "valueformat")
 		return None
 
+        def statevalue_to_bool(origvalue):
+            return origvalue.strip() == 'i.O'
+
 	for filename in filewalk('./'):
 	    if entry_re.search(filename) or withdrawal_re.search(filename):
 		customer_id = filename.split(os.path.sep)[1]
@@ -133,7 +137,7 @@ class Command(BaseCommand):
 		header_transform = {"Warenwert": ("product_value", value_to_float),
 				    "Produkte Nr.": ("product_nr", str),
 				    "Temp. beim Eingang": ("arrival_temperature", value_to_float),
-				    "Äusseres Aussehen": ("product_state", str),
+				    "Äusseres Aussehen": ("product_state", statevalue_to_bool),
 				    #"Karton à ": ("", str),
 				    #"AP/ KG": ("", str),
 				    "Verzollungsdatum": ("custom_handling_date", value_to_date),
@@ -260,6 +264,8 @@ class Command(BaseCommand):
 		    row['origin'] = f[row_nr][6]
 		    rows.append(row)
 
+                if header['transporter']:
+                    transporters[header['transporter']] = {'header': {'name': header['transporter']}}
 		if header['customer_name']:
 		    customers[customer_id]['name'] = header['customer_name']
 		if header['customer_address']:
@@ -300,6 +306,7 @@ class Command(BaseCommand):
 				     "Entry row %s does not exist in entry %s" %(entry_row_id, entry_id))
 		    entry_row = customer['entries'][entry_id]['rows'][entry_row_id]
 		    movemerge(row, 'origin', entry_row['header'], 'origin')
+		    movemerge(withdrawal['header'], 'insurance', entry['header'], 'insurance')
 
 	if errors:
 	    print "==================================={ ERRORS }==================================="
@@ -310,10 +317,17 @@ class Command(BaseCommand):
 
 	if not options.get('dry-run', False):
 	    # Create data objects
+	    for name, transporter in transporters.iteritems():
+                transporter_obj = obj_from_dict(lasso.lasso_customer.models.Transporter, transporter)
+                transporter_obj.save()
+
 	    for name, customer in customers.iteritems():
                 customer['header'].setdefault('price_per_kilo_per_day', 0)
                 customer['header'].setdefault('price_per_kilo_per_entry', 0)
                 customer['header'].setdefault('price_per_kilo_per_withdrawal', 0)
+                customer['header'].setdefault('price_per_unit_per_day', 0)
+                customer['header'].setdefault('price_per_unit_per_entry', 0)
+                customer['header'].setdefault('price_per_unit_per_withdrawal', 0)
                 customer_obj = obj_from_dict(lasso.lasso_customer.models.Customer, customer)
                 customer_obj.save()
 
@@ -337,7 +351,11 @@ class Command(BaseCommand):
                 withdrawals.sort(lambda a, b: cmp(a['header']['withdrawal_date'], b['header']['withdrawal_date']))
 
 		for withdrawal in withdrawals:
+                    transporter_id = withdrawal['header']['transporter']
+                    transporter_obj = transporters[transporter_id]['obj']
+                    del withdrawal['header']['transporter']
                     withdrawal_obj = obj_from_dict(lasso.lasso_warehandling.models.Withdrawal, withdrawal)
+                    withdrawal_obj.transporter = transporter_obj
                     withdrawal_obj.customer = customer_obj
                     withdrawal_obj.save()
 
@@ -371,8 +389,15 @@ class Command(BaseCommand):
                         entry_row['next_storagelog'] = tomorrow
 
 	else:
+	    for name, transporter in transporters.iteritems():
+		print "Transporter: %s" % (name,)
+		for name, value in transporter['header'].iteritems():
+		    print "    %s: %s" % (name, str(value).replace('\n', '\n        '))
+
+		print
+
 	    for name, customer in customers.iteritems():
-		print "%s" % (name,)
+		print "Customer: %s" % (name,)
 		for name, value in customer['header'].iteritems():
 		    print "    %s: %s" % (name, str(value).replace('\n', '\n        '))
 

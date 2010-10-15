@@ -9,25 +9,35 @@ class UnitWorkType(models.Model):
     def __unicode__(self):
         return self.name
 
-class Customer(User):
-
+class Contact(User):
     name = models.CharField(max_length=200)
     address = models.TextField()
-    price_per_kilo_per_day = models.FloatField()
-    price_per_kilo_per_entry = models.FloatField()
-    price_per_kilo_per_withdrawal = models.FloatField()
-
+    phone = models.CharField(max_length=200)
+    fax = models.CharField(max_length=200)
     def __unicode__(self):
         return self.name
 
-def customer_pre_save(sender, instance, **kwargs):
+def contact_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.is_staff = True
         instance.username = re.compile(r"[^a-z0-9]").sub("_", instance.name.lower())
     if '$' not in instance.password:
         instance.set_password(instance.password)
-pre_save.connect(customer_pre_save, sender=Customer)
+pre_save.connect(contact_pre_save, sender=Contact)
 
+class Customer(Contact):
+    price_per_kilo_per_day = models.FloatField()
+    price_per_kilo_per_entry = models.FloatField()
+    price_per_kilo_per_withdrawal = models.FloatField()
+
+    price_per_unit_per_day = models.FloatField()
+    price_per_unit_per_entry = models.FloatField()
+    price_per_unit_per_withdrawal = models.FloatField()
+pre_save.connect(contact_pre_save, sender=Customer)
+
+class Transporter(Contact):
+    pass
+pre_save.connect(contact_pre_save, sender=Transporter)
 
 class UnitWorkPrices(models.Model):
     customer = models.ForeignKey(Customer)

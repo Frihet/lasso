@@ -17,3 +17,9 @@ class CustomerAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 admin.site.register(Customer, CustomerAdmin)
+
+class TransporterAdmin(admin.ModelAdmin):
+    exclude = ('username', 'first_name', 'last_name', 'is_superuser','user_permissions', 'last_login', 'date_joined', 'is_staff')
+    search_fields = ('name',)
+
+admin.site.register(Transporter, TransporterAdmin)

@@ -10,6 +10,26 @@ from extendable_permissions import *
 
 class EntryRowInline(admin.StackedInline):
     model = EntryRow
+    fieldsets = [('Product', {'fields': ('use_before',
+                                         'product_nr',
+                                         'product_description',
+                                         'origin')
+                              }),
+                 ('Arrival', {'fields': ('transporter',
+                                         'arrival_temperature',
+                                         'product_state',
+                                         'comment')
+                              }),
+                 ('Customs', {'fields': ('custom_handling_date',
+                                         'customs_receipt_nr',
+                                         'customs_testimony_nr')
+                              }),
+                 ('Amount', {'fields': ('uom',
+                                        'units',
+                                        'nett_weight',
+                                        'gross_weight',
+                                        'product_value')
+                             })]
 
 class EntryAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
@@ -65,7 +85,26 @@ class WithdrawalRowInline(admin.TabularInline):
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
-    exclude = ('price_per_kilo_per_withdrawal',)
+
+    fieldsets = [('Destination', {'fields': ('destination_address',
+                                             'opening_hours',
+                                             'arrival_date',
+                                             'comment')
+                                  }),
+                 ('General', {'fields': ('customer',
+                                         'reference_nr',
+                                         'transport_nr',
+                                         'order_nr')
+                              }),
+                 ('Departure', {'fields': ('responsible',
+                                           'place_of_departure',
+                                           'withdrawal_date')
+                                }),
+                 ('Transport', {'fields': ('transport_condition',
+                                           'vehicle_type',
+                                           'transporter')
+                                })]
+
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
     owner_field = "customer"
