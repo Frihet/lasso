@@ -216,7 +216,18 @@ class Command(BaseCommand):
                     entry = customers[customer_id]['entries'][entry_id]
                     movemerge(header, 'price_per_kilo_per_entry', entry['header'], 'price_per_kilo_per_entry')
                     movemerge(header, 'arrival_date', entry['header'], 'arrival_date')
+                    movemerge(header, 'transporter', entry['header'], 'transporter')
                     entry['rows'][entry_row_id] = {'header': header, 'months': months}
+                    if entry['header']['transporter']:
+                        transporter = entry['header']['transporter']
+
+                        address = ""
+                        if ',' in transporter:
+                            transporter, address = transporter.split(',', 1)
+                            address = '\n'.join(item.strip() for item in address.split(","))
+                            entry['header']['transporter'] = transporter
+
+                        transporters[transporter] = {'header': {'name': transporter, 'address': address}}
 
 	    elif withdrawal_re.search(filename):
 		f = list(csv.reader(open(filename), dialect="excel"))
@@ -265,7 +276,11 @@ class Command(BaseCommand):
 		    rows.append(row)
 
                 if header['transporter']:
-                    transporters[header['transporter']] = {'header': {'name': header['transporter']}}
+                    address = ""
+                    if ',' in header['transporter']:
+                        header['transporter'], address = transporter.split(',', 1)
+                        address = '\n'.join(item.strip() for item in address.split(","))
+                    transporters[header['transporter']] = {'header': {'name': header['transporter'], 'address': address}}
 		if header['customer_name']:
 		    customers[customer_id]['name'] = header['customer_name']
 		if header['customer_address']:
@@ -332,7 +347,11 @@ class Command(BaseCommand):
                 customer_obj.save()
 
 		for entry_id, entry in customer['entries'].iteritems():
+                    transporter_id = entry['header']['transporter']
+                    transporter_obj = transporters[transporter_id]['obj']
+                    del entry['header']['transporter']
                     entry_obj = obj_from_dict(lasso.lasso_warehandling.models.Entry, entry)
+                    entry_obj.transporter = transporter_obj
                     entry_obj.customer = customer_obj
                     entry_obj.save()
 

@@ -10,6 +10,7 @@ class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
     insurance = models.CharField(max_length=200, blank=True)
+    transporter = models.ForeignKey(Transporter)
     price_per_kilo_per_entry = models.FloatField(blank=True)
     price_per_unit_per_entry = models.FloatField(blank=True)
 
@@ -59,7 +60,6 @@ class EntryRow(models.Model):
     custom_handling_date = models.DateField(null=True, blank=True)
     customs_receipt_nr = models.CharField(max_length=200, blank=True)
     customs_testimony_nr = models.CharField(max_length=200, blank=True)
-    transporter = models.CharField(max_length=200, blank=True)
     product_nr = models.CharField(max_length=400, blank=True)
     uom = models.CharField(max_length=200, blank=True)
     units = models.IntegerField()
