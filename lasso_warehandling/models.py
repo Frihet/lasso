@@ -250,6 +250,10 @@ class UnitWork(models.Model):
     date = models.DateField()
     units = models.IntegerField()
 
+    class Meta:
+        permissions = (("view_unitwork", "View"),
+                       ("view_own_unitwork", "View own"))
+
     def __unicode__(self):
         return u"%s of %s @ %s for %s" % (self.work_type.work_type, self.units, self.date, self.work_type.customer)
 

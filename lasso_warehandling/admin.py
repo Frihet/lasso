@@ -113,8 +113,9 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
 admin.site.register(Withdrawal, WithdrawalAdmin)
 
 
-class UnitWorkAdmin(admin.ModelAdmin):
+class UnitWorkAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     date_hierarchy = 'date'
     exclude = ('price_per_unit',)
+    owner_field = "work_type__customer"
 
 admin.site.register(UnitWork, UnitWorkAdmin)
