@@ -9,7 +9,7 @@ from lasso.utils import *
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
-    insurance = models.CharField(max_length=200, blank=True)
+    insurance = models.BooleanField(blank=True)
     transporter = models.ForeignKey(Transporter)
     price_per_kilo_per_entry = models.FloatField(blank=True)
     price_per_unit_per_entry = models.FloatField(blank=True)

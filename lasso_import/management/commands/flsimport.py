@@ -124,8 +124,8 @@ class Command(BaseCommand):
                 signal_error("'%s' is not a float" % (origvalue,), "valueformat")
 		return None
 
-        def statevalue_to_bool(origvalue):
-            return origvalue.strip() == 'i.O'
+        def value_to_bool(origvalue):
+            return origvalue.strip().lower() in ('i.o', 'durch uns/par nous')
 
 	for filename in filewalk('./'):
 	    if entry_re.search(filename) or withdrawal_re.search(filename):
@@ -137,7 +137,7 @@ class Command(BaseCommand):
 		header_transform = {"Warenwert": ("product_value", value_to_float),
 				    "Produkte Nr.": ("product_nr", str),
 				    "Temp. beim Eingang": ("arrival_temperature", value_to_float),
-				    "Äusseres Aussehen": ("product_state", statevalue_to_bool),
+				    "Äusseres Aussehen": ("product_state", value_to_bool),
 				    #"Karton à ": ("", str),
 				    #"AP/ KG": ("", str),
 				    "Verzollungsdatum": ("custom_handling_date", value_to_date),
@@ -244,7 +244,7 @@ class Command(BaseCommand):
 		header['responsible'] = f[17][3]
 		header['place_of_departure'] = f[14][0]
 
-		header['insurance'] = f[22][3]
+		header['insurance'] = value_to_bool(f[22][3])
 		header['transport_condition'] = f[23][3]
 		header['transport_nr'] = f[24][3]
 		header['order_nr'] = f[25][1];
