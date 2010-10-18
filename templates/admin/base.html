@@ -22,9 +22,6 @@
     {% if not is_popup %}
     <!-- Header -->
     <div id="header">
-        <div id="branding">
-        {% block branding %}{% endblock %}
-        </div>
         {% if user.is_authenticated and user.is_staff %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
