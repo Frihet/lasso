@@ -16,7 +16,7 @@ class Row(models.Model):
 
 class PalletSpace(models.Model):
     row = models.ForeignKey(Row)
-    entry = models.ForeignKey(Entry, null=True, blank=True, related_name="locations")
+    entry_row = models.ForeignKey(EntryRow, null=True, blank=True, related_name="locations")
     name = models.CharField(max_length=200)
     size_w = models.FloatField()
     size_h = models.FloatField()

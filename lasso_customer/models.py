@@ -9,25 +9,41 @@ class UnitWorkType(models.Model):
     def __unicode__(self):
         return self.name
 
-class Customer(User):
-
+class Organization(User):
+    _username_prefix = ""
     name = models.CharField(max_length=200)
-    address = models.TextField()
+    address = models.TextField(blank=True)
+    phone = models.CharField(max_length=200, blank=True)
+    fax = models.CharField(max_length=200, blank=True)
+    def __unicode__(self):
+        return self.name
+
+def organization_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        instance.is_staff = True
+        instance.username = instance._username_prefix + re.compile(r"[^a-z0-9]").sub("_", instance.name.lower())
+    if '$' not in instance.password:
+        instance.set_password(instance.password)
+pre_save.connect(organization_pre_save, sender=Organization)
+
+class Contact(Organization):
+    _username_prefix = "c_"
+    for_organization = models.ForeignKey(Organization, related_name = 'contacts')
+pre_save.connect(organization_pre_save, sender=Contact)
+
+class Customer(Organization):
     price_per_kilo_per_day = models.FloatField()
     price_per_kilo_per_entry = models.FloatField()
     price_per_kilo_per_withdrawal = models.FloatField()
 
-    def __unicode__(self):
-        return self.name
+    price_per_unit_per_day = models.FloatField()
+    price_per_unit_per_entry = models.FloatField()
+    price_per_unit_per_withdrawal = models.FloatField()
+pre_save.connect(organization_pre_save, sender=Customer)
 
-def customer_pre_save(sender, instance, **kwargs):
-    if instance.id is None:
-        instance.is_staff = True
-        instance.username = re.compile(r"[^a-z0-9]").sub("_", instance.name.lower())
-    if '$' not in instance.password:
-        instance.set_password(instance.password)
-pre_save.connect(customer_pre_save, sender=Customer)
-
+class Transporter(Organization):
+    _username_prefix = "tr_"
+pre_save.connect(organization_pre_save, sender=Transporter)
 
 class UnitWorkPrices(models.Model):
     customer = models.ForeignKey(Customer)

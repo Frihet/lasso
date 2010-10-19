@@ -4,9 +4,13 @@
 
 .form-row {
     overflow: hidden;
-    padding: 8px 12px;
+    padding:1pt;
     font-size: 11px;
     border-bottom: 1px solid #eee;
+}
+
+.form-row div {
+    clear: both;
 }
 
 .form-row img, .form-row input {
@@ -239,11 +243,12 @@ fieldset.monospace textarea {
 
 .inline-related h3 {
     margin: 0;
-    color: #666;
-    padding: 3px 5px;
-    font-size: 11px;
-    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
-    border-bottom: 1px solid #ddd;
+    background:url("../img/admin/default-bg.gif") repeat-x scroll left top #7CA0C7;
+    color:white;
+    font-size:11px;
+    margin:0;
+    padding:2px 5px 3px;
+    text-align:left;
 }
 
 .inline-related h3 span.delete {
@@ -325,3 +330,14 @@ fieldset.monospace textarea {
     padding-left: 14px;
 }
 
+.submit-row,
+.inline-group,
+.inline-related {
+    clear: both;
+}
+
+.inline-related .module,
+.module {
+    float: left;
+    margin: 4pt;
+}

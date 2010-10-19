@@ -53,7 +53,7 @@
       <tbody>
 	{% for date in dates %}
 	  {% with storage_log|nth:date as items_for_date %}
-	    <tr>
+	    <tr class="{% cycle 'row1' 'row2' %}">
 	      <td>{{ date|date:"Y-m-d" }}</td>
 	      <td>{{ items_for_date.sum_in.gross_weight|separateminus:items_for_date.sum_out.gross_weight }}</td>
 	      <td>{{ items_for_date.sum_in.nett_weight|separateminus:items_for_date.sum_out.nett_weight }}</td>

@@ -9,12 +9,12 @@ admin.site.register(Row)
 class EmptyPalletSpaceAdmin(admin.ModelAdmin):
     def queryset(self, request):
         qs = super(EmptyPalletSpaceAdmin, self).queryset(request)
-        return qs.filter(entry__isnull=True)
+        return qs.filter(entry_row__isnull=True)
 
 class FilledPalletSpaceAdmin(admin.ModelAdmin):
     def queryset(self, request):
         qs = super(FilledPalletSpaceAdmin, self).queryset(request)
-        return qs.filter(entry__isnull=False)
+        return qs.filter(entry_row__isnull=False)
 
 class EmptyPalletSpace(PalletSpace):
     class Meta:
