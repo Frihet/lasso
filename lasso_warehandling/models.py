@@ -13,6 +13,9 @@ class Entry(models.Model):
     transporter = models.ForeignKey(Transporter)
     price_per_kilo_per_entry = models.FloatField(blank=True)
     price_per_unit_per_entry = models.FloatField(blank=True)
+    custom_handling_date = models.DateField(null=True, blank=True)
+    customs_nr = models.CharField(max_length=200, blank=True)
+    origin = models.CharField(max_length=200, blank=True)
 
     class Meta:
         permissions = (("view_entry", "View"),
@@ -57,9 +60,7 @@ pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
     entry = models.ForeignKey(Entry, related_name="rows")
-    custom_handling_date = models.DateField(null=True, blank=True)
-    customs_receipt_nr = models.CharField(max_length=200, blank=True)
-    customs_testimony_nr = models.CharField(max_length=200, blank=True)
+    customs_certificate_nr = models.CharField(max_length=200, blank=True)
     product_nr = models.CharField(max_length=400, blank=True)
     uom = models.CharField(max_length=200, blank=True)
     units = models.IntegerField()
@@ -74,7 +75,6 @@ class EntryRow(models.Model):
     comment = models.TextField(null=True, blank=True)
     arrival_temperature = models.FloatField(null=True, blank=True)
 
-    origin = models.CharField(max_length=200, blank=True)
 
     @property
     def cost(self):

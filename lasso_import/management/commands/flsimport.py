@@ -158,7 +158,7 @@ class Command(BaseCommand):
                                         "Haltbarkeitsdatum": ("use_before", value_to_date),
                                         "Lieferant": ("transporter", str),
                                         "Zollquittungs Nr.": ("customs_receipt_nr", str),
-                                        "Zeugnis Nr.": ("customs_testimony_nr", str)}
+                                        "Zeugnis Nr.": ("customs_certificate_nr", str)}
                     month_transform = {"Januar": 1,
                                        "Februar": 2,
                                        "März": 3,
@@ -224,6 +224,9 @@ class Command(BaseCommand):
                         movemerge(header, 'price_per_kilo_per_entry', entry['header'], 'price_per_kilo_per_entry')
                         movemerge(header, 'arrival_date', entry['header'], 'arrival_date')
                         movemerge(header, 'transporter', entry['header'], 'transporter')
+                        movemerge(header, 'custom_handling_date', entry['header'], 'custom_handling_date')
+                        movemerge(header, 'custom_nr', entry['header'], 'custom_nr')
+                        movemerge(header, 'origin', entry['header'], 'origin')
                         entry['rows'][entry_row_id] = {'header': header, 'months': months}
                         if entry['header']['transporter']:
                             transporter = entry['header']['transporter']

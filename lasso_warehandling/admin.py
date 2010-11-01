@@ -49,17 +49,13 @@ class EntryRowInline(admin.StackedInline):
     model = EntryRow
     fieldsets = [('Product', {'fields': ('use_before',
                                          'product_nr',
-                                         'product_description',
-                                         'origin')
+                                         'product_description')
                               }),
                  ('Arrival', {'fields': ('arrival_temperature',
                                          'product_state',
                                          'comment',
-                                         'locations')
-                              }),
-                 ('Customs', {'fields': ('custom_handling_date',
-                                         'customs_receipt_nr',
-                                         'customs_testimony_nr')
+                                         'locations',
+                                         'customs_certificate_nr')
                               }),
                  ('Amount', {'fields': ('uom',
                                         'units',
