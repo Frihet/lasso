@@ -47,7 +47,7 @@ class Command(BaseCommand):
         def signal_error(msg, etype='generic', filename=None):
             if filename is not None:
                 msg = "%s: %s" % (filename, msg)
-            msg = unicode(msg)
+            msg = etype + ": " + unicode(msg)
 	    if etype in options.get('assert', ''):
 		raise AssertionError(msg)
 	    errors.append(msg)
@@ -129,6 +129,13 @@ class Command(BaseCommand):
                 signal_error("'%s' is not a float" % (origvalue,), "valueformat", filename)
 		return None
 
+	def value_to_float_list(origvalue, filename=None):
+            return [value_to_float(part, filename)
+                    for part in (part.endswith(",") and part[:-1] or part
+                                 for part in (part.strip()
+                                              for part in value.split(" "))
+                                 if part)]
+
         def value_to_bool(origvalue, filename=None):
             return origvalue.strip().lower() in ('i.o', 'durch uns/par nous')
 
@@ -142,23 +149,23 @@ class Command(BaseCommand):
 
                 if entry_re.search(filename):
                     header_transform = {"Warenwert": ("product_value", value_to_float),
-                                        "Produkte Nr.": ("product_nr", str),
-                                        "Temp. beim Eingang": ("arrival_temperature", value_to_float),
+                                        "Produkte Nr.": ("product_nr", unicode),
+                                        "Temp. beim Eingang": ("arrival_temperature", value_to_float_list),
                                         "Äusseres Aussehen": ("product_state", value_to_bool),
-                                        #"Karton à ": ("", str),
-                                        #"AP/ KG": ("", str),
+                                        #"Karton à ": ("", unicode),
+                                        #"AP/ KG": ("", unicode),
                                         "Verzollungsdatum": ("custom_handling_date", value_to_date),
-                                        "Firma": ("customer", str),
+                                        "Firma": ("customer", unicode),
                                         "Gewicht netto": ("nett_weight", value_to_float),
                                         "Gewicht brutto": ("gross_weight", value_to_float),
-                                        "Artikelbezeichnung": ("product_description", str),
+                                        "Artikelbezeichnung": ("product_description", unicode),
                                         "Anzahl Karton": ("units", value_to_int),
                                         "Eingangsdatum": ("arrival_date", value_to_date),
-                                        "Bemerkung zu Mängel": ("comment", str),
+                                        "Bemerkung zu Mängel": ("comment", unicode),
                                         "Haltbarkeitsdatum": ("use_before", value_to_date),
-                                        "Lieferant": ("transporter", str),
-                                        "Zollquittungs Nr.": ("customs_receipt_nr", str),
-                                        "Zeugnis Nr.": ("customs_certificate_nr", str)}
+                                        "Lieferant": ("transporter", unicode),
+                                        "Zollquittungs Nr.": ("customs_receipt_nr", unicode),
+                                        "Zeugnis Nr.": ("customs_certificate_nr", unicode)}
                     month_transform = {"Januar": 1,
                                        "Februar": 2,
                                        "März": 3,
@@ -297,6 +304,8 @@ class Command(BaseCommand):
                         customers[customer_id]['address'] = header['customer_address']
                     customers[customer_id]['withdrawals'][header['withdrawal_id']] = {'header': header, 'rows': rows}
             except UnicodeDecodeError:
+                raise
+            except UnicodeEncodeError:
                 raise
             except Exception, e:
                 signal_error(unicode(e), "exception", filename)

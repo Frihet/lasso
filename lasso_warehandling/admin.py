@@ -51,7 +51,7 @@ class EntryRowInline(admin.StackedInline):
                                          'product_nr',
                                          'product_description')
                               }),
-                 ('Arrival', {'fields': ('arrival_temperature',
+                 ('Arrival', {'fields': ('arrival_temperatures',
                                          'product_state',
                                          'comment',
                                          'locations',

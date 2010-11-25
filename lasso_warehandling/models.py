@@ -73,8 +73,7 @@ class EntryRow(models.Model):
     product_description = models.CharField(max_length=400, blank=True)
     product_state = models.BooleanField()
     comment = models.TextField(null=True, blank=True)
-    arrival_temperature = models.FloatField(null=True, blank=True)
-
+    arrival_temperatures = FloatListField()
 
     @property
     def cost(self):
