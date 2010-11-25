@@ -21,14 +21,16 @@ def zprint(text,copies, port=9100, lmarg=50, tmarg=25, ip="10.0.10.201"):
         lheight = 40
         lpos = tmarg
         data += "^XA\n"
-        lines = text.split("\n")
-        for line in lines:
+        for line in text.split("\n"):
             data += "^CI4\n"
             data += "^FO%s,%s^A0N,40,40^FD%s^FS\n" % (lmarg, lpos, line.strip())
             lpos += lheight
-        data += "^XZ\n"
 
-    print repr(data)
+        data += "^FO%s,200\n" % (lmarg,)
+        data += "^BQN,50,200,N,N,N\n"
+        data +="^FD>;%s^FS\n" % (text.replace("\n", "; "),)
+
+        data += "^XZ\n"
 
     fp = socket.create_connection((ip, port))
     try:
