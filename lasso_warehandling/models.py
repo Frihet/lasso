@@ -8,7 +8,7 @@ from lasso.utils import *
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
-    arrival_date = models.DateField()
+    arrival_date = models.DateField(default=lambda: datetime.date.today())
     insurance = models.BooleanField(blank=True)
     transporter = models.ForeignKey(Transporter)
     price_per_kilo_per_entry = models.FloatField(blank=True)
@@ -169,8 +169,8 @@ class Withdrawal(models.Model):
     order_nr = models.CharField(max_length=200, blank=True)
 
     destination_address = models.TextField(null=True, blank=True)
-    withdrawal_date = models.DateField()
-    arrival_date = models.DateField(null=True, blank=True)
+    withdrawal_date = models.DateField(default=lambda: datetime.date.today())
+    arrival_date = models.DateField(null=True, blank=True, default=lambda: datetime.date.today()+datetime.timedelta(1))
     vehicle_type = models.CharField(max_length=200, blank=True)
     opening_hours = models.CharField(max_length=200, blank=True)
     transporter = models.ForeignKey(Transporter)
