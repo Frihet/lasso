@@ -44,11 +44,13 @@ class Command(BaseCommand):
 
 	errors = []
 	
-        def signal_error(msg, etype='generic', filename=None):
+        def signal_error(msg, etype='generic', filename=None, rethrow = False):
             if filename is not None:
                 msg = "%s: %s" % (filename, msg)
             msg = etype + ": " + unicode(msg)
 	    if etype in options.get('assert', ''):
+                if rethrow:
+                    raise
 		raise AssertionError(msg)
 	    errors.append(msg)
 
@@ -112,7 +114,7 @@ class Command(BaseCommand):
 	def value_to_float(origvalue, filename=None):
             value = origvalue.strip()
             if value in ("", "x", "X"): return None
-            value = value.replace(" ", "").replace("°", ".").replace(",", ".").replace("'", "")
+            value = value.replace(" ", "").replace(u"°", ".").replace(",", ".").replace("'", "")
             if value.startswith("ca."):
                 value = value[3:]
             if value.startswith("CHF"):
@@ -133,7 +135,7 @@ class Command(BaseCommand):
             return [value_to_float(part, filename)
                     for part in (part.endswith(",") and part[:-1] or part
                                  for part in (part.strip()
-                                              for part in value.split(" "))
+                                              for part in origvalue.split(" "))
                                  if part)]
 
         def value_to_bool(origvalue, filename=None):
@@ -166,20 +168,20 @@ class Command(BaseCommand):
                                         "Lieferant": ("transporter", unicode),
                                         "Zollquittungs Nr.": ("customs_receipt_nr", unicode),
                                         "Zeugnis Nr.": ("customs_certificate_nr", unicode)}
-                    month_transform = {"Januar": 1,
-                                       "Februar": 2,
-                                       "März": 3,
-                                       "April": 4,
-                                       "Mai": 5,
-                                       "Juni": 6,
-                                       "Juli": 7,
-                                       "August": 8,
-                                       "September": 9,
-                                       "Oktober": 10,
-                                       "November": 11,
-                                       "Dezember": 12}
+                    month_transform = {u"Januar": 1,
+                                       u"Februar": 2,
+                                       u"März": 3,
+                                       u"April": 4,
+                                       u"Mai": 5,
+                                       u"Juni": 6,
+                                       u"Juli": 7,
+                                       u"August": 8,
+                                       u"September": 9,
+                                       u"Oktober": 10,
+                                       u"November": 11,
+                                       u"Dezember": 12}
 
-                    f = csv.reader(codecs.open(filename, 'r', 'utf-8'), dialect="excel")
+                    f = csv.reader(open(filename, 'r'), dialect="excel")
 
                     # Read header:
                     header = {}
@@ -188,6 +190,7 @@ class Command(BaseCommand):
 
                     mode = ['header']
                     for row in f:
+                        row = [col.decode('utf-8') for col in row]
                         if mode[-1] == 'header':
                             if row[0] == 'Auslagerung':
                                 mode[-1] = 'months'
@@ -247,7 +250,7 @@ class Command(BaseCommand):
                             transporters[transporter] = {'header': {'name': transporter, 'address': address}}
 
                 elif withdrawal_re.search(filename):
-                    f = list(csv.reader(codecs.open(filename, 'r', 'utf-8'), dialect="excel"))
+                    f =[[col.decode('utf-8') for col in row] for row in csv.reader(open(filename, 'r'), dialect="excel")]
 
                     # Read header:
                     header = {}
@@ -308,7 +311,7 @@ class Command(BaseCommand):
             except UnicodeEncodeError:
                 raise
             except Exception, e:
-                signal_error(unicode(e), "exception", filename)
+                signal_error(unicode(e), "exception", filename, True)
 
 	# More integrity checks and intra-structure mangling:
 
@@ -352,8 +355,7 @@ class Command(BaseCommand):
 	    for error in errors:
 		print error.encode("utf-8")
 	    print "================================================================================"
-
-
+        
 	if not options.get('dry-run', False):
 	    # Create data objects
 	    for name, transporter in transporters.iteritems():
@@ -366,7 +368,7 @@ class Command(BaseCommand):
                 customer['header'].setdefault('price_per_kilo_per_withdrawal', 0)
                 customer['header'].setdefault('price_per_unit_per_day', 0)
                 customer['header'].setdefault('price_per_unit_per_entry', 0)
-                customer['header'].setdefault('price_per_unit_per_withdrawal', 0)
+                customer['header'].setdefault('price_per_unit_per_withdrawal', 0)                
                 customer_obj = obj_from_dict(lasso.lasso_customer.models.Customer, customer)
                 customer_obj.save()
 
@@ -390,7 +392,7 @@ class Command(BaseCommand):
                         #    for name, value in values.iteritems():
                         #        pass
 
-                withdrawals =  customer['withdrawals'].values()
+                withdrawals = customer['withdrawals'].values()
                 withdrawals.sort(lambda a, b: cmp(a['header']['withdrawal_date'], b['header']['withdrawal_date']))
 
 		for withdrawal in withdrawals:

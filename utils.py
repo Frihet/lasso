@@ -48,8 +48,11 @@ class FloatListField(models.Field):
         else:
             return []
 
-    def get_prep_value(self, value):
+    def get_db_prep(self, value, connection = None, prepared=False):
         return ' '.join(str(part) for part in value)
+
+    def get_db_prep_save(self, value, connection = None):
+        return self.get_db_prep(value, connection)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': FloatListFormField}

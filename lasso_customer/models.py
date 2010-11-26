@@ -27,11 +27,12 @@ def organization_pre_save(sender, instance, **kwargs):
 pre_save.connect(organization_pre_save, sender=Organization)
 
 class Contact(Organization):
-    _username_prefix = "c_"
+    _username_prefix = "co_"
     for_organization = models.ForeignKey(Organization, related_name = 'contacts')
 pre_save.connect(organization_pre_save, sender=Contact)
 
 class Customer(Organization):
+    _username_prefix = "cu_"
     price_per_kilo_per_day = models.FloatField()
     price_per_kilo_per_entry = models.FloatField()
     price_per_kilo_per_withdrawal = models.FloatField()

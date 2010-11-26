@@ -81,7 +81,7 @@ def print_labels(request):
 
                         addr = lasso_labelprinting.models.Address.objects.get(customer_nr=customer_nr)
 
-                        zprint(("%(name)s (%(customer_nr)s)\n%(street)s\n%(zip)s %(platform)s %(city)s" % addr.as_dict).encode('latin-1'), 1)
+                        zprint(("%(name)s (%(customer_nr)s)\n%(street)s\n%(zip)s %(platform)s %(city)s" % addr.as_dict).encode('latin-1'), total)
 
         finally:
             try:
