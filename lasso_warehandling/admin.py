@@ -74,6 +74,7 @@ class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
 
 admin.site.register(Entry, EntryAdmin)
 
+admin.site.register(TransportCondition)
 
 class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow

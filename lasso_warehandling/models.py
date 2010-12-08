@@ -5,6 +5,7 @@ from django.db.models.signals import *
 from django import forms
 import datetime
 from lasso.utils import *
+import django.contrib.auth.models
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
@@ -155,16 +156,22 @@ def entry_row_pre_save(sender, instance, **kwargs):
         instance.units_left = instance.units
 pre_save.connect(entry_row_pre_save, sender=EntryRow)
 
+class TransportCondition(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
 class Withdrawal(models.Model):
     customer = models.ForeignKey(Customer)
     price_per_kilo_per_withdrawal = models.FloatField(blank=True)
     price_per_unit_per_withdrawal = models.FloatField(blank=True)
 
     reference_nr = models.CharField(max_length=200, blank=True)
-    responsible = models.CharField(max_length=200, blank=True)
+    responsible = models.ForeignKey(django.contrib.auth.models.User, related_name="responsible_for")
     place_of_departure = models.CharField(max_length=200, blank=True)
     
-    transport_condition = models.CharField(max_length=200, blank=True)
+    transport_condition = models.ForeignKey(TransportCondition, blank=True, null=True)
     transport_nr = models.CharField(max_length=200, blank=True)
     order_nr = models.CharField(max_length=200, blank=True)
 

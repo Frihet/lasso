@@ -5,6 +5,7 @@ import codecs
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from lasso.utils import *
+import django.contrib.auth.models
 
 class Command(BaseCommand):
     args = ''
@@ -41,6 +42,8 @@ class Command(BaseCommand):
 
 	customers = {}
         transporters = {}
+        responsibles = {}
+        transport_conditions = {}
 
 	errors = []
 	
@@ -295,6 +298,12 @@ class Command(BaseCommand):
                         row['origin'] = f[row_nr][6]
                         rows.append(row)
 
+                    if header['transport_condition']:
+                        transport_conditions[header['transport_condition']] = {'header': {'name': header['transport_condition']}}
+
+                    if header['responsible']:
+                        responsibles[header['responsible']] = {'header': {'name': header['responsible']}}
+
                     if header['transporter']:
                         address = ""
                         if ',' in header['transporter']:
@@ -358,6 +367,15 @@ class Command(BaseCommand):
         
 	if not options.get('dry-run', False):
 	    # Create data objects
+	    for name, transport_condition in transport_conditions.iteritems():
+                transport_condition_obj = obj_from_dict(lasso.lasso_warehandling.models.TransportCondition, transport_condition)
+                transport_condition_obj.save()
+
+	    for name, responsible in responsibles.iteritems():
+                responsible['header']['username'] = "re_" + re.compile(r"[^a-z0-9]").sub("_", responsible['header']['name'].lower())
+                responsible_obj = obj_from_dict(django.contrib.auth.models.User, responsible)
+                responsible_obj.save()
+
 	    for name, transporter in transporters.iteritems():
                 transporter_obj = obj_from_dict(lasso.lasso_customer.models.Transporter, transporter)
                 transporter_obj.save()
@@ -396,10 +414,18 @@ class Command(BaseCommand):
                 withdrawals.sort(lambda a, b: cmp(a['header']['withdrawal_date'], b['header']['withdrawal_date']))
 
 		for withdrawal in withdrawals:
+                    transport_condition_id = withdrawal['header']['transport_condition']
+                    transport_condition_obj = transport_conditions[transport_condition_id]['obj']
+                    responsible_id = withdrawal['header']['responsible']
+                    responsible_obj = responsibles[responsible_id]['obj']
                     transporter_id = withdrawal['header']['transporter']
                     transporter_obj = transporters[transporter_id]['obj']
+                    del withdrawal['header']['transport_condition']
+                    del withdrawal['header']['responsible']
                     del withdrawal['header']['transporter']
                     withdrawal_obj = obj_from_dict(lasso.lasso_warehandling.models.Withdrawal, withdrawal)
+                    withdrawal_obj.transport_condition = transport_condition_obj
+                    withdrawal_obj.responsible = responsible_obj
                     withdrawal_obj.transporter = transporter_obj
                     withdrawal_obj.customer = customer_obj
                     withdrawal_obj.save()
