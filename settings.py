@@ -89,3 +89,5 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'rosetta',
 )
+
+LASSO_LABELPRINTING_PRINTER = ("10.111.7.240", 9100)
