@@ -84,9 +84,31 @@ admin.site.register(Entry, EntryAdmin)
 
 admin.site.register(TransportCondition)
 
+class WithdrawalRowAdminForm(forms.ModelForm):
+    nett_weight = forms.FloatField(label="Nett weight")
+    gross_weight = forms.FloatField(label="Gross weight")
+
+    class Meta:
+        model = WithdrawalRow
+
+    def __init__(self, *args, **kwargs):
+        super(WithdrawalRowAdminForm, self).__init__(*args,**kwargs)
+        if self.instance.pk is not None:
+            self.initial['nett_weight'] = self.instance.nett_weight
+            self.initial['gross_weight'] = self.instance.gross_weight
+
+    def save(self, commit=True):
+        if not self.instance.entry_row.auto_weight:
+            self.instance.nett_weight = self.cleaned_data['nett_weight']
+            self.instance.gross_weight = self.cleaned_data['gross_weight']
+        return super(WithdrawalRowAdminForm, self).save(commit)
+
+    save.alters_data = True
+
 class WithdrawalRowInline(admin.TabularInline):
+    form = WithdrawalRowAdminForm
     model = WithdrawalRow
-    exclude = ('old_units', 'old_nett_weight', 'old_gross_weight')
+    fields = ('entry_row', 'units', 'nett_weight', 'gross_weight')
 
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
