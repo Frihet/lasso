@@ -47,7 +47,7 @@ MEDIA_URL = '/media/'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = 'http://lasso.redhog.org/media/admin/'
+ADMIN_MEDIA_PREFIX = 'http://localhost:8000/media/admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '+dacm+#gpsk=l8(yvnpb*=pe1=n5^4g%dk$_a8=&b#)c*iah(l'
