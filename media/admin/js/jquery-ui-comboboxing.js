@@ -62,7 +62,7 @@
 					.appendTo( ul );
 			};
 
-			$( "<a href='#'>&nbsp;</a>" )
+			$( "<a href='javascript:void(0);'>&nbsp;</a>" )
 				.attr( "tabIndex", -1 )
 				.attr( "title", "Show All Items" )
 				.insertAfter( input )
