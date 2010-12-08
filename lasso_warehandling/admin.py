@@ -137,6 +137,18 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
     owner_field = "customer"
 
+    def set_defaults(self, request, initial):
+        if 'responsible' not in initial:
+            initial['responsible'] = request.user.pk
+
+    def get_form(self, request, *arg, **kw):
+        Form = super(WithdrawalAdmin, self).get_form(request, *arg, **kw)
+        def model_form(*arg, **kw):
+            form = Form(*arg, **kw)
+            self.set_defaults(request, form.initial)
+            return form
+        return model_form
+
 admin.site.register(Withdrawal, WithdrawalAdmin)
 
 
