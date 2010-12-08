@@ -7,11 +7,14 @@ from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
 from extendable_permissions import *
+import utils
 
 class EntryRowAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
         queryset=PalletSpace.objects.all(),
         required=False)
+    withdrawal_links = utils.ModelLinkField(queryset=Withdrawal.objects.all(), required=False)
+
     class Meta:
         model = EntryRow
 
@@ -19,6 +22,7 @@ class EntryRowAdminForm(forms.ModelForm):
         super(EntryRowAdminForm, self).__init__(*args,**kwargs)
         if self.instance.pk is not None:
             self.initial['locations'] = [values[0] for values in self.instance.locations.values_list('pk')]
+            self.initial['withdrawal_links'] = [row.withdrawal for row in self.instance.withdrawal_rows.all()]
 
     def save(self, commit=True):
         instance = super(EntryRowAdminForm, self).save(commit)
@@ -57,12 +61,16 @@ class EntryRowInline(admin.StackedInline):
                                          'locations',
                                          'customs_certificate_nr')
                               }),
-                 ('Amount', {'fields': ('uom',
+                 ('Amount', {'fields': ('auto_weight',
+                                        'uom',
                                         'units',
                                         'nett_weight',
                                         'gross_weight',
                                         'product_value')
-                             })]
+                             }),
+                 ('Current status', {'fields': ('withdrawal_links',
+                                                )})
+                 ]
 
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [EntryRowInline,]
@@ -78,7 +86,7 @@ admin.site.register(TransportCondition)
 
 class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow
-    exclude = ('old_units',)
+    exclude = ('old_units', 'old_nett_weight', 'old_gross_weight')
 
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]

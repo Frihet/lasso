@@ -67,7 +67,9 @@ class EntryRow(models.Model):
     units = models.IntegerField()
     units_left = models.IntegerField(blank=True)
     nett_weight = models.FloatField()
+    _nett_weight_left = models.FloatField(blank=True, null=True)
     gross_weight = models.FloatField()
+    _gross_weight_left = models.FloatField(blank=True, null=True)
     product_value = models.FloatField(null=True, blank=True)
 
     use_before = models.DateField(null=True, blank=True)
@@ -75,6 +77,8 @@ class EntryRow(models.Model):
     product_state = models.BooleanField()
     comment = models.TextField(null=True, blank=True)
     arrival_temperatures = FloatListField()
+
+    auto_weight = models.BooleanField(default=True)
 
     @property
     def cost(self):
@@ -93,13 +97,27 @@ class EntryRow(models.Model):
         if self.product_value is None: return None
         return self.product_value / self.units
 
-    @property
-    def nett_weight_left(self):
-        return self.nett_weight_per_unit * self.units_left
+    def get_nett_weight_left(self):
+        if self.auto_weight:
+            return self.nett_weight_per_unit * self.units_left
+        else:
+            return self._nett_weight_left
+    def set_nett_weight_left(self, value):
+        if self.auto_weight:
+            raise Exception("Can not set nett weight left on EntryRow with auto_weight set")
+        self._nett_weight_left = value
+    nett_weight_left = property(get_nett_weight_left, set_nett_weight_left)
 
-    @property
-    def gross_weight_left(self):
-        return self.gross_weight_per_unit * self.units_left
+    def get_gross_weight_left(self):
+        if self.auto_weight:
+            return self.gross_weight_per_unit * self.units_left
+        else:
+            return self._gross_weight_left
+    def set_gross_weight_left(self, value):
+        if self.auto_weight:
+            raise Exception("Can not set gross weight left on EntryRow with auto_weight set")
+        self._gross_weight_left = value
+    gross_weight_left = property(get_gross_weight_left, set_gross_weight_left)
 
     @property
     def product_value_left(self):
@@ -154,6 +172,9 @@ class EntryRow(models.Model):
 def entry_row_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.units_left = instance.units
+        if not instance.auto_weight:
+            instance.nett_weight_left = instance.nett_weight
+            instance.gross_weight_left = instance.gross_weight
 pre_save.connect(entry_row_pre_save, sender=EntryRow)
 
 class TransportCondition(models.Model):
@@ -213,18 +234,36 @@ class WithdrawalRow(models.Model):
     entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows")
     old_units = models.IntegerField(blank=True)
     units = models.IntegerField()
+    old_nett_weight = models.FloatField(blank=True, null=True)
+    _nett_weight = models.FloatField(blank=True, null=True)
+    old_gross_weight = models.FloatField(blank=True, null=True)
+    _gross_weight = models.FloatField(blank=True, null=True)
 
     @property
     def cost(self):
         return self.gross_weight * self.withdrawal.price_per_kilo_per_withdrawal + self.units * self.withdrawal.price_per_unit_per_withdrawal
 
-    @property
-    def nett_weight(self):
-        return self.entry_row.nett_weight_per_unit * self.units
+    def get_nett_weight(self):
+        if self.entry_row.auto_weight:
+            return self.entry_row.nett_weight_per_unit * self.units
+        else:
+            return self._nett_weight
+    def set_nett_weight(self, value):
+        if self.entry_row.auto_weight:
+            raise Exception("Can not set nett weight for EntryRow with auto_weight set")
+        self._nett_weight = value
+    nett_weight = property(get_nett_weight, set_nett_weight)
 
-    @property
-    def gross_weight(self):
-        return self.entry_row.gross_weight_per_unit * self.units
+    def get_gross_weight(self):
+        if self.entry_row.auto_weight:
+            return self.entry_row.gross_weight_per_unit * self.units
+        else:
+            return self._gross_weight
+    def set_gross_weight(self, value):
+        if self.entry_row.auto_weight:
+            raise Exception("Can not set gross weight for EntryRow with auto_weight set")
+        self._gross_weight = value
+    gross_weight = property(get_gross_weight, set_gross_weight)
 
     @property
     def id_str(self):
@@ -236,16 +275,27 @@ class WithdrawalRow(models.Model):
 def withdrawal_row_post_init(sender, instance, **kwargs):
     if instance.id is None:
         instance.old_units = 0
+        if not instance.entry_row.auto_weight:
+            instance.old_nett_weight = 0.0
+            instance.old_gross_weight = 0.0
 pre_save.connect(withdrawal_row_post_init, sender=WithdrawalRow)
 
 def withdrawal_row_pre_save(sender, instance, **kwargs):
     instance.entry_row.units_left -= instance.units - instance.old_units
-    instance.entry_row.save()
     instance.old_units = instance.units
+    if not instance.entry_row.auto_weight:
+        instance.entry_row.nett_weight_left -= instance.nett_weight - instance.old_nett_weight
+        instance.entry_row.gross_weight_left -= instance.gross_weight - instance.old_gross_weight
+        instance.old_nett_weight = instance.nett_weight
+        instance.old_gross_weight = instance.gross_weight
+    instance.entry_row.save()
 pre_save.connect(withdrawal_row_pre_save, sender=WithdrawalRow)
 
 def withdrawal_row_pre_delete(sender, instance, **kwargs):
     instance.entry_row.units_left += instance.old_units
+    if not instance.entry_row.auto_weight:
+        instance.entry_row.nett_weight_left += instance.old_nett_weight
+        instance.entry_row.gross_weight_left += instance.old_gross_weight
     instance.entry_row.save()
 pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 
