@@ -13,23 +13,43 @@ import codecs
 import socket
 import settings
 
-def zprint(text,copies,lmarg=50, tmarg=25):
-    # Ok, this printer has a wierd character encoding...
-    text = text.translate('\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\x8f\x92\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\x9d\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4}{\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7|\xf9\xfa\xfb\xfc\xfd\xfe\xff')
+def zencode(str):
+    return unicode(str).encode('cp850')
 
+def zprint(args,copies,lmarg=50, tmarg=25):
     data = ''
     for job in xrange(0, copies):
-        lheight = 40
+        lheight = 60
         lpos = tmarg
         data += "^XA\n"
+        data += "^CI13\n"
+
+        platsize = 200
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg, tmarg, platsize, platsize, zencode(args['platform']))
+
+        # The barcode
+        text = zencode("%(customer_nr)s;%(name)s;%(street)s;%(zip)s;%(city)s;%(platform)s" % args)
+        data += "^FO%s,%s\n" % (lmarg + 300, tmarg)
+        data += "^BQN,N,5,N,N,N\n"
+        data +="^FD>;%s^FS\n" % (text,)
+
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg, 50, 50, zencode("FLS"))
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg + 50, 50, 50, zencode("Vecom"))
+
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg + 150, 50, 50, zencode(args['customer_nr']))
+
+        data += "^FO%s,%s^A0N,40,40^FD%s^FS\n" % (lmarg, tmarg + 200, "-------------------")
+
+        lpos = tmarg + 200 + lheight
+
+        text = zencode("%(name)s\n%(street)s\n%(zip)s %(city)s" % args)
         for line in text.split("\n"):
-            data += "^CI4\n"
-            data += "^FO%s,%s^A0N,40,40^FD%s^FS\n" % (lmarg, lpos, line.strip())
+            data += "^FO%s,%s^A0N,40,40^A0,%s,%s^FD%s^FS\n" % (lmarg, lpos, lheight-5, lheight-5, line.strip())
             lpos += lheight
 
-        data += "^FO%s,200\n" % (lmarg,)
-        data += "^BQN,50,200,N,N,N\n"
-        data +="^FD>;%s^FS\n" % (text.replace("\n", "; "),)
+        # Job number
+        text = "%s/%s" % (job+1, copies)
+        data += "^FO%s,%s^A0N,40,40^A0,%s,%s^FD%s^FS\n" % (775-lmarg-len(text)*23, 600-lheight, lheight-5, lheight-5, text)
 
         data += "^XZ\n"
 
@@ -83,7 +103,7 @@ def print_labels(request):
 
                         addr = lasso_labelprinting.models.Address.objects.get(customer_nr=customer_nr)
 
-                        zprint(("%(name)s (%(customer_nr)s)\n%(street)s\n%(zip)s %(platform)s %(city)s" % addr.as_dict).encode('latin-1'), total)
+                        zprint(addr.as_dict, total)
 
         finally:
             try:
