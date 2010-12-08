@@ -55,12 +55,6 @@ class EntryRowInline(admin.StackedInline):
                                          'product_nr',
                                          'product_description')
                               }),
-                 ('Arrival', {'fields': ('arrival_temperatures',
-                                         'product_state',
-                                         'comment',
-                                         'locations',
-                                         'customs_certificate_nr')
-                              }),
                  ('Amount', {'fields': ('auto_weight',
                                         'uom',
                                         'units',
@@ -69,7 +63,13 @@ class EntryRowInline(admin.StackedInline):
                                         'product_value')
                              }),
                  ('Current status', {'fields': ('withdrawal_links',
-                                                )})
+                                                )}),
+                 ('Arrival', {'fields': ('arrival_temperatures',
+                                         'product_state',
+                                         'comment',
+                                         'locations',
+                                         'customs_certificate_nr')
+                              }),
                  ]
 
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
