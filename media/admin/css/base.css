@@ -392,9 +392,18 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 /* MODULES */
 
 .module {
+    -moz-border-radius: 4pt;
+    border-radius: 4pt;
+
     border: 1px solid #ccc;
     margin-bottom: 5px;
     background: white;
+}
+
+.dashboard #content-main .module {
+    float: left;
+    width: 350pt;
+    margin: 5px;
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -684,7 +693,7 @@ table#change-history tbody th {
 }
 
 .dashboard #content {
-    width: 500px;
+    width: 80%;
 }
 
 /* HEADER */
@@ -745,3 +754,12 @@ table#change-history tbody th {
     color: #666;
 }
 
+.ui-button { margin-left: -1px; }
+.ui-button-icon-only .ui-button-text { padding: 0.35em; } 
+.ui-autocomplete-input { margin: 0; padding: 0.48em 0 0.47em 0.45em; }
+.ui-menu .ui-menu-item { list-style-type: none; }
+
+
+.tabular.inline-related .ui-autocomplete-input {
+    width: 300pt;
+}

@@ -47,7 +47,7 @@ MEDIA_URL = '/media/'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = 'http://10.111.1.90/media/admin/'
+ADMIN_MEDIA_PREFIX = 'http://217.193.154.12/media/admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '+dacm+#gpsk=l8(yvnpb*=pe1=n5^4g%dk$_a8=&b#)c*iah(l'
@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'lasso.lasso_warehouse',
     'lasso.lasso_customer',
     'lasso.lasso_warehandling',
+    'lasso.lasso_labelprinting',
     'lasso.lasso_import',
     'lasso.i18next',
     'django.contrib.admin',
@@ -88,3 +89,5 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'rosetta',
 )
+
+LASSO_LABELPRINTING_PRINTER = ("10.111.7.240", 9100)
