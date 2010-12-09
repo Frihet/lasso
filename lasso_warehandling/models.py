@@ -337,7 +337,8 @@ class StorageLog(models.Model):
     price_per_kilo_per_day = models.FloatField()
     price_per_unit_per_day = models.FloatField()
     units_left = models.IntegerField()
-
+    _nett_weight_left = models.FloatField(blank=True, null=True)
+    _gross_weight_left = models.FloatField(blank=True, null=True)
 
     class Meta:
         permissions = (("view_storagelog", "View"),
@@ -349,11 +350,17 @@ class StorageLog(models.Model):
 
     @property
     def nett_weight_left(self):
-        return self.entry_row.nett_weight_per_unit * self.units_left
+        if  self.entry_row.auto_weight:
+            return self.entry_row.nett_weight_per_unit * self.units_left
+        else:
+            return self._nett_weight_left
 
     @property
     def gross_weight_left(self):
-        return self.entry_row.gross_weight_per_unit * self.units_left
+        if  self.entry_row.auto_weight:
+            return self.entry_row.nett_weight_per_unit * self.units_left
+        else:
+            return self._nett_weight_left
 
     def __unicode__(self):
         return u"%s for %s: %s à %s/kg + %s/unit" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day, self.price_per_unit_per_day)
@@ -363,4 +370,7 @@ def storagelog_pre_save(sender, instance, **kwargs):
     if getattr(instance, 'price_per_kilo_per_day', None) is None: instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
     if getattr(instance, 'price_per_unit_per_day', None) is None: instance.price_per_unit_per_day = instance.entry_row.entry.customer.price_per_unit_per_day
     if getattr(instance, 'units_left', None) is None: instance.units_left = instance.entry_row.units_left
+    if not instance.entry_row.auto_weight:
+        if getattr(instance, 'nett_weight_left', None) is None: instance.nett_weight_left = instance.entry_row.nett_weight_left
+        if getattr(instance, 'gross_weight_left', None) is None: instance.gross_weight_left = instance.entry_row.gross_weight_left
 pre_save.connect(storagelog_pre_save, sender=StorageLog)
