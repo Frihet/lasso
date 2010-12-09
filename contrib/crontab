@@ -1,0 +1,4 @@
+# m h  dom mon dow   command
+*/2 * * * * $HOME/contrib/ensureoodaemonisrunning.sh >> /dev/null 2>&1
+0   0 * * * $HOME/contrib/logstorage.sh >> $HOME/storage.log 2>&1
+0   0 * * * $HOME/contrib/contrib/backupdb.sh >> $HOME/dbbackup.log 2>&1
