@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from lasso.lasso_customer.models import *
 from django.db.models.signals import *
@@ -21,6 +22,8 @@ class Entry(models.Model):
     class Meta:
         permissions = (("view_entry", "View"),
                        ("view_own_entry", "View own"))
+        verbose_name = _('Entry')
+        verbose_name_plural = _('Entries')
 
     @property
     def nett_weight(self):
@@ -60,6 +63,10 @@ def entry_pre_save(sender, instance, **kwargs):
 pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
+    class Meta:
+        verbose_name = _('Entry row')
+        verbose_name_plural = _('Entry rows')
+
     entry = models.ForeignKey(Entry, related_name="rows")
     customs_certificate_nr = models.CharField(max_length=200, blank=True)
     product_nr = models.CharField(max_length=400, blank=True)
@@ -185,12 +192,22 @@ def entry_row_pre_save(sender, instance, **kwargs):
 pre_save.connect(entry_row_pre_save, sender=EntryRow)
 
 class TransportCondition(models.Model):
+    class Meta:
+        verbose_name = _('Transport condition')
+        verbose_name_plural = _('Transport conditions')
+
     name = models.CharField(max_length=200)
 
     def __unicode__(self):
         return self.name
 
 class Withdrawal(models.Model):
+    class Meta:
+        permissions = (("view_withdrawal", "View"),
+                       ("view_own_withdrawal", "View own"))
+        verbose_name = _('Withdrawal')
+        verbose_name_plural = _('Withdrawals')
+
     customer = models.ForeignKey(Customer)
     price_per_kilo_per_withdrawal = models.FloatField(blank=True)
     price_per_unit_per_withdrawal = models.FloatField(blank=True)
@@ -210,10 +227,6 @@ class Withdrawal(models.Model):
     opening_hours = models.CharField(max_length=200, blank=True)
     transporter = models.ForeignKey(Transporter)
     comment = models.TextField(null=True, blank=True)
-
-    class Meta:
-        permissions = (("view_withdrawal", "View"),
-                       ("view_own_withdrawal", "View own"))
 
     @property
     def nett_weight(self):
@@ -237,6 +250,10 @@ def withdrawal_pre_save(sender, instance, **kwargs):
 pre_save.connect(withdrawal_pre_save, sender=Withdrawal)
 
 class WithdrawalRow(models.Model):
+    class Meta:
+        verbose_name = _('Withdrawal row')
+        verbose_name_plural = _('Withdrawal rows')
+
     withdrawal = models.ForeignKey(Withdrawal, related_name="rows")
     entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows")
     old_units = models.IntegerField(blank=True)
@@ -312,6 +329,10 @@ pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 
 
 class UnitWork(models.Model):
+    class Meta:
+        verbose_name = _('Unit work')
+        verbose_name_plural = _('Unit work instances')
+
     work_type = models.ForeignKey(UnitWorkPrices)
     price_per_unit = models.FloatField(blank=True)
     date = models.DateField()
@@ -332,6 +353,10 @@ pre_save.connect(unitwork_pre_save, sender=UnitWork)
 
 
 class StorageLog(models.Model):
+    class Meta:
+        verbose_name = _('Storage log')
+        verbose_name_plural = _('Storage log entries')
+
     entry_row = models.ForeignKey(EntryRow, related_name="logs")
     date = models.DateField()
     price_per_kilo_per_day = models.FloatField()

@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User, UserManager
@@ -13,11 +14,19 @@ def __unicode__(self):
 User.__unicode__ = __unicode__
 
 class UnitWorkType(models.Model):
+    class Meta:
+        verbose_name = _('Unit work type')
+        verbose_name_plural = _('Unit work types')
+
     name = models.CharField(max_length=200)
     def __unicode__(self):
         return self.name
 
 class Organization(User):
+    class Meta:
+        verbose_name = _('Organization')
+        verbose_name_plural = _('Organizations')
+
     _username_prefix = ""
     name = models.CharField(max_length=200)
     address = models.TextField(blank=True)
@@ -35,11 +44,19 @@ def organization_pre_save(sender, instance, **kwargs):
 pre_save.connect(organization_pre_save, sender=Organization)
 
 class Contact(Organization):
+    class Meta:
+        verbose_name = _('Contact')
+        verbose_name_plural = _('Contacts')
+
     _username_prefix = "co_"
     for_organization = models.ForeignKey(Organization, related_name = 'contacts')
 pre_save.connect(organization_pre_save, sender=Contact)
 
 class Customer(Organization):
+    class Meta:
+        verbose_name = _('Customer')
+        verbose_name_plural = _('Customers')
+
     _username_prefix = "cu_"
     price_per_kilo_per_day = models.FloatField()
     price_per_kilo_per_entry = models.FloatField()
@@ -51,10 +68,16 @@ class Customer(Organization):
 pre_save.connect(organization_pre_save, sender=Customer)
 
 class Transporter(Organization):
+    class Meta:
+        verbose_name = _('Transporter')
+        verbose_name_plural = _('Transporters')
     _username_prefix = "tr_"
 pre_save.connect(organization_pre_save, sender=Transporter)
 
 class UnitWorkPrices(models.Model):
+    class Meta:
+        verbose_name = _('Unit work price')
+        verbose_name_plural = _('Unit work prices')
     customer = models.ForeignKey(Customer)
     work_type = models.ForeignKey(UnitWorkType)
     price_per_unit = models.FloatField()
