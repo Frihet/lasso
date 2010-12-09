@@ -1,0 +1,3 @@
+python-openoffice
+openoffice.org-java-common
+Django (< 1.1.2)
