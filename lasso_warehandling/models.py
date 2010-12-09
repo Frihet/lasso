@@ -136,24 +136,27 @@ class EntryRow(models.Model):
 
         log_items = []
 
+        # Start logging on the arrival day, or on the day after the
+        # last logged date if there is a log
         try:
-            last_log = StorageLog.objects.filter(entry_row = self).order_by("-date")[0]
+            last_log = self.logs.order_by("-date")[0]
             units_left = last_log.units_left
             last_date = last_log.date + datetime.timedelta(1)
         except IndexError:
-            last_date = entry_row.entry.arrival_date
-            units_left = entry_row.units
+            last_date = self.entry.arrival_date
+            units_left = self.units
 
-        steps = [(withdrawal.withdrawal_date + datetime.timedelta(1), withdrawal.units)
-                       for withdrawal in WithdrawalRow.objects.filter(entry_row = self,
-                                                                      withdrawal__withdrawal_date__gte = last_date,
-                                                                      withdrawal__withdrawal_date__lt = until
-                                                                      ).order_by("withdrawal__withdrawal_date")]
+        # Plus one day, because withdrawals are logged the day after they are done
+        steps = [(withdrawal_row.withdrawal.withdrawal_date + datetime.timedelta(1), withdrawal_row.units)
+                 for withdrawal_row in WithdrawalRow.objects.filter(entry_row = self,
+                                                                    withdrawal__withdrawal_date__gte = last_date,
+                                                                    withdrawal__withdrawal_date__lt = until
+                                                                    ).order_by("withdrawal__withdrawal_date")]
         steps += [(until, 0)]
 
         for (next_date, units) in steps:
             for storage_date in xdaterange(last_date, next_date):
-                log_item = lasso.lasso_warehandling.models.StorageLog()
+                log_item = StorageLog()
                 log_item.units_left = units_left
                 log_item.date = storage_date
                 log_item.entry_row = self
@@ -175,6 +178,10 @@ def entry_row_pre_save(sender, instance, **kwargs):
         if not instance.auto_weight:
             instance.nett_weight_left = instance.nett_weight
             instance.gross_weight_left = instance.gross_weight
+#    Saving a withdrawal updates units_left so deleting all logs then
+#    doesn't work...
+#    for log in instance.logs.all():
+#        log.delete()
 pre_save.connect(entry_row_pre_save, sender=EntryRow)
 
 class TransportCondition(models.Model):
@@ -289,6 +296,10 @@ def withdrawal_row_pre_save(sender, instance, **kwargs):
         instance.old_nett_weight = instance.nett_weight
         instance.old_gross_weight = instance.gross_weight
     instance.entry_row.save()
+    print "XXXXX", instance.entry_row.logs.all()
+    for log in instance.entry_row.logs.filter(date__gte=instance.withdrawal.withdrawal_date).all():
+        print "DELETING", log.date
+        log.delete()
 pre_save.connect(withdrawal_row_pre_save, sender=WithdrawalRow)
 
 def withdrawal_row_pre_delete(sender, instance, **kwargs):
@@ -321,7 +332,7 @@ pre_save.connect(unitwork_pre_save, sender=UnitWork)
 
 
 class StorageLog(models.Model):
-    entry_row = models.ForeignKey(EntryRow)
+    entry_row = models.ForeignKey(EntryRow, related_name="logs")
     date = models.DateField()
     price_per_kilo_per_day = models.FloatField()
     price_per_unit_per_day = models.FloatField()
