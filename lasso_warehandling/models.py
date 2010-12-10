@@ -9,7 +9,8 @@ from lasso.utils import *
 import django.contrib.auth.models
 
 class Entry(models.Model):
-    customer = models.ForeignKey(Customer)
+    customer = models.ForeignKey(Customer, related_name="customer_for_entry")
+    original_seller = models.ForeignKey(OriginalSeller, blank=True, null=True, related_name="original_seller_for_entry")
     arrival_date = models.DateField(default=lambda: datetime.date.today())
     insurance = models.BooleanField(blank=True)
     transporter = models.ForeignKey(Transporter)
@@ -208,7 +209,7 @@ class Withdrawal(models.Model):
         verbose_name = _('Withdrawal')
         verbose_name_plural = _('Withdrawals')
 
-    customer = models.ForeignKey(Customer)
+    customer = models.ForeignKey(Customer, related_name='customer_for_withdrawal')
     price_per_kilo_per_withdrawal = models.FloatField(blank=True)
     price_per_unit_per_withdrawal = models.FloatField(blank=True)
 
@@ -220,7 +221,7 @@ class Withdrawal(models.Model):
     transport_nr = models.CharField(max_length=200, blank=True)
     order_nr = models.CharField(max_length=200, blank=True)
 
-    destination_address = models.TextField(null=True, blank=True)
+    destination = models.ForeignKey(Destination, related_name='destination_for_withdrawal')
     withdrawal_date = models.DateField(default=lambda: datetime.date.today())
     arrival_date = models.DateField(null=True, blank=True, default=lambda: datetime.date.today()+datetime.timedelta(1))
     vehicle_type = models.CharField(max_length=200, blank=True)

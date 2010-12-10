@@ -114,7 +114,7 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
-    fieldsets = [('Destination', {'fields': ('destination_address',
+    fieldsets = [('Arrival', {'fields': ('destination',
                                              'opening_hours',
                                              'arrival_date',
                                              'comment')

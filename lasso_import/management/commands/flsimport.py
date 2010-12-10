@@ -43,6 +43,7 @@ class Command(BaseCommand):
 	customers = {}
         transporters = {}
         responsibles = {}
+        destinations = {}
         transport_conditions = {}
 
 	errors = []
@@ -228,7 +229,7 @@ class Command(BaseCommand):
                                 months[month]['price_per_kilo_per_day'] = row[3]
                     if 'units' in header and header['units'] != None:
                         if header['customer']:
-                            mergeset(customers[customer_id]['header'], 'name', header['customer'].split(',')[0].strip())
+                            mergeset(customers[customer_id]['header'], 'title', header['customer'].split(',')[0].strip())
                             mergeset(customers[customer_id]['header'], 'address', '\n'.join(item.strip() for item in header['customer'].split(',')))
                         entry_id, entry_row_id = header['entry_id'].split('.')
                         if entry_id not in customers[customer_id]['entries']:
@@ -250,7 +251,7 @@ class Command(BaseCommand):
                                 address = '\n'.join(item.strip() for item in address.split(","))
                                 entry['header']['transporter'] = transporter
 
-                            transporters[transporter] = {'header': {'name': transporter, 'address': address}}
+                            transporters[transporter] = {'header': {'title': transporter, 'address': address}}
 
                 elif withdrawal_re.search(filename):
                     f =[[col.decode('utf-8') for col in row] for row in csv.reader(open(filename, 'r'), dialect="excel")]
@@ -272,6 +273,7 @@ class Command(BaseCommand):
                     header['transport_nr'] = f[24][3]
                     header['order_nr'] = f[25][1];
 
+                    header['destination'] = f[14][5]
                     header['destination_address'] = f[14][5] + '\n' + f[15][5] + '\n' + f[16][5] + '\n' + f[17][5]
 
                     header['withdrawal_date'] = value_to_date(f[19][8])
@@ -302,16 +304,19 @@ class Command(BaseCommand):
                         transport_conditions[header['transport_condition']] = {'header': {'name': header['transport_condition']}}
 
                     if header['responsible']:
-                        responsibles[header['responsible']] = {'header': {'name': header['responsible']}}
+                        responsibles[header['responsible']] = {'header': {'title': header['responsible']}}
+
+                    if header['destination']:
+                        destinations[header['destination']] = {'header': {'title': header['destination'], 'address': header['destination_address']}}
 
                     if header['transporter']:
                         address = ""
                         if ',' in header['transporter']:
                             header['transporter'], address = transporter.split(',', 1)
                             address = '\n'.join(item.strip() for item in address.split(","))
-                        transporters[header['transporter']] = {'header': {'name': header['transporter'], 'address': address}}
+                        transporters[header['transporter']] = {'header': {'title': header['transporter'], 'address': address}}
                     if header['customer_name']:
-                        customers[customer_id]['name'] = header['customer_name']
+                        customers[customer_id]['title'] = header['customer_name']
                     if header['customer_address']:
                         customers[customer_id]['address'] = header['customer_address']
                     customers[customer_id]['withdrawals'][header['withdrawal_id']] = {'header': header, 'rows': rows}
@@ -372,11 +377,15 @@ class Command(BaseCommand):
                 transport_condition_obj.save()
 
 	    for name, responsible in responsibles.iteritems():
-                responsible['header']['username'] = "re_" + re.compile(r"[^a-z0-9]").sub("_", responsible['header']['name'].lower())
                 responsible_obj = obj_from_dict(django.contrib.auth.models.User, responsible)
                 responsible_obj.save()
 
+	    for name, destination in destinations.iteritems():
+                destination_obj = obj_from_dict(lasso.lasso_customer.models.Destination, destination)
+                destination_obj.save()
+
 	    for name, transporter in transporters.iteritems():
+                print transporter
                 transporter_obj = obj_from_dict(lasso.lasso_customer.models.Transporter, transporter)
                 transporter_obj.save()
 
@@ -418,14 +427,19 @@ class Command(BaseCommand):
                     transport_condition_obj = transport_conditions[transport_condition_id]['obj']
                     responsible_id = withdrawal['header']['responsible']
                     responsible_obj = responsibles[responsible_id]['obj']
+                    destination_id = withdrawal['header']['destination']
+                    destination_obj = destinations[destination_id]['obj']
                     transporter_id = withdrawal['header']['transporter']
                     transporter_obj = transporters[transporter_id]['obj']
                     del withdrawal['header']['transport_condition']
                     del withdrawal['header']['responsible']
+                    del withdrawal['header']['destination']
+                    del withdrawal['header']['destination_address']
                     del withdrawal['header']['transporter']
                     withdrawal_obj = obj_from_dict(lasso.lasso_warehandling.models.Withdrawal, withdrawal)
                     withdrawal_obj.transport_condition = transport_condition_obj
                     withdrawal_obj.responsible = responsible_obj
+                    withdrawal_obj.destination = destination_obj
                     withdrawal_obj.transporter = transporter_obj
                     withdrawal_obj.customer = customer_obj
                     withdrawal_obj.save()

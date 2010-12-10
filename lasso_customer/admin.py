@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
 
-
 admin.site.register(UnitWorkType)
 
 class UnitWorkPricesInline(admin.TabularInline):
@@ -13,19 +12,26 @@ class UnitWorkPricesInline(admin.TabularInline):
 
 class ContactInline(admin.TabularInline):
     model = Contact
-    fk_name = "for_organization"
+    fk_name = "organization"
     fields = ("first_name", "last_name", "email", "phone", "fax", "address")
 
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [UnitWorkPricesInline, ContactInline]
-    exclude = ('username', 'first_name', 'last_name', 'is_superuser','user_permissions', 'last_login', 'date_joined', 'is_staff')
     search_fields = ('name',)
-
 admin.site.register(Customer, CustomerAdmin)
+
+class OriginalSellerAdmin(admin.ModelAdmin):
+    inlines = [ContactInline]
+    search_fields = ('name',)
+admin.site.register(OriginalSeller, OriginalSellerAdmin)
+
+class DestinationAdmin(admin.ModelAdmin):
+    inlines = [ContactInline]
+    search_fields = ('name',)
+admin.site.register(Destination, DestinationAdmin)
 
 class TransporterAdmin(admin.ModelAdmin):
     inlines = [ContactInline]
-    exclude = ('username', 'first_name', 'last_name', 'is_superuser','user_permissions', 'last_login', 'date_joined', 'is_staff')
     search_fields = ('name',)
 
 admin.site.register(Transporter, TransporterAdmin)
