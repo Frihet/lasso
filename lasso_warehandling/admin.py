@@ -110,7 +110,17 @@ class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow
     fields = ('entry_row', 'units', 'nett_weight', 'gross_weight')
 
+class WithdrawalAdminForm(forms.ModelForm):
+    class Meta:
+        model = Withdrawal
+    reference_nr = forms.CharField()
+    def __init__(self, *args, **kwargs):
+        super(WithdrawalAdminForm, self).__init__(*args,**kwargs)
+        if self.instance is not None:
+            self.initial['reference_nr'] = self.instance.reference_nr
+
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
+    form = WithdrawalAdminForm
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
@@ -121,7 +131,8 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
                                   }),
                  ('General', {'fields': ('customer',
                                          'transport_nr',
-                                         'order_nr')
+                                         'order_nr',
+                                         'reference_nr')
                               }),
                  ('Departure', {'fields': ('responsible',
                                            'place_of_departure',
