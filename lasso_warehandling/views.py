@@ -144,3 +144,12 @@ def costlog(request, *arg, **kw):
 
     return render_to_response('lasso_warehandling/costlog.html', info, context_instance=template.RequestContext(request))
 
+@staff_member_required
+def withdrawal_print(request, withdrawal_id, *arg, **kw):
+    info = {}
+    info['withdrawal'] = Withdrawal.objects.get(id=withdrawal_id)
+    info['units'] = sum(row.units for row in info['withdrawal'].rows.all())
+    info['nett_weight'] = sum(row.nett_weight for row in info['withdrawal'].rows.all())
+    info['gross_weight'] = sum(row.gross_weight for row in info['withdrawal'].rows.all())
+
+    return render_to_response('lasso_warehandling/withdrawal_print.html', info, context_instance=template.RequestContext(request))
