@@ -120,7 +120,6 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
                                              'comment')
                                   }),
                  ('General', {'fields': ('customer',
-                                         'reference_nr',
                                          'transport_nr',
                                          'order_nr')
                               }),

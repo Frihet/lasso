@@ -2,6 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from lasso.lasso_customer.models import *
+from lasso.lasso_global.models import *
 from django.db.models.signals import *
 from django import forms
 import datetime
@@ -18,7 +19,8 @@ class Entry(models.Model):
     price_per_unit_per_entry = models.FloatField(blank=True)
     custom_handling_date = models.DateField(null=True, blank=True)
     customs_nr = models.CharField(max_length=200, blank=True)
-    origin = models.CharField(max_length=200, blank=True)
+    origin = models.ForeignKey(Origin, blank=True, null=True)
+    customer_entry_nr = models.CharField(max_length=200, blank=True)
 
     class Meta:
         permissions = (("view_entry", "View"),
@@ -213,7 +215,6 @@ class Withdrawal(models.Model):
     price_per_kilo_per_withdrawal = models.FloatField(blank=True)
     price_per_unit_per_withdrawal = models.FloatField(blank=True)
 
-    reference_nr = models.CharField(max_length=200, blank=True)
     responsible = models.ForeignKey(django.contrib.auth.models.User, related_name="responsible_for")
     place_of_departure = models.CharField(max_length=200, blank=True)
     
@@ -228,6 +229,29 @@ class Withdrawal(models.Model):
     opening_hours = models.CharField(max_length=200, blank=True)
     transporter = models.ForeignKey(Transporter)
     comment = models.TextField(null=True, blank=True)
+
+    @property
+    def reference_nr(self):
+        origin = None
+        for row in self.rows.all():
+            if origin is None:
+                origin = row.entry_row.entry.origin
+            else:
+                if origin != row.entry_row.entry.origin:
+                    origin = False
+        if origin:
+            origin = origin.reference_nr
+        else:
+            origin = 0
+
+        # Don't ask my why...
+        # 2007 = 01..12
+        # 2008 = 21..32
+        # 2009 = 41..52
+        # 2010 = 61..72
+        month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
+
+        return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')
 
     @property
     def nett_weight(self):
@@ -314,9 +338,7 @@ def withdrawal_row_pre_save(sender, instance, **kwargs):
         instance.old_nett_weight = instance.nett_weight
         instance.old_gross_weight = instance.gross_weight
     instance.entry_row.save()
-    print "XXXXX", instance.entry_row.logs.all()
     for log in instance.entry_row.logs.filter(date__gte=instance.withdrawal.withdrawal_date).all():
-        print "DELETING", log.date
         log.delete()
 pre_save.connect(withdrawal_row_pre_save, sender=WithdrawalRow)
 

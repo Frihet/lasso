@@ -37,7 +37,6 @@ class Organization(Group):
 
 def organization_pre_save(sender, instance, **kwargs):
     instance.name = type(instance).__name__ + "_" + instance.title
-    print "SAVE", instance.name
 pre_save.connect(organization_pre_save, sender=Organization)
 
 class Contact(User):
@@ -58,6 +57,8 @@ class Customer(Organization):
     class Meta:
         verbose_name = _('Customer')
         verbose_name_plural = _('Customers')
+
+    customer_nr = models.CharField(max_length=200, blank=True)
 
     price_per_kilo_per_day = models.FloatField(default=0.0)
     price_per_kilo_per_entry = models.FloatField(default=0.0)
