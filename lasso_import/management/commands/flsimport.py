@@ -333,7 +333,7 @@ class Command(BaseCommand):
                         mergeset(origins[header['origin']]['header'], 'name', header['origin'])
                         mergeset(origins[header['origin']]['header'], 'reference_nr', header['reference_nr'].split('.')[0])
 
-                    mergeset(customers[customer_id], 'customer_nr', header['reference_nr'].split('.')[2])
+                    mergeset(customers[customer_id]['header'], 'customer_nr', header['reference_nr'].split('.')[2])
                     del header['reference_nr']
 
             except UnicodeDecodeError:
