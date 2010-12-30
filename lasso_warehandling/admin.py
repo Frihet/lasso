@@ -75,7 +75,7 @@ class EntryRowInline(admin.StackedInline):
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [EntryRowInline,]
     date_hierarchy = 'arrival_date'
-    exclude = ('price_per_kilo_per_entry','price_per_unit_per_entry',)
+    exclude = ('insurance_percentage', 'price_per_kilo_per_entry','price_per_unit_per_entry',)
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
     search_fields = ('customer__name', 'arrival_date', 'rows__product_description')
     owner_field = "customer"

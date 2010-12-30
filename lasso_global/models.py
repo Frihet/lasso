@@ -19,8 +19,11 @@ class Insurance(models.Model):
     percent = models.FloatField()
 
     def __unicode__(self):
-        return self.percent
+        return unicode(self.percent)
 
     @classmethod
     def get(cls):
-        return cls.objects.all()[0].percent
+        all = cls.objects.all()
+        if all:
+            return all[0].percent
+        return 0.0

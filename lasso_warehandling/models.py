@@ -8,6 +8,7 @@ from django import forms
 import datetime
 from lasso.utils import *
 import django.contrib.auth.models
+import operator
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer, related_name="customer_for_entry")
@@ -15,6 +16,7 @@ class Entry(models.Model):
     arrival_date = models.DateField(default=lambda: datetime.date.today())
     insurance = models.BooleanField(blank=True)
     transporter = models.ForeignKey(Transporter)
+    insurance_percentage = models.FloatField(blank=True)
     price_per_kilo_per_entry = models.FloatField(blank=True)
     price_per_unit_per_entry = models.FloatField(blank=True)
     custom_handling_date = models.DateField(null=True, blank=True)
@@ -61,6 +63,7 @@ class Entry(models.Model):
 
 def entry_pre_save(sender, instance, **kwargs):
     if instance.id is None:
+        instance.insurance_percentage = Insurance.get()
         instance.price_per_kilo_per_entry = instance.customer.price_per_kilo_per_entry
         instance.price_per_unit_per_entry = instance.customer.price_per_unit_per_entry
 pre_save.connect(entry_pre_save, sender=Entry)
@@ -92,7 +95,10 @@ class EntryRow(models.Model):
 
     @property
     def cost(self):
-        return self.gross_weight * self.entry.price_per_kilo_per_entry + self.units * self.entry.price_per_unit_per_entry
+        res = self.gross_weight * self.entry.price_per_kilo_per_entry + self.units * self.entry.price_per_unit_per_entry
+        if self.entry.insurance:
+            res += self.product_value * self.entry.insurance_percentage
+        return res
 
     @property
     def nett_weight_per_unit(self):
@@ -252,6 +258,14 @@ class Withdrawal(models.Model):
         month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
 
         return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')
+
+    @property
+    def insurance(self):
+        if reduce(operator.__and__, [row.entry_row.entry.insurance for row in self.rows], True):
+            return 2
+        if reduce(operator.__or__, [row.entry_row.entry.insurance for row in self.rows], True):
+            return 1
+        return 0
 
     @property
     def nett_weight(self):

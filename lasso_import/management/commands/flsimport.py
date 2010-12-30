@@ -380,6 +380,8 @@ class Command(BaseCommand):
 		    entry_row = entry['rows'][entry_row_id]
 		    movemerge(row, 'origin', entry['header'], 'origin')
 		    movemerge(withdrawal['header'], 'insurance', entry['header'], 'insurance')
+                    if 'insurance' in withdrawal['header']:
+                        del withdrawal['header']['insurance']
 
 	if errors:
 	    print "==================================={ ERRORS }==================================="

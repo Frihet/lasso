@@ -163,7 +163,7 @@
 			<td>
 				VERSICHERING/ASSURANCE</td>
 			<td>
-				&nbsp;</td>
+				{% ifequal withdrawal.insurance 2 %}PAR NOUS{% else %}{% ifequal withdrawal.insurance 1 %}Some wares covered{% else %}PAS PAR NOUS{% endifequal %}{% endifequal %}</td>
 			<td>
 				TRANSPORTMITTEL/MOYEN TRANSPORT</td>
 			<td>
