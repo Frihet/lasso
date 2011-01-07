@@ -1,0 +1,298 @@
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>{% block title %}{{ withdrawal.id }} - {{ withdrawal.customer }}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}lasso_warehandling/withdrawal_print.css" />
+  </head>
+  <body>
+    {% block header %}
+<table class="header">
+	<tbody>
+		<tr>
+			<td>
+				Postanschrift</td>
+			<td>
+				Bankverbindung Inland</td>
+			<td>
+				Bankverbindung Ausland</td>
+			<td>
+				Postcheckkonto: 40-187-1</td>
+		</tr>
+		<tr>
+			<td>
+				FLS Furness Lagerhaus &amp; Spedition AG</td>
+			<td>
+				Cr&eacute;dit Suisse</td>
+			<td>
+				Deutsche Bank</td>
+			<td>
+				MWST-Nr.: 263 873</td>
+		</tr>
+		<tr>
+			<td>
+				G&uuml;terstrasse 66</td>
+			<td>
+				CH-4133 Pratteln</td>
+			<td>
+				D-79539 L&ouml;rrach</td>
+			<td>
+				Telefon (+41)(0)61 / 8262800</td>
+		</tr>
+		<tr>
+			<td>
+				CH-4133 Pratteln</td>
+			<td>
+				IBAN CH93 0458 0056 6000 7100 0</td>
+			<td>
+				IBAN DE62 6837 0034 0065 1430 00</td>
+			<td>
+				Telefax (+41)(0)61 / 8212075</td>
+		</tr>
+		<tr>
+			<td>
+				E-Mail: info@fls-furness.ch</td>
+			<td>
+				BIC: CRESCHZZ41H</td>
+			<td>
+				BIC: DEUTDE6F683</td>
+			<td>
+				<a href="http://www.fls-furness.ch/">http://www.fls-furness.ch</a></td>
+		</tr>
+	</tbody>
+</table>
+    {% endblock %}
+
+    {% block info %}
+<table class="info">
+	<tbody>
+		<tr>
+			<td class="importance_3">
+				LF Nr. {{ withdrawal.id }}</td>
+			<td>
+				&nbsp;</td>
+			<td colspan="1" rowspan="2">
+					LIEFERSHEIN GEF. Ware<br>
+				BULLETIN DE LIVRAISON CONGELES</td>
+			<td colspan="1">
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="1">
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+				&nbsp;</td>
+			<td>
+				{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>
+			<td class="importance_3" rowspan="4">
+				{{ withdrawal.destination.address|linebreaksbr }}</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="1">
+				REFERENZ/NOTRE REF</td>
+			<td>
+				{{ withdrawal.reference_nr }}</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="1">
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="1">
+				ZUSTANDIG/RESPONSABLE</td>
+			<td>
+				{{ withdrawal.responsible.first_name }} {{ withdrawal.responsible.last_name }}</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+				ABGANGSORT/LIEU DE DEPART</td>
+			<td>
+				{{ withdrawal.place_of_departure }}</td>
+			<td>
+				ABFAHRTSDATUM/DATE DE DEPART</td>
+			<td>
+				{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>
+		</tr>
+		<tr>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				ANKUNFTSDATUM/DATE D&#39;ARRIVEE</td>
+			<td>
+				{{ withdrawal.arrival_date|date:"d/m/Y" }}</td>
+		</tr>
+		<tr>
+			<td>
+				ANKUNFTSORT/DEST.FINALE</td>
+			<td>
+				{{ withdrawal.destination.address|linebreaksbr }}</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+				VERSICHERING/ASSURANCE</td>
+			<td>
+				{% ifequal withdrawal.insurance 2 %}PAR NOUS{% else %}{% ifequal withdrawal.insurance 1 %}Some wares covered{% else %}PAS PAR NOUS{% endifequal %}{% endifequal %}</td>
+			<td>
+				TRANSPORTMITTEL/MOYEN TRANSPORT</td>
+			<td>
+				{{ withdrawal.vehicle_type }}</td>
+		</tr>
+		<tr>
+			<td>
+				KONDITION/COND.LIVRAISON</td>
+			<td>
+				{{ withdrawal.transport_condition }}</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+				LIEFERSHEIN NR/BUL. DE LIVRAISON</td>
+			<td>
+				{{ withdrawal.transport_nr }}</td>
+			<td>
+				&Ouml;ffnungzseiten/horaires de livraison</td>
+			<td>
+				{{ withdrawal.opening_hours }}</td>
+		</tr>
+		<tr>
+			<td>
+				BESTELL-NR/N&deg; DE COMMANDE</td>
+			<td>
+				{{ withdrawal.order_nr }}</td>
+			<td>
+				Besonderes/Observations</td>
+			<td>
+				{{ withdrawal.comment }}</td>
+		</tr>
+		<tr>
+			<td>
+				ABSENDER/EXPEDITEUR</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				TRANSPORTEUR</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+					{{ withdrawal.customer.address|linebreaksbr }}
+			</td>
+			<td>
+				&nbsp;</td>
+			<td>
+				{{ withdrawal.transporter.title }}</td>
+			<td>
+				&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+
+
+    {% endblock %}
+
+    {% block rows %}
+      <table class="rows">
+        <tr>
+          <th>Zeichen/Lager</th>
+          <th>Artikel Nr.</th>
+          <th>Artikelbezeichnung</th>
+          <th>Ursprung</th>
+          <th class="numeric">Menge/Qté</th>
+          <th class="numeric">Kg Netto</th>
+          <th class="numeric">Kg Brutto</th>
+        </tr>
+        <tr>
+          <th>Stock</th>
+          <th>Article Nr</th>
+          <th>Désignation</th>
+          <th>Origine</th>
+          <th class="numeric">Karton/Carton</th>
+          <th class="numeric">Kg net</th>
+          <th class="numeric">Kg brut</th>
+        </tr>
+	{% for row in withdrawal.rows.all %}
+          <tr>
+	    <td>{{ row.entry_row.id_str }}</td>
+	    <td>{{ row.entry_row.product_nr }}</td>
+	    <td>{{ row.entry_row.product_description }}</td>
+	    <td>{{ row.entry_row.entry.origin }}</td>
+	    <td class="numeric">{{ row.units }}</td>
+	    <td class="numeric">{{ row.nett_weight }}</td>
+	    <td class="numeric">{{ row.gross_weight }}</td>
+          </tr>
+	{% endfor %}
+        <tr class="total">
+          <td colspan="3"></td>
+          <th>Total</th>
+	  <td class="numeric">{{ units }}</td>
+	  <td class="numeric">{{ nett_weight }}</td>
+	  <td class="numeric">{{ gross_weight }}</td>
+        </tr>
+      </table>
+    {% endblock %}
+
+    {% block footer %}
+
+      <table class="footer">
+        <tr>
+          <td colspan="3">
+	    EMPFANGS-BESTÄTIGUNG<br>
+	    CONFIRMATION DE RECEPTION DES MARCHANDISES<br>
+	    <br>
+	    Wir bestätigen, obige Sendung in ordnungsgemässem Zustand (Temp. -18°C) empfangen zu haben. Beanstandungen sind innerhalb 48 Stunden zu melden, ansonsten gilt die Lieferung als akzeptiert.<br>
+	    Nous confirmons avoir réceptionné la marchandise sus-mentionnée en bon état (temp. -18° C ) les dégats éventuels ou toute autre réclamation doivent être signalés sous 48 heures.Au delà de ce délai, la livraison est considérée comme acceptée.<br><br>
+	  </td>
+        </tr>
+        <tr>
+	  <td colspan="2">ORT/ DATUM/LIEU/DATE</td>
+	  <td>STEMPEL UND UNTERSCHRIFT/TIMBRE ET SIGNATURE</td>
+	</tr>
+	<tr>
+          <td>{{ withdrawal.place_of_departure }},</td>
+          <td>{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>
+          <td>NAME IN BLOCKSCHRIFT/NOM EN LETTRES CAPITALES</td>
+        </tr>
+      </table>
+
+
+    {% endblock %}
+
+
+  </body>
+</html>

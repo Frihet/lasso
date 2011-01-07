@@ -1,0 +1,45 @@
+* {
+  font-size: 90%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td, th {
+  vertical-align: top;
+  text-align: left;
+}
+td.numeric, th.numeric {
+  text-align: right;
+}
+
+.header {
+  border-bottom: 1pt solid black;
+}
+
+.info {
+}
+
+.rows {
+  border-top: 1pt solid black;
+  margin-top: 10pt;
+}
+
+.rows td {
+  border-top: 1pt dashed black;
+  padding: 1pt;
+}
+.rows .total td, .rows .total th {
+  border-top: 1pt solid black;
+}
+
+.footer {
+  margin-top: 10pt;
+}
+
+
+.importance_3 {
+  font-size: 120%;
+  font-weight: bold;
+}

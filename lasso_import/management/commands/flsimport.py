@@ -29,6 +29,7 @@ class Command(BaseCommand):
         import lasso.lasso_warehandling.models
         import lasso.lasso_warehouse.models
         import lasso.lasso_customer.models
+        import lasso.lasso_global.models
 
 	import sys, csv, os.path, re, datetime
 
@@ -43,7 +44,9 @@ class Command(BaseCommand):
 	customers = {}
         transporters = {}
         responsibles = {}
+        destinations = {}
         transport_conditions = {}
+        origins = {}
 
 	errors = []
 	
@@ -87,7 +90,10 @@ class Command(BaseCommand):
             if 'header' in header:
                 header = header['header']
             for key, value in header.iteritems():
-                setattr(obj, key, value)
+                try:
+                    setattr(obj, key, value)
+                except Exception, e:
+                    raise Exception(e, obj, key, value)
             dct['obj'] = obj
             return obj
 
@@ -228,7 +234,7 @@ class Command(BaseCommand):
                                 months[month]['price_per_kilo_per_day'] = row[3]
                     if 'units' in header and header['units'] != None:
                         if header['customer']:
-                            mergeset(customers[customer_id]['header'], 'name', header['customer'].split(',')[0].strip())
+                            mergeset(customers[customer_id]['header'], 'title', header['customer'].split(',')[0].strip())
                             mergeset(customers[customer_id]['header'], 'address', '\n'.join(item.strip() for item in header['customer'].split(',')))
                         entry_id, entry_row_id = header['entry_id'].split('.')
                         if entry_id not in customers[customer_id]['entries']:
@@ -239,7 +245,6 @@ class Command(BaseCommand):
                         movemerge(header, 'transporter', entry['header'], 'transporter')
                         movemerge(header, 'custom_handling_date', entry['header'], 'custom_handling_date')
                         movemerge(header, 'custom_nr', entry['header'], 'custom_nr')
-                        movemerge(header, 'origin', entry['header'], 'origin')
                         entry['rows'][entry_row_id] = {'header': header, 'months': months}
                         if entry['header']['transporter']:
                             transporter = entry['header']['transporter']
@@ -250,7 +255,7 @@ class Command(BaseCommand):
                                 address = '\n'.join(item.strip() for item in address.split(","))
                                 entry['header']['transporter'] = transporter
 
-                            transporters[transporter] = {'header': {'name': transporter, 'address': address}}
+                            transporters[transporter] = {'header': {'title': transporter, 'address': address}}
 
                 elif withdrawal_re.search(filename):
                     f =[[col.decode('utf-8') for col in row] for row in csv.reader(open(filename, 'r'), dialect="excel")]
@@ -272,6 +277,7 @@ class Command(BaseCommand):
                     header['transport_nr'] = f[24][3]
                     header['order_nr'] = f[25][1];
 
+                    header['destination'] = f[14][5]
                     header['destination_address'] = f[14][5] + '\n' + f[15][5] + '\n' + f[16][5] + '\n' + f[17][5]
 
                     header['withdrawal_date'] = value_to_date(f[19][8])
@@ -296,25 +302,40 @@ class Command(BaseCommand):
                         row['entry_row_id'] = "%s-%s" % (header['arrival_date'].year, f[row_nr][0])
                         row['units'] = value_to_int(f[row_nr][7])
                         row['origin'] = f[row_nr][6]
+                        movemerge(row, 'origin', header, 'origin', filename)
                         rows.append(row)
 
                     if header['transport_condition']:
                         transport_conditions[header['transport_condition']] = {'header': {'name': header['transport_condition']}}
 
                     if header['responsible']:
-                        responsibles[header['responsible']] = {'header': {'name': header['responsible']}}
+                        responsibles[header['responsible']] = {'header': {'title': header['responsible']}}
+
+                    if header['destination']:
+                        destinations[header['destination']] = {'header': {'title': header['destination'], 'address': header['destination_address']}}
 
                     if header['transporter']:
                         address = ""
                         if ',' in header['transporter']:
                             header['transporter'], address = transporter.split(',', 1)
                             address = '\n'.join(item.strip() for item in address.split(","))
-                        transporters[header['transporter']] = {'header': {'name': header['transporter'], 'address': address}}
+                        transporters[header['transporter']] = {'header': {'title': header['transporter'], 'address': address}}
                     if header['customer_name']:
-                        customers[customer_id]['name'] = header['customer_name']
+                        customers[customer_id]['title'] = header['customer_name']
                     if header['customer_address']:
                         customers[customer_id]['address'] = header['customer_address']
                     customers[customer_id]['withdrawals'][header['withdrawal_id']] = {'header': header, 'rows': rows}
+                    mergeset(customers[customer_id], 'customer_nr', header['reference_nr'].split('.')[2])
+
+                    if 'origin' in header:
+                        if header['origin'] not in origins:
+                            origins[header['origin']] = {'header': {}}
+                        mergeset(origins[header['origin']]['header'], 'name', header['origin'])
+                        mergeset(origins[header['origin']]['header'], 'reference_nr', header['reference_nr'].split('.')[0])
+
+                    mergeset(customers[customer_id]['header'], 'customer_nr', header['reference_nr'].split('.')[2])
+                    del header['reference_nr']
+
             except UnicodeDecodeError:
                 raise
             except UnicodeEncodeError:
@@ -355,9 +376,12 @@ class Command(BaseCommand):
                                             "Entry %s does not exist" % (entry_id,)): continue
 		    if not assert_integrity(entry_row_id in customer['entries'][entry_id]['rows'],
                                             "Entry row %s does not exist in entry %s" %(entry_row_id, entry_id)): continue
-		    entry_row = customer['entries'][entry_id]['rows'][entry_row_id]
-		    movemerge(row, 'origin', entry_row['header'], 'origin')
+		    entry = customer['entries'][entry_id]
+		    entry_row = entry['rows'][entry_row_id]
+		    movemerge(row, 'origin', entry['header'], 'origin')
 		    movemerge(withdrawal['header'], 'insurance', entry['header'], 'insurance')
+                    if 'insurance' in withdrawal['header']:
+                        del withdrawal['header']['insurance']
 
 	if errors:
 	    print "==================================={ ERRORS }==================================="
@@ -372,13 +396,22 @@ class Command(BaseCommand):
                 transport_condition_obj.save()
 
 	    for name, responsible in responsibles.iteritems():
-                responsible['header']['username'] = "re_" + re.compile(r"[^a-z0-9]").sub("_", responsible['header']['name'].lower())
                 responsible_obj = obj_from_dict(django.contrib.auth.models.User, responsible)
                 responsible_obj.save()
 
+	    for name, destination in destinations.iteritems():
+                destination_obj = obj_from_dict(lasso.lasso_customer.models.Destination, destination)
+                destination_obj.save()
+
 	    for name, transporter in transporters.iteritems():
+                print transporter
                 transporter_obj = obj_from_dict(lasso.lasso_customer.models.Transporter, transporter)
                 transporter_obj.save()
+
+	    for name, origin in origins.iteritems():
+                print origin
+                origin_obj = obj_from_dict(lasso.lasso_global.models.Origin, origin)
+                origin_obj.save()
 
 	    for name, customer in customers.iteritems():
                 customer['header'].setdefault('price_per_kilo_per_day', 0)
@@ -394,9 +427,15 @@ class Command(BaseCommand):
                     transporter_id = entry['header']['transporter']
                     transporter_obj = transporters[transporter_id]['obj']
                     del entry['header']['transporter']
+                    origin_obj = None
+                    if 'origin' in entry['header']:
+                        origin_id = entry['header']['origin']
+                        origin_obj = origins[origin_id]['obj']
+                        del entry['header']['origin']
                     entry_obj = obj_from_dict(lasso.lasso_warehandling.models.Entry, entry)
                     entry_obj.transporter = transporter_obj
                     entry_obj.customer = customer_obj
+                    entry_obj.origin = origin_obj
                     entry_obj.save()
 
 		    for entry_row_id, entry_row in entry['rows'].iteritems():
@@ -418,14 +457,19 @@ class Command(BaseCommand):
                     transport_condition_obj = transport_conditions[transport_condition_id]['obj']
                     responsible_id = withdrawal['header']['responsible']
                     responsible_obj = responsibles[responsible_id]['obj']
+                    destination_id = withdrawal['header']['destination']
+                    destination_obj = destinations[destination_id]['obj']
                     transporter_id = withdrawal['header']['transporter']
                     transporter_obj = transporters[transporter_id]['obj']
                     del withdrawal['header']['transport_condition']
                     del withdrawal['header']['responsible']
+                    del withdrawal['header']['destination']
+                    del withdrawal['header']['destination_address']
                     del withdrawal['header']['transporter']
                     withdrawal_obj = obj_from_dict(lasso.lasso_warehandling.models.Withdrawal, withdrawal)
                     withdrawal_obj.transport_condition = transport_condition_obj
                     withdrawal_obj.responsible = responsible_obj
+                    withdrawal_obj.destination = destination_obj
                     withdrawal_obj.transporter = transporter_obj
                     withdrawal_obj.customer = customer_obj
                     withdrawal_obj.save()
@@ -460,17 +504,43 @@ class Command(BaseCommand):
                         entry_row['next_storagelog'] = tomorrow
 
 	else:
-	    for name, transporter in transporters.iteritems():
-		print "Transporter: %s" % (name,)
-		for name, value in transporter['header'].iteritems():
-		    print "    %s: %s" % (name, str(value).replace('\n', '\n        '))
+            def str(o):
+                return unicode(o).encode('utf-8')
 
+	    for name, transporter in transporters.iteritems():
+		print "Transporter: %s" % (str(name),)
+		for name, value in transporter['header'].iteritems():
+		    print "    %s: %s" % (str(name), str(value).replace('\n', '\n        '))
+		print
+
+	    for name, responsible in responsibles.iteritems():
+		print "Responsible: %s" % (str(name),)
+		for name, value in responsible['header'].iteritems():
+		    print "    %s: %s" % (str(name), str(value).replace('\n', '\n        '))
+		print
+
+	    for name, destination in destinations.iteritems():
+		print "Destination: %s" % (str(name),)
+		for name, value in destination['header'].iteritems():
+		    print "    %s: %s" % (str(name), str(value).replace('\n', '\n        '))
+		print
+
+	    for name, transport_condition in transport_conditions.iteritems():
+		print "Transport condition: %s" % (str(name),)
+		for name, value in transport_condition['header'].iteritems():
+		    print "    %s: %s" % (str(name), str(value).replace('\n', '\n        '))
+		print
+
+	    for name, origin in origins.iteritems():
+		print "Origin: %s" % (str(name),)
+		for name, value in origin['header'].iteritems():
+		    print "    %s: %s" % (str(name), str(value).replace('\n', '\n        '))
 		print
 
 	    for name, customer in customers.iteritems():
-		print "Customer: %s" % (name,)
+		print "Customer: %s" % (str(name),)
 		for name, value in customer['header'].iteritems():
-		    print "    %s: %s" % (name, str(value).replace('\n', '\n        '))
+		    print "    %s: %s" % (str(name), str(value).replace('\n', '\n        '))
 
 		print
 
