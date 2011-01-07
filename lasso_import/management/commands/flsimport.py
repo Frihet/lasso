@@ -499,7 +499,10 @@ class Command(BaseCommand):
                             log_item = lasso.lasso_warehandling.models.StorageLog()
                             log_item.date = storage_date
                             log_item.entry_row = entry_row['obj']
-                            log_item.price_per_kilo_per_day = entry_row['months'][storage_date.month]['price_per_kilo_per_day']
+                            if storage_date.year > entry_row['next_storagelog'].year:
+                                log_item.price_per_kilo_per_day = entry_row['months'][max(entry_row['months'].keys())]['price_per_kilo_per_day']
+                            else:
+                                log_item.price_per_kilo_per_day = entry_row['months'][storage_date.month]['price_per_kilo_per_day']
                             log_item.save()
                         entry_row['next_storagelog'] = tomorrow
 
