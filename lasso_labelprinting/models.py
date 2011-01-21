@@ -6,12 +6,12 @@ class Address(models.Model):
         verbose_name = _('Address')
         verbose_name_plural = _('Addresses')
 
-    customer_nr = models.IntegerField()
-    platform = models.CharField(max_length = 20)
-    name = models.CharField(max_length = 200)
-    street = models.CharField(max_length = 200)
-    zip = models.CharField(max_length = 200)
-    city = models.CharField(max_length = 200)
+    customer_nr = models.IntegerField(verbose_name=_("Customer nr"))
+    platform = models.CharField(max_length = 20, verbose_name=_("Platform"))
+    name = models.CharField(max_length = 200, verbose_name=_("Name"))
+    street = models.CharField(max_length = 200, verbose_name=_("Street"))
+    zip = models.CharField(max_length = 200, verbose_name=_("Zip"))
+    city = models.CharField(max_length = 200, verbose_name=_("City"))
 
     @property
     def as_dict(self):

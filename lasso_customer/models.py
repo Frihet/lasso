@@ -18,7 +18,8 @@ class UnitWorkType(models.Model):
         verbose_name = _('Unit work type')
         verbose_name_plural = _('Unit work types')
 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name=_("Name"))
+
     def __unicode__(self):
         return self.name
 
@@ -27,10 +28,10 @@ class Organization(Group):
         verbose_name = _('Organization')
         verbose_name_plural = _('Organizations')
 
-    title = models.CharField(max_length=200, blank=True)
-    address = models.TextField(blank=True)
-    phone = models.CharField(max_length=200, blank=True)
-    fax = models.CharField(max_length=200, blank=True)
+    title = models.CharField(max_length=200, blank=True, verbose_name=_("Title"))
+    address = models.TextField(blank=True, verbose_name=_("Address"))
+    phone = models.CharField(max_length=200, blank=True, verbose_name=_("Phone"))
+    fax = models.CharField(max_length=200, blank=True, verbose_name=_("Fax"))
 
     def __unicode__(self):
         return self.title
@@ -40,10 +41,10 @@ def organization_pre_save(sender, instance, **kwargs):
 pre_save.connect(organization_pre_save, sender=Organization)
 
 class Contact(User):
-    address = models.TextField(blank=True)
-    phone = models.CharField(max_length=200, blank=True)
-    fax = models.CharField(max_length=200, blank=True)
-    organization = models.ForeignKey(Organization)
+    address = models.TextField(blank=True, verbose_name=_("Address"))
+    phone = models.CharField(max_length=200, blank=True, verbose_name=_("Phone"))
+    fax = models.CharField(max_length=200, blank=True, verbose_name=_("Fax"))
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"))
 
 def contact_pre_save(sender, instance, **kwargs):
     if instance.id is None:
@@ -58,15 +59,15 @@ class Customer(Organization):
         verbose_name = _('Customer')
         verbose_name_plural = _('Customers')
 
-    customer_nr = models.CharField(max_length=200, blank=True)
+    customer_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customer nr"))
 
-    price_per_kilo_per_day = models.FloatField(default=0.0)
-    price_per_kilo_per_entry = models.FloatField(default=0.0)
-    price_per_kilo_per_withdrawal = models.FloatField(default=0.0)
+    price_per_kilo_per_day = models.FloatField(default=0.0, verbose_name=_("Price per kilo per day"))
+    price_per_kilo_per_entry = models.FloatField(default=0.0, verbose_name=_("Price per kilo per entry"))
+    price_per_kilo_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Price per kilo per withdrawal"))
 
-    price_per_unit_per_day = models.FloatField(default=0.0)
-    price_per_unit_per_entry = models.FloatField(default=0.0)
-    price_per_unit_per_withdrawal = models.FloatField(default=0.0)
+    price_per_unit_per_day = models.FloatField(default=0.0, verbose_name=_("Price per unit per day"))
+    price_per_unit_per_entry = models.FloatField(default=0.0, verbose_name=_("Price per unit per entry"))
+    price_per_unit_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Price per unit per withdrawal"))
 pre_save.connect(organization_pre_save, sender=Customer)
 
 class OriginalSeller(Organization):
@@ -91,9 +92,9 @@ class UnitWorkPrices(models.Model):
     class Meta:
         verbose_name = _('Unit work price')
         verbose_name_plural = _('Unit work prices')
-    customer = models.ForeignKey(Customer)
-    work_type = models.ForeignKey(UnitWorkType)
-    price_per_unit = models.FloatField()
+    customer = models.ForeignKey(Customer, verbose_name=_("Customer"))
+    work_type = models.ForeignKey(UnitWorkType, verbose_name=_("Work type"))
+    price_per_unit = models.FloatField(verbose_name=_("Price per unit"))
 
     def __unicode__(self):
         return "%s: %s for %s" % (self.customer, self.price_per_unit, self.work_type)

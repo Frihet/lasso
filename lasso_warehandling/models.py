@@ -11,18 +11,18 @@ import django.contrib.auth.models
 import operator
 
 class Entry(models.Model):
-    customer = models.ForeignKey(Customer, related_name="customer_for_entry")
-    original_seller = models.ForeignKey(OriginalSeller, blank=True, null=True, related_name="original_seller_for_entry")
-    arrival_date = models.DateField(default=lambda: datetime.date.today())
-    insurance = models.BooleanField(blank=True)
-    transporter = models.ForeignKey(Transporter)
-    insurance_percentage = models.FloatField(blank=True)
-    price_per_kilo_per_entry = models.FloatField(blank=True)
-    price_per_unit_per_entry = models.FloatField(blank=True)
-    custom_handling_date = models.DateField(null=True, blank=True)
-    customs_nr = models.CharField(max_length=200, blank=True)
-    origin = models.ForeignKey(Origin, blank=True, null=True)
-    customer_entry_nr = models.CharField(max_length=200, blank=True)
+    customer = models.ForeignKey(Customer, related_name="customer_for_entry", verbose_name=_("Customer"))
+    original_seller = models.ForeignKey(OriginalSeller, blank=True, null=True, related_name="original_seller_for_entry", verbose_name=_("Original seller"))
+    arrival_date = models.DateField(default=lambda: datetime.date.today(), verbose_name=_("Arrival date"))
+    insurance = models.BooleanField(blank=True, verbose_name=_("Insurance"))
+    transporter = models.ForeignKey(Transporter, verbose_name=_("Transporter"))
+    insurance_percentage = models.FloatField(blank=True, verbose_name=_("Insurance percentage"))
+    price_per_kilo_per_entry = models.FloatField(blank=True, verbose_name=_("Price per kilo per entry"))
+    price_per_unit_per_entry = models.FloatField(blank=True, verbose_name=_("Price per unit per entry"))
+    custom_handling_date = models.DateField(null=True, blank=True, verbose_name=_("Custom handling date"))
+    customs_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customs nr"))
+    origin = models.ForeignKey(Origin, blank=True, null=True, verbose_name=_("Origin"))
+    customer_entry_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customer entry nr"))
 
     class Meta:
         permissions = (("view_entry", "View"),
@@ -73,25 +73,25 @@ class EntryRow(models.Model):
         verbose_name = _('Entry row')
         verbose_name_plural = _('Entry rows')
 
-    entry = models.ForeignKey(Entry, related_name="rows")
-    customs_certificate_nr = models.CharField(max_length=200, blank=True)
-    product_nr = models.CharField(max_length=400, blank=True)
-    uom = models.CharField(max_length=200, blank=True)
-    units = models.IntegerField()
-    units_left = models.IntegerField(blank=True)
-    nett_weight = models.FloatField()
-    _nett_weight_left = models.FloatField(blank=True, null=True)
-    gross_weight = models.FloatField()
-    _gross_weight_left = models.FloatField(blank=True, null=True)
-    product_value = models.FloatField(null=True, blank=True)
+    entry = models.ForeignKey(Entry, related_name="rows", verbose_name=_("Entry"))
+    customs_certificate_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customs certificate nr"))
+    product_nr = models.CharField(max_length=400, blank=True, verbose_name=_("Product nr"))
+    uom = models.CharField(max_length=200, blank=True, verbose_name=_("UoM"))
+    units = models.IntegerField(verbose_name=_("Units"))
+    units_left = models.IntegerField(blank=True, verbose_name=_("Units left"))
+    nett_weight = models.FloatField(verbose_name=_("Nett weight"))
+    _nett_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Nett weight left"))
+    gross_weight = models.FloatField(verbose_name=_("Gross weight"))
+    _gross_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Gross weight left"))
+    product_value = models.FloatField(null=True, blank=True, verbose_name=_("Product value"))
 
-    use_before = models.DateField(null=True, blank=True)
-    product_description = models.CharField(max_length=400, blank=True)
-    product_state = models.BooleanField()
-    comment = models.TextField(null=True, blank=True)
-    arrival_temperatures = FloatListField()
+    use_before = models.DateField(null=True, blank=True, verbose_name=_("Use before"))
+    product_description = models.CharField(max_length=400, blank=True, verbose_name=_("Product description"))
+    product_state = models.BooleanField(verbose_name=_("Product state"))
+    comment = models.TextField(null=True, blank=True, verbose_name=_("Comment"))
+    arrival_temperatures = FloatListField(verbose_name=_("Arrival temperatures"))
 
-    auto_weight = models.BooleanField(default=True)
+    auto_weight = models.BooleanField(default=True, verbose_name=_("Auto weight"))
 
     @property
     def cost(self):
@@ -217,24 +217,24 @@ class Withdrawal(models.Model):
         verbose_name = _('Withdrawal')
         verbose_name_plural = _('Withdrawals')
 
-    customer = models.ForeignKey(Customer, related_name='customer_for_withdrawal')
-    price_per_kilo_per_withdrawal = models.FloatField(blank=True)
-    price_per_unit_per_withdrawal = models.FloatField(blank=True)
+    customer = models.ForeignKey(Customer, related_name='customer_for_withdrawal', verbose_name=_("Customer"))
+    price_per_kilo_per_withdrawal = models.FloatField(blank=True, verbose_name=_("Price per kilo per withdrawal"))
+    price_per_unit_per_withdrawal = models.FloatField(blank=True, verbose_name=_("Price per unit per withdrawal"))
 
-    responsible = models.ForeignKey(django.contrib.auth.models.User, related_name="responsible_for")
-    place_of_departure = models.CharField(max_length=200, blank=True)
+    responsible = models.ForeignKey(django.contrib.auth.models.User, related_name="responsible_for", verbose_name=_("Responsible"))
+    place_of_departure = models.CharField(max_length=200, blank=True, verbose_name=_("Place of departure"))
     
-    transport_condition = models.ForeignKey(TransportCondition, blank=True, null=True)
-    transport_nr = models.CharField(max_length=200, blank=True)
-    order_nr = models.CharField(max_length=200, blank=True)
+    transport_condition = models.ForeignKey(TransportCondition, blank=True, null=True, verbose_name=_("Transport condition"))
+    transport_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Transport nr"))
+    order_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Order nr"))
 
-    destination = models.ForeignKey(Destination, related_name='destination_for_withdrawal')
-    withdrawal_date = models.DateField(default=lambda: datetime.date.today())
-    arrival_date = models.DateField(null=True, blank=True, default=lambda: datetime.date.today()+datetime.timedelta(1))
-    vehicle_type = models.CharField(max_length=200, blank=True)
-    opening_hours = models.CharField(max_length=200, blank=True)
-    transporter = models.ForeignKey(Transporter)
-    comment = models.TextField(null=True, blank=True)
+    destination = models.ForeignKey(Destination, related_name='destination_for_withdrawal', verbose_name=_("Destination"))
+    withdrawal_date = models.DateField(default=lambda: datetime.date.today(), verbose_name=_("Withdrawal date"))
+    arrival_date = models.DateField(null=True, blank=True, default=lambda: datetime.date.today()+datetime.timedelta(1), verbose_name=_("Arrival_date"))
+    vehicle_type = models.CharField(max_length=200, blank=True, verbose_name=_("Vehicle type"))
+    opening_hours = models.CharField(max_length=200, blank=True, verbose_name=_("Opening hours"))
+    transporter = models.ForeignKey(Transporter, verbose_name=_("Transporter"))
+    comment = models.TextField(null=True, blank=True, verbose_name=_("Comment"))
 
     @property
     def reference_nr(self):
@@ -293,14 +293,14 @@ class WithdrawalRow(models.Model):
         verbose_name = _('Withdrawal row')
         verbose_name_plural = _('Withdrawal rows')
 
-    withdrawal = models.ForeignKey(Withdrawal, related_name="rows")
-    entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows")
-    old_units = models.IntegerField(blank=True)
-    units = models.IntegerField()
-    old_nett_weight = models.FloatField(blank=True, null=True)
-    _nett_weight = models.FloatField(blank=True, null=True)
-    old_gross_weight = models.FloatField(blank=True, null=True)
-    _gross_weight = models.FloatField(blank=True, null=True)
+    withdrawal = models.ForeignKey(Withdrawal, related_name="rows", verbose_name=_("Withdrawal"))
+    entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows", verbose_name=_("Entry row"))
+    old_units = models.IntegerField(blank=True, verbose_name=_("Old units"))
+    units = models.IntegerField(verbose_name=_("Units"))
+    old_nett_weight = models.FloatField(blank=True, null=True, verbose_name=_("Old nett weight"))
+    _nett_weight = models.FloatField(blank=True, null=True, verbose_name=_("Nett weight"))
+    old_gross_weight = models.FloatField(blank=True, null=True, verbose_name=_("Old gross weight"))
+    _gross_weight = models.FloatField(blank=True, null=True, verbose_name=_("Gross weight"))
 
     @property
     def cost(self):
@@ -368,16 +368,14 @@ pre_delete.connect(withdrawal_row_pre_delete, sender=WithdrawalRow)
 class UnitWork(models.Model):
     class Meta:
         verbose_name = _('Unit work')
-        verbose_name_plural = _('Unit work instances')
-
-    work_type = models.ForeignKey(UnitWorkPrices)
-    price_per_unit = models.FloatField(blank=True)
-    date = models.DateField()
-    units = models.IntegerField()
-
-    class Meta:
+        verbose_name_plural = _('Unit works')
         permissions = (("view_unitwork", "View"),
                        ("view_own_unitwork", "View own"))
+
+    work_type = models.ForeignKey(UnitWorkPrices, verbose_name=_("Work type"))
+    price_per_unit = models.FloatField(blank=True, verbose_name=_("Price per unit"))
+    date = models.DateField(verbose_name=_("Date"))
+    units = models.IntegerField(verbose_name=_("Units"))
 
     def __unicode__(self):
         return u"%s of %s @ %s for %s" % (self.work_type.work_type, self.units, self.date, self.work_type.customer)
@@ -393,18 +391,16 @@ class StorageLog(models.Model):
     class Meta:
         verbose_name = _('Storage log')
         verbose_name_plural = _('Storage log entries')
-
-    entry_row = models.ForeignKey(EntryRow, related_name="logs")
-    date = models.DateField()
-    price_per_kilo_per_day = models.FloatField()
-    price_per_unit_per_day = models.FloatField()
-    units_left = models.IntegerField()
-    _nett_weight_left = models.FloatField(blank=True, null=True)
-    _gross_weight_left = models.FloatField(blank=True, null=True)
-
-    class Meta:
         permissions = (("view_storagelog", "View"),
                        ("view_own_storagelog", "View own"))
+
+    entry_row = models.ForeignKey(EntryRow, related_name="logs", verbose_name=_("Entry row"))
+    date = models.DateField(verbose_name=_("Date"))
+    price_per_kilo_per_day = models.FloatField(verbose_name=_("Price per kilo per day"))
+    price_per_unit_per_day = models.FloatField(verbose_name=_("Price per unit per day"))
+    units_left = models.IntegerField(verbose_name=_("Units left"))
+    _nett_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Nett weight left"))
+    _gross_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Gross weight left"))
 
     @property
     def cost(self):
