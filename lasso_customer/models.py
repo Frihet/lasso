@@ -54,6 +54,12 @@ def contact_pre_save(sender, instance, **kwargs):
         instance.set_password(instance.password)
 pre_save.connect(contact_pre_save, sender=Contact)
 
+def contact_post_save(sender, instance, **kwargs):
+    if instance.groups.filter(id=instance.organization.id).count() == 0:
+        instance.groups.add(instance.organization)
+        instance.save()
+post_save.connect(contact_post_save, sender=Contact)
+
 class Customer(Organization):
     class Meta:
         verbose_name = _('Customer')
