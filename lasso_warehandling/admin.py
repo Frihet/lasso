@@ -13,8 +13,9 @@ import utils
 class EntryRowAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
         queryset=PalletSpace.objects.all(),
-        required=False)
-    withdrawal_links = utils.ModelLinkField(queryset=Withdrawal.objects.all(), required=False)
+        required=False,
+        label=_("Locations"))
+    withdrawal_links = utils.ModelLinkField(queryset=Withdrawal.objects.all(), required=False, label=_("Withdrawal links"))
 
     class Meta:
         model = EntryRow
@@ -86,8 +87,8 @@ admin.site.register(Entry, EntryAdmin)
 admin.site.register(TransportCondition)
 
 class WithdrawalRowAdminForm(forms.ModelForm):
-    nett_weight = forms.FloatField(label="Nett weight")
-    gross_weight = forms.FloatField(label="Gross weight")
+    nett_weight = forms.FloatField(label="Nett weight", required=False)
+    gross_weight = forms.FloatField(label="Gross weight", required=False)
 
     class Meta:
         model = WithdrawalRow
@@ -99,9 +100,8 @@ class WithdrawalRowAdminForm(forms.ModelForm):
             self.initial['gross_weight'] = self.instance.gross_weight
 
     def save(self, commit=True):
-        if not self.instance.entry_row.auto_weight:
-            self.instance.nett_weight = self.cleaned_data['nett_weight']
-            self.instance.gross_weight = self.cleaned_data['gross_weight']
+        self.instance.nett_weight = self.cleaned_data['nett_weight']
+        self.instance.gross_weight = self.cleaned_data['gross_weight']
         return super(WithdrawalRowAdminForm, self).save(commit)
 
     save.alters_data = True

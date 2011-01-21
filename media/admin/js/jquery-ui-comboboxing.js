@@ -90,5 +90,5 @@
 })( jQuery );
 
 $(function() {
-  $("select:not([multiple])").combobox();
+  $(".change-form #content-main select:not([multiple])").combobox();
 });
