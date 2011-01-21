@@ -70,8 +70,8 @@
         {% if messages %}
         <ul class="messagelist">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
         {% endif %}
-        {% if errors %}
-        <ul class="errorlist">{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% if global_errors %}
+        <ul class="errorlist">{% for error in global_errors %}<li>{{ error }}</li>{% endfor %}</ul>
         {% endif %}
 
     <!-- Content -->
