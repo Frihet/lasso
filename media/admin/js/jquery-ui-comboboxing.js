@@ -90,5 +90,5 @@
 })( jQuery );
 
 $(function() {
-	$("select").combobox();
+  $("select:not([multiple])").combobox();
 });
