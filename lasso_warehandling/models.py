@@ -238,18 +238,6 @@ class Withdrawal(models.Model):
 
     @property
     def reference_nr(self):
-        origin = None
-        for row in self.rows.all():
-            if origin is None:
-                origin = row.entry_row.entry.origin
-            else:
-                if origin != row.entry_row.entry.origin:
-                    origin = False
-        if origin:
-            origin = origin.reference_nr
-        else:
-            origin = 0
-
         # Don't ask my why...
         # 2007 = 01..12
         # 2008 = 21..32
@@ -257,6 +245,7 @@ class Withdrawal(models.Model):
         # 2010 = 61..72
         month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
 
+        origin = 248
         return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')
 
     @property
