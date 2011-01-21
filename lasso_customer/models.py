@@ -92,6 +92,7 @@ class UnitWorkPrices(models.Model):
     class Meta:
         verbose_name = _('Unit work price')
         verbose_name_plural = _('Unit work prices')
+        unique_together = ("customer", "work_type")
     customer = models.ForeignKey(Customer, verbose_name=_("Customer"))
     work_type = models.ForeignKey(UnitWorkType, verbose_name=_("Work type"))
     price_per_unit = models.FloatField(verbose_name=_("Price per unit"))
