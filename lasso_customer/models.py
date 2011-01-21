@@ -49,6 +49,7 @@ class Contact(User):
 def contact_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.is_staff = True
+    if not instance.username:
         instance.username = re.compile(r"[^a-z0-9]").sub("_", ("%s %s" % (instance.first_name, instance.last_name)).lower())
     if '$' not in instance.password:
         instance.set_password(instance.password)
