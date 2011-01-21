@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import ugettext_lazy as _
 from lasso.lasso_warehandling.models import *
 from lasso.lasso_warehouse.models import *
 from django.db import models
@@ -51,25 +52,25 @@ class EntryRowAdminForm(forms.ModelForm):
 class EntryRowInline(admin.StackedInline):
     form = EntryRowAdminForm
     model = EntryRow
-    fieldsets = [('Product', {'fields': ('use_before',
-                                         'product_nr',
-                                         'product_description')
-                              }),
-                 ('Amount', {'fields': ('auto_weight',
-                                        'uom',
-                                        'units',
-                                        'nett_weight',
-                                        'gross_weight',
-                                        'product_value')
-                             }),
-                 ('Current status', {'fields': ('withdrawal_links',
-                                                )}),
-                 ('Arrival', {'fields': ('arrival_temperatures',
-                                         'product_state',
-                                         'comment',
-                                         'locations',
-                                         'customs_certificate_nr')
-                              }),
+    fieldsets = [(_('Product'), {'fields': ('use_before',
+                                            'product_nr',
+                                            'product_description')
+                                 }),
+                 (_('Amount'), {'fields': ('auto_weight',
+                                           'uom',
+                                           'units',
+                                           'nett_weight',
+                                           'gross_weight',
+                                           'product_value')
+                                }),
+                 (_('Current status'), {'fields': ('withdrawal_links',
+                                                   )}),
+                 (_('Arrival'), {'fields': ('arrival_temperatures',
+                                            'product_state',
+                                            'comment',
+                                            'locations',
+                                            'customs_certificate_nr')
+                                 }),
                  ]
 
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
@@ -124,24 +125,24 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
-    fieldsets = [('Arrival', {'fields': ('destination',
+    fieldsets = [(_('Arrival'), {'fields': ('destination',
                                              'opening_hours',
                                              'arrival_date',
                                              'comment')
                                   }),
-                 ('General', {'fields': ('customer',
-                                         'transport_nr',
-                                         'order_nr',
-                                         'reference_nr')
-                              }),
-                 ('Departure', {'fields': ('responsible',
-                                           'place_of_departure',
-                                           'withdrawal_date')
-                                }),
-                 ('Transport', {'fields': ('transport_condition',
-                                           'vehicle_type',
-                                           'transporter')
-                                })]
+                 (_('General'), {'fields': ('customer',
+                                            'transport_nr',
+                                            'order_nr',
+                                            'reference_nr')
+                                 }),
+                 (_('Departure'), {'fields': ('responsible',
+                                              'place_of_departure',
+                                              'withdrawal_date')
+                                   }),
+                 (_('Transport'), {'fields': ('transport_condition',
+                                              'vehicle_type',
+                                              'transporter')
+                                   })]
 
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
