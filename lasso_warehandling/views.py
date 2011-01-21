@@ -1,5 +1,5 @@
 # Create your views here.
-
+from django.utils.translation import ugettext_lazy as _
 from django.http import *
 from lasso.lasso_warehandling.models import *
 from lasso.lasso_customer.models import *
@@ -11,10 +11,10 @@ import datetime
 import calendar
 
 class CostlogForm(forms.Form):
-    year = forms.IntegerField(label="Year", required=False)
-    month = forms.IntegerField(label="Month", required=False)
-    customer = forms.ModelChoiceField(queryset = Customer.objects.all(), label="Customer", required=False)
-    entry = forms.ModelChoiceField(queryset = Entry.objects.all(), label="Entry", required=False)
+    year = forms.IntegerField(required=False, label=_("Year"))
+    month = forms.IntegerField(required=False, label=_("Month"))
+    customer = forms.ModelChoiceField(queryset = Customer.objects.all(), required=False, label=_("Customer"))
+    entry = forms.ModelChoiceField(queryset = Entry.objects.all(), required=False, label=_("Entry"))
 
 @staff_member_required
 def costlog(request, *arg, **kw):

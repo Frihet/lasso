@@ -55,7 +55,7 @@
 			    <option value="{{ lang.0 }}" {% ifequal lang.0 LANGUAGE_CODE %}selected="true"{% endifequal %} >{{ lang.1 }}</option>
 			{% endfor %}
 		    </select>
-		    <input type="submit" value="Go" />
+		    <input type="submit" value="{% trans "Go" %}" />
 		</form>
 
             {% endblock %}
@@ -69,6 +69,9 @@
 
         {% if messages %}
         <ul class="messagelist">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% if global_errors %}
+        <ul class="errorlist">{% for error in global_errors %}<li>{{ error }}</li>{% endfor %}</ul>
         {% endif %}
 
     <!-- Content -->

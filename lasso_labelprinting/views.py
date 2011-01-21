@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import *
 from django.contrib.admin.views.decorators import *
 from django import template
@@ -75,35 +76,40 @@ def print_labels(request):
         f, path = tempfile.mkstemp(request.FILES['labellistfile'].name)
         csvpath = path + ".csv"
         try:
-
-            f = os.fdopen(f, "w")
             try:
-                for chunk in request.FILES['labellistfile'].chunks():
-                    f.write(chunk)
-            finally:
-                f.close()
+                f = os.fdopen(f, "w")
+                try:
+                    for chunk in request.FILES['labellistfile'].chunks():
+                        f.write(chunk)
+                finally:
+                    f.close()
 
-            converter = lasso.contrib.DocumentConverter.DocumentConverter()
-            converter.convert(path, csvpath)
+                converter = lasso.contrib.DocumentConverter.DocumentConverter()
+                converter.convert(path, csvpath)
 
-            with open(csvpath, 'r') as f:
-                r = iter(csv.reader(f, dialect="excel"))
-                headers1 = r.next()
-                headers = r.next()
-                headers = [col.decode('utf-8') for col in headers]
-                for row in r:
-                    row = dict(zip(headers, [col.decode('utf-8') for col in row]))
-                    if row[u"Kdn. Nr. "].strip() == '':
-                        break
-                    total = int(row[u"TOTAL ¢ "])
-                    if total > 0:
-                        customer_nr = row[u"Kdn. Nr. "]
-                        assert customer_nr.startswith("D1")
-                        customer_nr = int(customer_nr[2:].lstrip("0") or "0")
+                with open(csvpath, 'r') as f:
+                    r = iter(csv.reader(f, dialect="excel"))
+                    headers1 = r.next()
+                    headers = r.next()
+                    headers = [col.decode('utf-8') for col in headers]
+                    for row in r:
+                        row = dict(zip(headers, [col.decode('utf-8') for col in row]))
+                        if row[u"Kdn. Nr. "].strip() == '':
+                            break
+                        total = int(row[u"TOTAL ¢ "])
+                        if total > 0:
+                            customer_nr = row[u"Kdn. Nr. "]
+                            assert customer_nr.startswith("D1")
+                            customer_nr = int(customer_nr[2:].lstrip("0") or "0")
 
-                        addr = lasso_labelprinting.models.Address.objects.get(customer_nr=customer_nr)
+                            addr = lasso_labelprinting.models.Address.objects.get(customer_nr=customer_nr)
 
-                        zprint(addr.as_dict, total)
+                            try:
+                                zprint(addr.as_dict, total)
+                            except Exception, e:
+                                return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to print document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
+            except Exception, e:
+                return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
 
         finally:
             try:
@@ -115,7 +121,7 @@ def print_labels(request):
             except:
                 pass
 
-        messages.append("Printed labels")
+        messages.append(_("Printed labels"))
 
     return render_to_response('lasso_labelprinting/print_labels.html', {'messages':messages}, context_instance=template.RequestContext(request))
 
@@ -128,37 +134,40 @@ def addresses(request):
         f, path = tempfile.mkstemp(request.FILES['addressfile'].name)
         csvpath = path + ".csv"
         try:
-
-            f = os.fdopen(f, "w")
             try:
-                for chunk in request.FILES['addressfile'].chunks():
-                    f.write(chunk)
-            finally:
-                f.close()
 
-            converter = lasso.contrib.DocumentConverter.DocumentConverter()
-            converter.convert(path, csvpath)
+                f = os.fdopen(f, "w")
+                try:
+                    for chunk in request.FILES['addressfile'].chunks():
+                        f.write(chunk)
+                finally:
+                    f.close()
 
-            with open(csvpath, 'r') as f:
-                r = iter(csv.reader(f, dialect="excel"))
-                headers = r.next()
-                headers = [col.decode('utf-8') for col in headers]
-                for row in r:
-                    row = dict(zip(headers, [col.decode('utf-8') for col in row]))
-                    
-                    addrs = lasso_labelprinting.models.Address.objects.filter(customer_nr = int(row['Lf. Nr.']))
-                    if len(addrs):
-                        addr = addrs[0]
-                    else:
-                        addr = lasso_labelprinting.models.Address()
+                converter = lasso.contrib.DocumentConverter.DocumentConverter()
+                converter.convert(path, csvpath)
 
-                    addr.customer_nr = int(row['Lf. Nr.'])
-                    addr.platform = row['Plattform']
-                    addr.name = row['Firma']
-                    addr.street = row['Strasse']
-                    addr.zip = row['PLZ']
-                    addr.city = row['Ort']
-                    addr.save()
+                with open(csvpath, 'r') as f:
+                    r = iter(csv.reader(f, dialect="excel"))
+                    headers = r.next()
+                    headers = [col.decode('utf-8') for col in headers]
+                    for row in r:
+                        row = dict(zip(headers, [col.decode('utf-8') for col in row]))
+
+                        addrs = lasso_labelprinting.models.Address.objects.filter(customer_nr = int(row['Lf. Nr.']))
+                        if len(addrs):
+                            addr = addrs[0]
+                        else:
+                            addr = lasso_labelprinting.models.Address()
+
+                        addr.customer_nr = int(row['Lf. Nr.'])
+                        addr.platform = row['Plattform']
+                        addr.name = row['Firma']
+                        addr.street = row['Strasse']
+                        addr.zip = row['PLZ']
+                        addr.city = row['Ort']
+                        addr.save()
+            except Exception, e:
+                return render_to_response('lasso_labelprinting/addresses.html', {'global_errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
 
         finally:
             try:
@@ -170,6 +179,6 @@ def addresses(request):
             except:
                 pass
 
-        messages.append("Uploaded addresses")
+        messages.append(_("Uploaded addresses"))
 
     return render_to_response('lasso_labelprinting/addresses.html', {'messages':messages}, context_instance=template.RequestContext(request))

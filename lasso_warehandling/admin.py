@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import ugettext_lazy as _
 from lasso.lasso_warehandling.models import *
 from lasso.lasso_warehouse.models import *
 from django.db import models
@@ -12,8 +13,9 @@ import utils
 class EntryRowAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
         queryset=PalletSpace.objects.all(),
-        required=False)
-    withdrawal_links = utils.ModelLinkField(queryset=Withdrawal.objects.all(), required=False)
+        required=False,
+        label=_("Locations"))
+    withdrawal_links = utils.ModelLinkField(queryset=Withdrawal.objects.all(), required=False, label=_("Withdrawal links"))
 
     class Meta:
         model = EntryRow
@@ -51,25 +53,25 @@ class EntryRowAdminForm(forms.ModelForm):
 class EntryRowInline(admin.StackedInline):
     form = EntryRowAdminForm
     model = EntryRow
-    fieldsets = [('Product', {'fields': ('use_before',
-                                         'product_nr',
-                                         'product_description')
-                              }),
-                 ('Amount', {'fields': ('auto_weight',
-                                        'uom',
-                                        'units',
-                                        'nett_weight',
-                                        'gross_weight',
-                                        'product_value')
-                             }),
-                 ('Current status', {'fields': ('withdrawal_links',
-                                                )}),
-                 ('Arrival', {'fields': ('arrival_temperatures',
-                                         'product_state',
-                                         'comment',
-                                         'locations',
-                                         'customs_certificate_nr')
-                              }),
+    fieldsets = [(_('Product'), {'fields': ('use_before',
+                                            'product_nr',
+                                            'product_description')
+                                 }),
+                 (_('Amount'), {'fields': ('auto_weight',
+                                           'uom',
+                                           'units',
+                                           'nett_weight',
+                                           'gross_weight',
+                                           'product_value')
+                                }),
+                 (_('Current status'), {'fields': ('withdrawal_links',
+                                                   )}),
+                 (_('Arrival'), {'fields': ('arrival_temperatures',
+                                            'product_state',
+                                            'comment',
+                                            'locations',
+                                            'customs_certificate_nr')
+                                 }),
                  ]
 
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
@@ -85,8 +87,8 @@ admin.site.register(Entry, EntryAdmin)
 admin.site.register(TransportCondition)
 
 class WithdrawalRowAdminForm(forms.ModelForm):
-    nett_weight = forms.FloatField(label="Nett weight")
-    gross_weight = forms.FloatField(label="Gross weight")
+    nett_weight = forms.FloatField(label="Nett weight", required=False)
+    gross_weight = forms.FloatField(label="Gross weight", required=False)
 
     class Meta:
         model = WithdrawalRow
@@ -98,9 +100,8 @@ class WithdrawalRowAdminForm(forms.ModelForm):
             self.initial['gross_weight'] = self.instance.gross_weight
 
     def save(self, commit=True):
-        if not self.instance.entry_row.auto_weight:
-            self.instance.nett_weight = self.cleaned_data['nett_weight']
-            self.instance.gross_weight = self.cleaned_data['gross_weight']
+        self.instance.nett_weight = self.cleaned_data['nett_weight']
+        self.instance.gross_weight = self.cleaned_data['gross_weight']
         return super(WithdrawalRowAdminForm, self).save(commit)
 
     save.alters_data = True
@@ -113,7 +114,7 @@ class WithdrawalRowInline(admin.TabularInline):
 class WithdrawalAdminForm(forms.ModelForm):
     class Meta:
         model = Withdrawal
-    reference_nr = forms.CharField()
+    reference_nr = utils.ReadonlyCharField()
     def __init__(self, *args, **kwargs):
         super(WithdrawalAdminForm, self).__init__(*args,**kwargs)
         if self.instance is not None:
@@ -124,24 +125,24 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
-    fieldsets = [('Arrival', {'fields': ('destination',
+    fieldsets = [(_('Arrival'), {'fields': ('destination',
                                              'opening_hours',
                                              'arrival_date',
                                              'comment')
                                   }),
-                 ('General', {'fields': ('customer',
-                                         'transport_nr',
-                                         'order_nr',
-                                         'reference_nr')
-                              }),
-                 ('Departure', {'fields': ('responsible',
-                                           'place_of_departure',
-                                           'withdrawal_date')
-                                }),
-                 ('Transport', {'fields': ('transport_condition',
-                                           'vehicle_type',
-                                           'transporter')
-                                })]
+                 (_('General'), {'fields': ('customer',
+                                            'transport_nr',
+                                            'order_nr',
+                                            'reference_nr')
+                                 }),
+                 (_('Departure'), {'fields': ('responsible',
+                                              'place_of_departure',
+                                              'withdrawal_date')
+                                   }),
+                 (_('Transport'), {'fields': ('transport_condition',
+                                              'vehicle_type',
+                                              'transporter')
+                                   })]
 
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')

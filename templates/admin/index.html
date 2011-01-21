@@ -23,20 +23,24 @@
         <table summary="{% blocktrans with app.name|_ as name %}Models available in the {{ name }} application.{% endblocktrans %}">
         <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name|_ as name %}{{ name }}{% endblocktrans %}</a></caption>
         {% for model in app.models %}
-            <tr>
-            <th scope="row"><a href="{{ model.admin_url }}">{{ model.name|_ }}</a></th>
+	    {% ifnotequal model.admin_url 'auth/group/' %}
+	    {% ifnotequal model.admin_url 'sites/site/' %}
+		<tr>
+		<th scope="row"><a href="{{ model.admin_url }}">{{ model.name|_ }}</a></th>
 
-            {% if model.perms.add %}
-                <td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.perms.change %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
+		{% if model.perms.add %}
+		    <td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
+		{% else %}
+		    <td>&nbsp;</td>
+		{% endif %}
+		{% if model.perms.change %}
+		    <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+		{% else %}
+		    <td>&nbsp;</td>
+		{% endif %}
+		</tr>
+	    {% endifnotequal %}
+	    {% endifnotequal %}
         {% endfor %}
 	{% with app.name|lower as app_label %}
 	  {% with app_label|aadd:"/admin/index.html" as extra_template %}

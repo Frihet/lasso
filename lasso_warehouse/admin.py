@@ -16,14 +16,5 @@ class FilledPalletSpaceAdmin(admin.ModelAdmin):
         qs = super(FilledPalletSpaceAdmin, self).queryset(request)
         return qs.filter(entry_row__isnull=False)
 
-class EmptyPalletSpace(PalletSpace):
-    class Meta:
-        proxy = True
-
-class FilledPalletSpace(PalletSpace):
-    class Meta:
-        proxy = True
-
-
 admin.site.register(EmptyPalletSpace, EmptyPalletSpaceAdmin)
 admin.site.register(FilledPalletSpace, FilledPalletSpaceAdmin)
