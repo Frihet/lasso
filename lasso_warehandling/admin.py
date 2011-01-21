@@ -114,7 +114,7 @@ class WithdrawalRowInline(admin.TabularInline):
 class WithdrawalAdminForm(forms.ModelForm):
     class Meta:
         model = Withdrawal
-    reference_nr = forms.CharField()
+    reference_nr = utils.ReadonlyCharField()
     def __init__(self, *args, **kwargs):
         super(WithdrawalAdminForm, self).__init__(*args,**kwargs)
         if self.instance is not None:
