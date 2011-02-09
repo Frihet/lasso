@@ -29,6 +29,8 @@ if not hasattr(django.forms.forms.BaseForm, 'pre_init_validation_baseform_init')
                     field.init_clean()
                 except ValidationError, e:
                     self._errors[name] = self.error_class(e.messages)
+        if not self._errors:
+            self._errors = None
     django.forms.forms.BaseForm.init_clean = init_clean
 
 if not hasattr(django.forms.models.ModelChoiceField, 'init_clean'):
