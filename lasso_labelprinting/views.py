@@ -87,6 +87,7 @@ def print_labels(request):
                 converter = lasso.contrib.DocumentConverter.DocumentConverter()
                 converter.convert(path, csvpath)
 
+                addresses = []
                 with open(csvpath, 'r') as f:
                     r = iter(csv.reader(f, dialect="excel"))
                     headers1 = r.next()
@@ -104,10 +105,18 @@ def print_labels(request):
 
                             addr = lasso_labelprinting.models.Address.objects.get(customer_nr=customer_nr)
 
-                            try:
-                                zprint(addr.as_dict, total)
-                            except Exception, e:
-                                return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to print document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
+                            addresses.append({'customer_nr': customer_nr, 'address': addr.as_dict, 'total': total})
+
+                def acmp(a, b):
+                    return cmp(a['customer_nr'], b['customer_nr'])
+                addresses.sort(acmp)
+
+                for address in addresses:
+                    try:
+                        #print "X", address['customer_nr'], address['address'], address['total']
+                        zprint(address['address'], address['total'])
+                    except Exception, e:
+                        return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to print document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
             except Exception, e:
                 return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
 
