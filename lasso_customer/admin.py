@@ -29,6 +29,11 @@ class ContactAdminForm(forms.ModelForm):
 
     save.alters_data = True
 
+    def __init__(self, *arg, **kw):
+        super(ContactAdminForm, self).__init__(*arg, **kw)
+        self.fields['username'].required = False
+
+
 class ContactInline(admin.TabularInline):
     form = ContactAdminForm
     model = Contact
