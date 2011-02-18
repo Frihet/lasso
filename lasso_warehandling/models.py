@@ -244,7 +244,7 @@ class Withdrawal(models.Model):
             # 2008 = 21..32
             # 2009 = 41..52
             # 2010 = 61..72
-            month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
+            month = (self.withdrawal_date.year - 2007) * 20 + self.withdrawal_date.month
 
             origin = 248
             return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')
