@@ -26,8 +26,12 @@ def separateminus_filter(value1, value2):
         res += "-%s" % (value2,)
     return res
 
+def aadd_filter(value1, value2):
+    return value1 + value2
+
 register.filter('nth', nth_filter)
 register.filter('eachnth', eachnth_filter)
 register.filter('sum', sum_filter)
 register.filter('separateminus', separateminus_filter)
+register.filter('aadd', aadd_filter)
 
