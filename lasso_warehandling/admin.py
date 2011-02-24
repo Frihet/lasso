@@ -75,7 +75,7 @@ class EntryRowInline(admin.StackedInline):
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [EntryRowInline,]
     date_hierarchy = 'arrival_date'
-    exclude = ('price_per_kilo_per_entry','price_per_unit_per_entry',)
+    exclude = ('insurance_percentage', 'price_per_kilo_per_entry','price_per_unit_per_entry',)
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
     search_fields = ('customer__name', 'arrival_date', 'rows__product_description')
     owner_field = "customer"
@@ -110,19 +110,29 @@ class WithdrawalRowInline(admin.TabularInline):
     model = WithdrawalRow
     fields = ('entry_row', 'units', 'nett_weight', 'gross_weight')
 
+class WithdrawalAdminForm(forms.ModelForm):
+    class Meta:
+        model = Withdrawal
+    reference_nr = forms.CharField()
+    def __init__(self, *args, **kwargs):
+        super(WithdrawalAdminForm, self).__init__(*args,**kwargs)
+        if self.instance is not None:
+            self.initial['reference_nr'] = self.instance.reference_nr
+
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
+    form = WithdrawalAdminForm
     inlines = [WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
-    fieldsets = [('Destination', {'fields': ('destination_address',
+    fieldsets = [('Arrival', {'fields': ('destination',
                                              'opening_hours',
                                              'arrival_date',
                                              'comment')
                                   }),
                  ('General', {'fields': ('customer',
-                                         'reference_nr',
                                          'transport_nr',
-                                         'order_nr')
+                                         'order_nr',
+                                         'reference_nr')
                               }),
                  ('Departure', {'fields': ('responsible',
                                            'place_of_departure',

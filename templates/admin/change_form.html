@@ -1,5 +1,8 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_modify adminmedia %}
+{% load i18n i18next admin_modify adminmedia %}
+{% load datatypes %}
+
+{% block content_title %}<h1>{% if add %}{% trans "Add" %} {{ opts.verbose_name|_ }}{% else %}{{ original|truncatewords:"18" }}{% endif %}</h1>{% endblock %}
 
 {% block extrahead %}{{ block.super }}
 {% url admin:jsi18n as jsi18nurl %}
@@ -16,17 +19,30 @@
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
-     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+     <a href="../../">{{ app_label|capfirst|_|escape }}</a> &rsaquo; 
+     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst|_ }}</a>{% else %}{{ opts.verbose_name_plural|capfirst|_ }}{% endif %} &rsaquo; 
+     {% if add %}{% trans "Add" %} {{ opts.verbose_name|_ }}{% else %}{{ original|truncatewords:"18" }}{% endif %} 
 </div>
 {% endif %}{% endblock %}
 
 {% block content %}<div id="content-main">
+
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools"><li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+
+  {% with opts.app_label|lower as app_label %}
+    {% with app_label|aadd:"/admin/change_form_object_tools.html" as extra_template %}
+      {% include extra_template %}
+      {% with opts.object_name|lower as model_label %}
+	{% with app_label|aadd:"/admin/"|aadd:model_label|aadd:"/change_form_object_tools.html" as extra_template2 %}
+	  {% include extra_template2 %}
+	{% endwith %}
+      {% endwith %}
+    {% endwith %}
+  {% endwith %}
+
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
