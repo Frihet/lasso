@@ -9,6 +9,7 @@ import datetime
 from lasso.utils import *
 import django.contrib.auth.models
 import operator
+import settings
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer, related_name="customer_for_entry", verbose_name=_("Customer"))
@@ -222,7 +223,7 @@ class Withdrawal(models.Model):
     price_per_unit_per_withdrawal = models.FloatField(blank=True, verbose_name=_("Price per unit per withdrawal"))
 
     responsible = models.ForeignKey(django.contrib.auth.models.User, related_name="responsible_for", verbose_name=_("Responsible"))
-    place_of_departure = models.CharField(max_length=200, blank=True, verbose_name=_("Place of departure"))
+    place_of_departure = models.CharField(max_length=200, blank=True, verbose_name=_("Place of departure"), default=settings.LASSO_DEFAULT_PLACE_OF_DEPARTURE)
     
     transport_condition = models.ForeignKey(TransportCondition, blank=True, null=True, verbose_name=_("Transport condition"))
     transport_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Transport nr"))
@@ -244,7 +245,7 @@ class Withdrawal(models.Model):
             # 2008 = 21..32
             # 2009 = 41..52
             # 2010 = 61..72
-            month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
+            month = (self.withdrawal_date.year - 2007) * 20 + self.withdrawal_date.month
 
             origin = 248
             return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')

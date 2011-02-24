@@ -49,10 +49,17 @@ class Contact(User):
 def contact_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.is_staff = True
+    if not instance.username:
         instance.username = re.compile(r"[^a-z0-9]").sub("_", ("%s %s" % (instance.first_name, instance.last_name)).lower())
     if '$' not in instance.password:
         instance.set_password(instance.password)
 pre_save.connect(contact_pre_save, sender=Contact)
+
+def contact_post_save(sender, instance, **kwargs):
+    if instance.groups.filter(id=instance.organization.id).count() == 0:
+        instance.groups.add(instance.organization)
+        instance.save()
+post_save.connect(contact_post_save, sender=Contact)
 
 class Customer(Organization):
     class Meta:
@@ -92,6 +99,7 @@ class UnitWorkPrices(models.Model):
     class Meta:
         verbose_name = _('Unit work price')
         verbose_name_plural = _('Unit work prices')
+        unique_together = ("customer", "work_type")
     customer = models.ForeignKey(Customer, verbose_name=_("Customer"))
     work_type = models.ForeignKey(UnitWorkType, verbose_name=_("Work type"))
     price_per_unit = models.FloatField(verbose_name=_("Price per unit"))

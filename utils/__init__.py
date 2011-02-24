@@ -6,11 +6,38 @@ import django.utils.safestring
 import django.core.urlresolvers
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
-from django.forms.util import flatatt
+from django.forms.util import flatatt, ErrorDict, ErrorList, ValidationError
+import django.forms.forms
+import django.forms.fields
+import django.forms.models
 
 def xdaterange(d1, d2):
     return (d1 + datetime.timedelta(x)
             for x in xrange(0, (d2 - d1).days))
+
+if not hasattr(django.forms.forms.BaseForm, 'pre_init_validation_baseform_init'):
+    django.forms.forms.BaseForm.pre_init_validation_baseform_init = django.forms.forms.BaseForm.__init__
+    def __init__(self, *arg, **kw):
+        self.pre_init_validation_baseform_init(*arg, **kw)
+        self.init_clean()
+    django.forms.forms.BaseForm.__init__ = __init__
+    def init_clean(self):
+        self._errors = ErrorDict()
+        for name, field in self.fields.items():
+            if hasattr(field, 'init_clean'):
+                try:
+                    field.init_clean()
+                except ValidationError, e:
+                    self._errors[name] = self.error_class(e.messages)
+        if not self._errors:
+            self._errors = None
+    django.forms.forms.BaseForm.init_clean = init_clean
+
+if not hasattr(django.forms.models.ModelChoiceField, 'init_clean'):
+    def init_clean(self):
+        if self.required and self.queryset.count() == 0:
+            raise ValidationError(_("You must first create at least one of these before you can save."))
+    django.forms.models.ModelChoiceField.init_clean = init_clean
 
 class FloatListInput(forms.TextInput):
     def render(self, name, value, attrs=None):
