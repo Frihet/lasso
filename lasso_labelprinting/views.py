@@ -107,9 +107,9 @@ def print_labels(request):
                             try:
                                 zprint(addr.as_dict, total)
                             except Exception, e:
-                                return render_to_response('lasso_labelprinting/print_labels.html', {'errors':[_('Unable to print document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
+                                return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to print document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
             except Exception, e:
-                return render_to_response('lasso_labelprinting/print_labels.html', {'errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
+                return render_to_response('lasso_labelprinting/print_labels.html', {'global_errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
 
         finally:
             try:
@@ -167,7 +167,7 @@ def addresses(request):
                         addr.city = row['Ort']
                         addr.save()
             except Exception, e:
-                return render_to_response('lasso_labelprinting/addresses.html', {'errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
+                return render_to_response('lasso_labelprinting/addresses.html', {'global_errors':[_('Unable to convert document: %(error)s') % {'error': str(e)}]}, context_instance=template.RequestContext(request))
 
         finally:
             try:
