@@ -4,11 +4,15 @@ from lasso.lasso_customer.models import *
 from django.db.models.signals import *
 from django import forms
 import datetime
+from lasso.utils import *
 
 class Entry(models.Model):
     customer = models.ForeignKey(Customer)
     arrival_date = models.DateField()
+    insurance = models.BooleanField(blank=True)
+    transporter = models.ForeignKey(Transporter)
     price_per_kilo_per_entry = models.FloatField(blank=True)
+    price_per_unit_per_entry = models.FloatField(blank=True)
 
     class Meta:
         permissions = (("view_entry", "View"),
@@ -48,6 +52,7 @@ class Entry(models.Model):
 def entry_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.price_per_kilo_per_entry = instance.customer.price_per_kilo_per_entry
+        instance.price_per_unit_per_entry = instance.customer.price_per_unit_per_entry
 pre_save.connect(entry_pre_save, sender=Entry)
 
 class EntryRow(models.Model):
@@ -55,7 +60,6 @@ class EntryRow(models.Model):
     custom_handling_date = models.DateField(null=True, blank=True)
     customs_receipt_nr = models.CharField(max_length=200, blank=True)
     customs_testimony_nr = models.CharField(max_length=200, blank=True)
-    transporter = models.CharField(max_length=200, blank=True)
     product_nr = models.CharField(max_length=400, blank=True)
     uom = models.CharField(max_length=200, blank=True)
     units = models.IntegerField()
@@ -66,7 +70,7 @@ class EntryRow(models.Model):
 
     use_before = models.DateField(null=True, blank=True)
     product_description = models.CharField(max_length=400, blank=True)
-    product_state = models.CharField(max_length=200, blank=True)
+    product_state = models.BooleanField()
     comment = models.TextField(null=True, blank=True)
     arrival_temperature = models.FloatField(null=True, blank=True)
 
@@ -74,7 +78,7 @@ class EntryRow(models.Model):
 
     @property
     def cost(self):
-        return self.gross_weight * self.entry.price_per_kilo_per_entry
+        return self.gross_weight * self.entry.price_per_kilo_per_entry + self.units * self.entry.price_per_unit_per_entry
 
     @property
     def nett_weight_per_unit(self):
@@ -106,10 +110,43 @@ class EntryRow(models.Model):
     def id_str(self):
         return "%s.%s" % (self.entry.id, self.id)
 
-    def log(self):
-        if not list(StorageLog.objects.filter(entry_row = self, date = datetime.date.today())):
-            return StorageLog(entry_row = self).save()
-        return None
+    def log(self, until = None):
+        # Note: Don't log today until tomorrow, stuff might be added afterwards!
+        # Units left doesn't change until the day after a withdrawal, but on the same day for an entry!
+
+        if until is None: until = datetime.date.today()
+
+        log_items = []
+
+        try:
+            last_log = StorageLog.objects.filter(entry_row = self).order_by("-date")[0]
+            units_left = last_log.units_left
+            last_date = last_log.date + datetime.timedelta(1)
+        except IndexError:
+            last_date = entry_row.entry.arrival_date
+            units_left = entry_row.units
+
+        steps = [(withdrawal.withdrawal_date + datetime.timedelta(1), withdrawal.units)
+                       for withdrawal in WithdrawalRow.objects.filter(entry_row = self,
+                                                                      withdrawal__withdrawal_date__gte = last_date,
+                                                                      withdrawal__withdrawal_date__lt = until
+                                                                      ).order_by("withdrawal__withdrawal_date")]
+        steps += [(until, 0)]
+
+        for (next_date, units) in steps:
+            for storage_date in xdaterange(last_date, next_date):
+                log_item = lasso.lasso_warehandling.models.StorageLog()
+                log_item.units_left = units_left
+                log_item.date = storage_date
+                log_item.entry_row = self
+                log_item.price_per_kilo_per_day = self.entry.customer.price_per_kilo_per_day
+                log_item.price_per_unit_per_day = self.entry.customer.price_per_unit_per_day
+                log_item.save()
+                log_items.append(log_item)
+            last_date = next_date
+            units_left -= units
+
+        return log_items
 
     def __unicode__(self):
         return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units, self.uom, self.nett_weight, self.entry.arrival_date, self.entry.customer)
@@ -122,12 +159,12 @@ pre_save.connect(entry_row_pre_save, sender=EntryRow)
 class Withdrawal(models.Model):
     customer = models.ForeignKey(Customer)
     price_per_kilo_per_withdrawal = models.FloatField(blank=True)
+    price_per_unit_per_withdrawal = models.FloatField(blank=True)
 
     reference_nr = models.CharField(max_length=200, blank=True)
     responsible = models.CharField(max_length=200, blank=True)
     place_of_departure = models.CharField(max_length=200, blank=True)
     
-    insurance = models.CharField(max_length=200, blank=True)
     transport_condition = models.CharField(max_length=200, blank=True)
     transport_nr = models.CharField(max_length=200, blank=True)
     order_nr = models.CharField(max_length=200, blank=True)
@@ -137,7 +174,7 @@ class Withdrawal(models.Model):
     arrival_date = models.DateField(null=True, blank=True)
     vehicle_type = models.CharField(max_length=200, blank=True)
     opening_hours = models.CharField(max_length=200, blank=True)
-    transporter = models.CharField(max_length=200, blank=True)
+    transporter = models.ForeignKey(Transporter)
     comment = models.TextField(null=True, blank=True)
 
     class Meta:
@@ -162,6 +199,7 @@ class Withdrawal(models.Model):
 def withdrawal_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.price_per_kilo_per_withdrawal = instance.customer.price_per_kilo_per_withdrawal
+        instance.price_per_unit_per_withdrawal = instance.customer.price_per_unit_per_withdrawal
 pre_save.connect(withdrawal_pre_save, sender=Withdrawal)
 
 class WithdrawalRow(models.Model):
@@ -172,7 +210,7 @@ class WithdrawalRow(models.Model):
 
     @property
     def cost(self):
-        return self.gross_weight * self.withdrawal.price_per_kilo_per_withdrawal
+        return self.gross_weight * self.withdrawal.price_per_kilo_per_withdrawal + self.units * self.withdrawal.price_per_unit_per_withdrawal
 
     @property
     def nett_weight(self):
@@ -212,6 +250,10 @@ class UnitWork(models.Model):
     date = models.DateField()
     units = models.IntegerField()
 
+    class Meta:
+        permissions = (("view_unitwork", "View"),
+                       ("view_own_unitwork", "View own"))
+
     def __unicode__(self):
         return u"%s of %s @ %s for %s" % (self.work_type.work_type, self.units, self.date, self.work_type.customer)
 
@@ -226,11 +268,17 @@ class StorageLog(models.Model):
     entry_row = models.ForeignKey(EntryRow)
     date = models.DateField()
     price_per_kilo_per_day = models.FloatField()
+    price_per_unit_per_day = models.FloatField()
     units_left = models.IntegerField()
+
+
+    class Meta:
+        permissions = (("view_storagelog", "View"),
+                       ("view_own_storagelog", "View own"))
 
     @property
     def cost(self):
-        return self.gross_weight_left * self.price_per_kilo_per_day
+        return self.gross_weight_left * self.price_per_kilo_per_day + self.units_left * self.price_per_unit_per_day
 
     @property
     def nett_weight_left(self):
@@ -241,11 +289,11 @@ class StorageLog(models.Model):
         return self.entry_row.gross_weight_per_unit * self.units_left
 
     def __unicode__(self):
-        return u"%s for %s: %s à %s" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day)
+        return u"%s for %s: %s à %s/kg + %s/unit" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day, self.price_per_unit_per_day)
 
 def storagelog_pre_save(sender, instance, **kwargs):
-    if instance.id is None:
-        instance.date = datetime.date.today()
-        instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
-        instance.units_left = instance.entry_row.units_left
+    if getattr(instance, 'date', None) is None: instance.date = datetime.date.today()
+    if getattr(instance, 'price_per_kilo_per_day', None) is None: instance.price_per_kilo_per_day = instance.entry_row.entry.customer.price_per_kilo_per_day
+    if getattr(instance, 'price_per_unit_per_day', None) is None: instance.price_per_unit_per_day = instance.entry_row.entry.customer.price_per_unit_per_day
+    if getattr(instance, 'units_left', None) is None: instance.units_left = instance.entry_row.units_left
 pre_save.connect(storagelog_pre_save, sender=StorageLog)
