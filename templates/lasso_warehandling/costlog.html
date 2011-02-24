@@ -1,10 +1,11 @@
 {% extends "admin/base_site.html" %}
-{% load adminmedia admin_list %}
+{% load adminmedia %}
+{% load admin_list %}
 {% load i18n %}
 {% load i18next %}
 {% load datatypes %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
 
 {% block coltype %}flex{% endblock %}
 
@@ -30,8 +31,7 @@
 
 {% block content %}
   <form method="GET" action="{% url lasso_warehandling.views.costlog %}">
-    <label for="year">Year:</label> <input type="text" name="year" value="{{ year }}">
-    <label for="month">Month:</label> <input type="text" name="month" value="{{ month }}">
+    {{ config_form.as_p }}
     <input type="submit" value="{% trans "Go" %}">
   </form>
 
@@ -60,10 +60,10 @@
 	      <td>{{ items_for_date.sum_in.units|separateminus:items_for_date.sum_out.units }}</td>
 	      <td>
 		{% for entry in items_for_date.entry_items.values %}
-		  <a href="{% url admin:lasso_warehandling_entry_change object_id=entry.entry.id %}">E:{{ entry.id_str }}</a>
+		  <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">E:{{ entry.id_str }}</a>
 		{% endfor %}
 		{% for entry in items_for_date.withdrawal_items.values %}
-		  <a href="{% url admin:lasso_warehandling_withdrawal_change object_id=entry.withdrawal.id %}">W:{{ entry.id_str }}</a>
+		  <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">W:{{ entry.id_str }}</a>
 		{% endfor %}
 	      </td>
 	      <td>{{ items_for_date.sum_in.cost|add:items_for_date.sum_out.cost }}</td>

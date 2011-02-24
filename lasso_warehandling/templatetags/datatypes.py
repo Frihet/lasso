@@ -1,4 +1,8 @@
 from django import template
+from django.core.serializers import serialize
+from django.db.models.query import QuerySet
+from django.utils import simplejson
+import django.db.models.base
 
 register = template.Library()
 
@@ -29,6 +33,17 @@ def separateminus_filter(value1, value2):
 def aadd_filter(value1, value2):
     return value1 + value2
 
+def jsonify_filter(object):
+    def jsonify_models(obj):
+        if isinstance(obj, django.db.models.base.Model):
+            return simplejson.loads(serialize('json', [obj]))[0]
+        elif isinstance(object, QuerySet):
+            return simplejson.loads(serialize('json', obj))
+        else:
+            return obj
+    return simplejson.dumps(object, default=jsonify_models)
+
+register.filter('jsonify', jsonify_filter)
 register.filter('nth', nth_filter)
 register.filter('eachnth', eachnth_filter)
 register.filter('sum', sum_filter)

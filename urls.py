@@ -9,9 +9,10 @@ admin.autodiscover()
 urlpatterns = patterns('',
 
     (r'^admin/lasso_warehandling/costlog/', include('lasso_warehandling.urls.costlog')),
+    (r'^admin/lasso_warehouse/overview/', include('lasso_warehouse.urls.overview')),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
     (r'^rosetta/', include('rosetta.urls')),
     (r'^i18n/', include('django.conf.urls.i18n')),
-    (r'^' + settings.MEDIA_URL + '(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+    (r'^' + settings.MEDIA_URL[1:] + '(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )
