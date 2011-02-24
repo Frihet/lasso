@@ -646,6 +646,7 @@ table#change-history tbody th {
 
 #header {
     width: 100%;
+    height: 77px;
 }
 
 #content-main {
@@ -702,7 +703,7 @@ table#change-history tbody th {
 /* HEADER */
 
 #header {
-    background: #417690;
+    background: url(../img/lasso_branding/logo.png) no-repeat #93bae4;
     color: #ffc;
     overflow: hidden;
 }
