@@ -57,7 +57,7 @@
 			    <option value="{{ lang.0 }}" {% ifequal lang.0 LANGUAGE_CODE %}selected="true"{% endifequal %} >{{ lang.1 }}</option>
 			{% endfor %}
 		    </select>
-		    <input type="submit" value="Go" />
+		    <input type="submit" value="{% trans "Go" %}" />
 		</form>
 
             {% endblock %}

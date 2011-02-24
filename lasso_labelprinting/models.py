@@ -23,4 +23,4 @@ class Address(models.Model):
                 "city": self.city}
 
     def __unicode__(self):
-        return "%s %s" % (self.customer_nr, self.name)
+        return _("%(customer_nr)s %(name)s") % {"customer_nr":self.customer_nr, "name":self.name}

@@ -10,7 +10,7 @@ User.__bases__ += (utils.modelhelpers.SubclasModelMixin,)
 
 @utils.modelhelpers.subclassproxy
 def __unicode__(self):
-    return "%s (%s %s)" % (self.username, self.first_name, self.last_name)
+    return _("%(username)s (%(first_name)s %(last_name)s)") % {"username": self.username, "first_name": self.first_name, "last_name": self.last_name}
 User.__unicode__ = __unicode__
 
 class UnitWorkType(models.Model):
@@ -97,4 +97,4 @@ class UnitWorkPrices(models.Model):
     price_per_unit = models.FloatField(verbose_name=_("Price per unit"))
 
     def __unicode__(self):
-        return "%s: %s for %s" % (self.customer, self.price_per_unit, self.work_type)
+        return _("%(customer)s: %(price_per_unit)s for %(work_type)s") % {"customer":self.customer, "price_per_unit":self.price_per_unit, "work_type":self.work_type}

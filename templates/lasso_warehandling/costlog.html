@@ -19,10 +19,10 @@
       </a>
        &rsaquo; 
        <a href="{% url admin:app_list app_label="lasso_warehandling" %}">
-         {{ "Warehandling"|_ }}
+         {% trans "Warehandling" %}
       </a>
       &rsaquo; 
-      {{ "Cost log"|_ }}
+      {% trans "Cost log" %}
     </div>
   {% endblock %}
 {% endif %}

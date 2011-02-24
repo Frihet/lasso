@@ -21,7 +21,7 @@ class Row(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("Name"))
 
     def __unicode__(self):
-        return "%s in %s" % (self.name, self.warehouse.name)
+        return _("%(name)s in %(warehouse.name)s") % {"name":self.name, "warehouse.name":self.warehouse.name}
 
 class PalletSpace(models.Model):
     class Meta:
@@ -36,7 +36,7 @@ class PalletSpace(models.Model):
     size_d = models.FloatField(verbose_name=_("Depth"))
 
     def __unicode__(self):
-        return "%s-%s in %s" % (self.row.name, self.name, self.row.warehouse.name)
+        return _("%(row.name)s-%(name)s in %(row.warehouse.name)s") % {"row.name":self.row.name, "name":self.name, "row.warehouse.name":self.row.warehouse.name}
 
 class EmptyPalletSpace(PalletSpace):
     dummy = _('empty pallet space')

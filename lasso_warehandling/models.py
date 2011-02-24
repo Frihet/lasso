@@ -59,7 +59,7 @@ class Entry(models.Model):
         return '; '.join(["%s %s %s" % (row.units, row.uom, row.product_description) for row in self.rows.all() if row.product_description])
 
     def __unicode__(self):
-        return u"%s @ %s for %s" % (self.id, self.arrival_date, self.customer)
+        return _(u"%(id)s @ %(arrival_date)s for %(customer)s") % {'id': self.id, 'arrival_date': self.arrival_date, 'customer': self.customer}
 
 def entry_pre_save(sender, instance, **kwargs):
     if instance.id is None:
@@ -186,7 +186,7 @@ class EntryRow(models.Model):
         return log_items
 
     def __unicode__(self):
-        return u"%s: %s (%s %s à %skg @ %s for %s)" % (self.id_str, self.product_description, self.units_left, self.uom, self.nett_weight_per_unit, self.entry.arrival_date, self.entry.customer)
+        return _(u"%(id_str)s: %(product_description)s (%(units_left)s %(uom)s à %(nett_weight_per_unit)skg @ %(entry.arrival_date)s for %(entry.customer)s)") % {"id_str": self.id_str, "product_description": self.product_description, "units_left": self.units_left, "uom": self.uom, "nett_weight_per_unit": self.nett_weight_per_unit, "entry.arrival_date": self.entry.arrival_date, "entry.customer": self.entry.customer}
 
 def entry_row_pre_save(sender, instance, **kwargs):
     if instance.id is None:
@@ -238,26 +238,18 @@ class Withdrawal(models.Model):
 
     @property
     def reference_nr(self):
-        origin = None
-        for row in self.rows.all():
-            if origin is None:
-                origin = row.entry_row.entry.origin
-            else:
-                if origin != row.entry_row.entry.origin:
-                    origin = False
-        if origin:
-            origin = origin.reference_nr
-        else:
-            origin = 0
+        try:
+            # Don't ask my why...
+            # 2007 = 01..12
+            # 2008 = 21..32
+            # 2009 = 41..52
+            # 2010 = 61..72
+            month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
 
-        # Don't ask my why...
-        # 2007 = 01..12
-        # 2008 = 21..32
-        # 2009 = 41..52
-        # 2010 = 61..72
-        month = (self.withdrawal_date.year - 2007) * 2 + self.withdrawal_date.month
-
-        return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')
+            origin = 248
+            return ('%3s.%2s.%4s' % (origin, month, self.customer.customer_nr)).replace(' ', '0')
+        except:
+            return "XXX.XX.XXXX"
 
     @property
     def insurance(self):
@@ -298,9 +290,9 @@ class WithdrawalRow(models.Model):
     old_units = models.IntegerField(blank=True, verbose_name=_("Old units"))
     units = models.IntegerField(verbose_name=_("Units"))
     old_nett_weight = models.FloatField(blank=True, null=True, verbose_name=_("Old nett weight"))
-    _nett_weight = models.FloatField(blank=True, null=True, verbose_name=_("Nett weight"))
+    _nett_weight = models.FloatField(blank=True, null=True, default=0, verbose_name=_("Nett weight"))
     old_gross_weight = models.FloatField(blank=True, null=True, verbose_name=_("Old gross weight"))
-    _gross_weight = models.FloatField(blank=True, null=True, verbose_name=_("Gross weight"))
+    _gross_weight = models.FloatField(blank=True, null=True, default=0, verbose_name=_("Gross weight"))
 
     @property
     def cost(self):
@@ -312,8 +304,8 @@ class WithdrawalRow(models.Model):
         else:
             return self._nett_weight
     def set_nett_weight(self, value):
-        if self.entry_row.auto_weight:
-            raise Exception("Can not set nett weight for EntryRow with auto_weight set")
+        #if self.entry_row.auto_weight:
+        #    raise Exception("Can not set nett weight for EntryRow with auto_weight set")
         self._nett_weight = value
     nett_weight = property(get_nett_weight, set_nett_weight)
 
@@ -323,8 +315,8 @@ class WithdrawalRow(models.Model):
         else:
             return self._gross_weight
     def set_gross_weight(self, value):
-        if self.entry_row.auto_weight:
-            raise Exception("Can not set gross weight for EntryRow with auto_weight set")
+        #if self.entry_row.auto_weight:
+        #    raise Exception("Can not set gross weight for EntryRow with auto_weight set")
         self._gross_weight = value
     gross_weight = property(get_gross_weight, set_gross_weight)
 
@@ -333,7 +325,7 @@ class WithdrawalRow(models.Model):
         return "%s.%s" % (self.withdrawal.id, self.id)
 
     def __unicode__(self):
-        return u"%s (%s @ %s from %s)" % (self.id_str, self.units, self.withdrawal.withdrawal_date, self.entry_row)
+        return _(u"%(id_str)s (%(units)s @ %(withdrawal.withdrawal_date)s from %(entry_row)s)") % {"id_str": self.id_str, "units": self.units, "withdrawal.withdrawal_date": self.withdrawal.withdrawal_date, "entry_row": self.entry_row}
 
 def withdrawal_row_post_init(sender, instance, **kwargs):
     if instance.id is None:
