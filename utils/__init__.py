@@ -4,6 +4,9 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 import django.utils.safestring
 import django.core.urlresolvers
+from django.utils.encoding import StrAndUnicode, force_unicode
+from django.utils.safestring import mark_safe
+from django.forms.util import flatatt
 
 def xdaterange(d1, d2):
     return (d1 + datetime.timedelta(x)
@@ -79,3 +82,17 @@ class ModelLinkWidget(django.forms.Select):
 
 class ModelLinkField(django.forms.ModelChoiceField):
     widget = ModelLinkWidget
+
+
+class ReadonlyTextInput(forms.TextInput):
+    def render(self, name, value, attrs=None):
+        if value is None: value = ''
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        if value != '':
+            # Only add the 'value' attribute if a value is non-empty.
+            final_attrs['value'] = force_unicode(value)
+        final_attrs['type'] = 'hidden'
+        return mark_safe(u'<input%s />' % flatatt(final_attrs) + force_unicode(value))
+
+class ReadonlyCharField(django.forms.CharField):
+    widget = ReadonlyTextInput
