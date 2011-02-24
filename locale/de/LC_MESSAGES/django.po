@@ -1,14 +1,14 @@
 # German translation of Lasso
 # Copyright (C) 2010
 # This file is distributed under the same license as the Lasso package.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 02:26-0600\n"
-"PO-Revision-Date: 2010-12-09 11:03\n"
-"Last-Translator: <a@a.com>\n"
+"POT-Creation-Date: 2011-01-21 09:28-0600\n"
+"PO-Revision-Date: 2011-02-18 11:00\n"
+"Last-Translator: <>\n"
 "Language-Team: Lasso I18N <lasso@freecode.no>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,6 +18,16 @@ msgstr ""
 "X-Poedit-Language: Deutch\n"
 "X-Poedit-Country: SWITZERLAND\n"
 
+#: lasso_customer/admin.py:16 templates/admin/auth/user/add_form.html:20
+#: templates/admin/auth/user/change_password.html:34
+msgid "Password"
+msgstr "Passwort"
+
+#: lasso_customer/models.py:13
+#, python-format
+msgid "%(username)s (%(first_name)s %(last_name)s)"
+msgstr "%(username)s (%(first_name)s %(last_name)s)"
+
 #: lasso_customer/models.py:18
 msgid "Unit work type"
 msgstr "Leistungsart"
@@ -26,99 +36,338 @@ msgstr "Leistungsart"
 msgid "Unit work types"
 msgstr "Leistungsarten"
 
-#: lasso_customer/models.py:27
+#: lasso_customer/models.py:21 lasso_global/models.py:15
+#: lasso_labelprinting/models.py:11 lasso_warehouse/models.py:10
+#: lasso_warehouse/models.py:21 lasso_warehouse/models.py:33
+msgid "Name"
+msgstr "Name"
+
+#: lasso_customer/models.py:28 lasso_customer/models.py:47
 msgid "Organization"
-msgstr ""
+msgstr "Organisation"
 
-#: lasso_customer/models.py:28
+#: lasso_customer/models.py:29
 msgid "Organizations"
-msgstr "Transaktionskosten"
+msgstr "Organisationen"
 
-#: lasso_customer/models.py:58
+#: lasso_customer/models.py:31
+msgid "Title"
+msgstr "Anrede"
+
+#: lasso_customer/models.py:32 lasso_customer/models.py:44
+#: lasso_labelprinting/models.py:6
+msgid "Address"
+msgstr "Adresse"
+
+#: lasso_customer/models.py:33 lasso_customer/models.py:45
+msgid "Phone"
+msgstr "Tel"
+
+#: lasso_customer/models.py:34 lasso_customer/models.py:46
+msgid "Fax"
+msgstr "Fax"
+
+#: lasso_customer/models.py:66 lasso_customer/models.py:103
+#: lasso_warehandling/models.py:14 lasso_warehandling/models.py:220
+#: lasso_warehandling/views.py:16
 msgid "Customer"
-msgstr "Kunde"
+msgstr "Importeur"
 
-#: lasso_customer/models.py:59
+#: lasso_customer/models.py:67
 msgid "Customers"
-msgstr "Kunden"
+msgstr "Importeure"
 
-#: lasso_customer/models.py:74
+#: lasso_customer/models.py:69 lasso_labelprinting/models.py:9
+msgid "Customer nr"
+msgstr "Kunden Nr."
+
+#: lasso_customer/models.py:71 lasso_warehandling/models.py:391
+msgid "Price per kilo per day"
+msgstr "Preis pro Kilo und Tag"
+
+#: lasso_customer/models.py:72 lasso_warehandling/models.py:20
+msgid "Price per kilo per entry"
+msgstr "Preis pro Kilo und Einlagerung"
+
+#: lasso_customer/models.py:73 lasso_warehandling/models.py:221
+msgid "Price per kilo per withdrawal"
+msgstr "Preis pro Kilo und Auslagerung"
+
+#: lasso_customer/models.py:75 lasso_warehandling/models.py:392
+msgid "Price per unit per day"
+msgstr "Preis pro Kilo und Tag"
+
+#: lasso_customer/models.py:76 lasso_warehandling/models.py:21
+msgid "Price per unit per entry"
+msgstr "Preis pro Kilo und Einlagerung"
+
+#: lasso_customer/models.py:77 lasso_warehandling/models.py:222
+msgid "Price per unit per withdrawal"
+msgstr "Preis pro Kilo und Auslagerung"
+
+#: lasso_customer/models.py:82 lasso_warehandling/models.py:15
 msgid "Original seller"
-msgstr ""
+msgstr "Lieferant"
 
-#: lasso_customer/models.py:75
+#: lasso_customer/models.py:83
 msgid "Original sellers"
-msgstr ""
+msgstr "Lieferanten"
 
-#: lasso_customer/models.py:80
-#, fuzzy
+#: lasso_customer/models.py:88 lasso_warehandling/models.py:231
 msgid "Destination"
-msgstr "Zieladresse"
+msgstr "Empfänger"
 
-#: lasso_customer/models.py:81
-#, fuzzy
+#: lasso_customer/models.py:89
 msgid "Destinations"
-msgstr "Zieladresse"
+msgstr "Empfänger"
 
-#: lasso_customer/models.py:86
+#: lasso_customer/models.py:94 lasso_warehandling/models.py:18
+#: lasso_warehandling/models.py:236
 msgid "Transporter"
-msgstr "Lieferant"
+msgstr "Spediteur"
 
-#: lasso_customer/models.py:87
+#: lasso_customer/models.py:95
 msgid "Transporters"
-msgstr "Lieferant"
+msgstr "Spediteure"
 
-#: lasso_customer/models.py:92
+#: lasso_customer/models.py:100
 msgid "Unit work price"
 msgstr "Preis pro Leistung"
 
-#: lasso_customer/models.py:93
+#: lasso_customer/models.py:101
 msgid "Unit work prices"
 msgstr "Preis pro Leistung"
 
-#: lasso_global/models.py:12
+#: lasso_customer/models.py:104 lasso_warehandling/models.py:367
+msgid "Work type"
+msgstr "Leistung"
+
+#: lasso_customer/models.py:105 lasso_warehandling/models.py:368
+msgid "Price per unit"
+msgstr "Preis pro Einheit"
+
+#: lasso_customer/models.py:108
+#, python-format
+msgid "%(customer)s: %(price_per_unit)s for %(work_type)s"
+msgstr "%(customer)s: %(price_per_unit)s für %(work_type)s"
+
+#: lasso_global/models.py:12 lasso_warehandling/models.py:24
 msgid "Origin"
-msgstr ""
+msgstr "Origin"
 
 #: lasso_global/models.py:13
-#, fuzzy
 msgid "Origins"
-msgstr "Transaktionskosten"
+msgstr "Origins"
 
-#: lasso_global/models.py:24
+#: lasso_global/models.py:16
+msgid "Reference nr"
+msgstr "Referenz Nr."
+
+#: lasso_global/models.py:24 lasso_warehandling/models.py:17
 msgid "Insurance"
 msgstr "Versicherung"
 
 #: lasso_global/models.py:25
-#, fuzzy
 msgid "Insurances"
-msgstr "Versicherung"
+msgstr "Versicherungen"
 
-#: lasso_labelprinting/models.py:6
-msgid "Address"
-msgstr "ADRESSEN LADEN"
+#: lasso_global/models.py:27
+msgid "Percent"
+msgstr "Prozent"
 
 #: lasso_labelprinting/models.py:7
 msgid "Addresses"
-msgstr "ADRESSEN LADEN"
+msgstr "Adressen Vecom bearbeiten"
 
-#: lasso_warehandling/models.py:30
+#: lasso_labelprinting/models.py:10
+msgid "Platform"
+msgstr "Platform"
+
+#: lasso_labelprinting/models.py:12
+msgid "Street"
+msgstr "Strasse"
+
+#: lasso_labelprinting/models.py:13
+msgid "Zip"
+msgstr "PlZ"
+
+#: lasso_labelprinting/models.py:14
+msgid "City"
+msgstr "Ort"
+
+#: lasso_labelprinting/models.py:26
+#, python-format
+msgid "%(customer_nr)s %(name)s"
+msgstr "%(customer_nr)s %(name)s"
+
+#: lasso_labelprinting/views.py:110
+#, python-format
+msgid "Unable to print document: %(error)s"
+msgstr "Kann das Dokument nicht Drucken: %(error)s"
+
+#: lasso_labelprinting/views.py:112 lasso_labelprinting/views.py:170
+#, python-format
+msgid "Unable to convert document: %(error)s"
+msgstr "Kann das Dokument nicht Konvertieren: %(error)s"
+
+#: lasso_labelprinting/views.py:124
+msgid "Printed labels"
+msgstr "Vecom Etiketten  Drucken"
+
+#: lasso_labelprinting/views.py:182
+msgid "Uploaded addresses"
+msgstr "geladene Adressen"
+
+#: lasso_warehandling/admin.py:17
+msgid "Locations"
+msgstr "Position"
+
+#: lasso_warehandling/admin.py:18
+msgid "Withdrawal links"
+msgstr "Auslagerungen"
+
+#: lasso_warehandling/admin.py:56
+msgid "Product"
+msgstr "Produkt"
+
+#: lasso_warehandling/admin.py:60
+msgid "Amount"
+msgstr "Menge"
+
+#: lasso_warehandling/admin.py:67
+msgid "Current status"
+msgstr "momentaner Status"
+
+#: lasso_warehandling/admin.py:69 lasso_warehandling/admin.py:128
+msgid "Arrival"
+msgstr "Eingangsdatum"
+
+#: lasso_warehandling/admin.py:133
+msgid "General"
+msgstr "Allgemein"
+
+#: lasso_warehandling/admin.py:138
+msgid "Departure"
+msgstr "Abfahrt"
+
+#: lasso_warehandling/admin.py:142
+msgid "Transport"
+msgstr "Spediteur"
+
+#: lasso_warehandling/models.py:16
+msgid "Arrival date"
+msgstr "Eingangsdatum"
+
+#: lasso_warehandling/models.py:19
+msgid "Insurance percentage"
+msgstr "Versicherungsprozente"
+
+#: lasso_warehandling/models.py:22
+msgid "Custom handling date"
+msgstr "Verzollungsdatum"
+
+#: lasso_warehandling/models.py:23
+msgid "Customs nr"
+msgstr "Zoll Nr."
+
+#: lasso_warehandling/models.py:25
+msgid "Customer entry nr"
+msgstr "Zeugnisnr."
+
+#: lasso_warehandling/models.py:30 lasso_warehandling/models.py:76
+#: lasso_warehandling/views.py:17
 msgid "Entry"
 msgstr "Einlagerung"
 
 #: lasso_warehandling/models.py:31
 msgid "Entries"
-msgstr "Einlagerung"
+msgstr "Einlagerungen"
 
-#: lasso_warehandling/models.py:73
+#: lasso_warehandling/models.py:62
+#, python-format
+msgid "%(id)s @ %(arrival_date)s for %(customer)s"
+msgstr "%(id)s @ %(arrival_date)s für %(customer)s"
+
+#: lasso_warehandling/models.py:73 lasso_warehandling/models.py:289
+#: lasso_warehandling/models.py:389 lasso_warehouse/models.py:32
 msgid "Entry row"
 msgstr "Produkteingang"
 
 #: lasso_warehandling/models.py:74
 msgid "Entry rows"
-msgstr "Produkteingang"
+msgstr "Produkteingänge"
 
-#: lasso_warehandling/models.py:205
+#: lasso_warehandling/models.py:77
+msgid "Customs certificate nr"
+msgstr "Zollquittungsnr."
+
+#: lasso_warehandling/models.py:78
+msgid "Product nr"
+msgstr "Produktenr."
+
+#: lasso_warehandling/models.py:79
+msgid "UoM"
+msgstr "Masseinheiten"
+
+#: lasso_warehandling/models.py:80 lasso_warehandling/models.py:291
+#: lasso_warehandling/models.py:370
+msgid "Units"
+msgstr "Anzahl / Menge"
+
+#: lasso_warehandling/models.py:81 lasso_warehandling/models.py:393
+msgid "Units left"
+msgstr "Anzahl / Menge (Saldo)"
+
+#: lasso_warehandling/models.py:82 lasso_warehandling/models.py:293
+msgid "Nett weight"
+msgstr "Gewicht netto"
+
+#: lasso_warehandling/models.py:83 lasso_warehandling/models.py:394
+msgid "Nett weight left"
+msgstr "Gewicht netto"
+
+#: lasso_warehandling/models.py:84 lasso_warehandling/models.py:295
+msgid "Gross weight"
+msgstr "Gewicht brutto"
+
+#: lasso_warehandling/models.py:85 lasso_warehandling/models.py:395
+msgid "Gross weight left"
+msgstr "Gewicht brutto"
+
+#: lasso_warehandling/models.py:86
+msgid "Product value"
+msgstr "Warenwert"
+
+#: lasso_warehandling/models.py:88
+msgid "Use before"
+msgstr "Haltbarkeitsdatum"
+
+#: lasso_warehandling/models.py:89
+msgid "Product description"
+msgstr "Artikelbezeichnung"
+
+#: lasso_warehandling/models.py:90
+msgid "Product state"
+msgstr "Äusseres Aussehen"
+
+#: lasso_warehandling/models.py:91 lasso_warehandling/models.py:237
+msgid "Comment"
+msgstr "Kommentar"
+
+#: lasso_warehandling/models.py:92
+msgid "Arrival temperatures"
+msgstr "Temp. beim Eingang (°C)"
+
+#: lasso_warehandling/models.py:94
+msgid "Auto weight"
+msgstr "Gewicht netto"
+
+#: lasso_warehandling/models.py:189
+#, python-format
+msgid "%(id_str)s: %(product_description)s (%(units_left)s %(uom)s à %(nett_weight_per_unit)skg @ %(entry.arrival_date)s for %(entry.customer)s)"
+msgstr "%(id_str)s: %(product_description)s (%(units_left)s %(uom)s à %(nett_weight_per_unit)skg @ %(entry.arrival_date)s für %(entry.customer)s)"
+
+#: lasso_warehandling/models.py:205 lasso_warehandling/models.py:227
 msgid "Transport condition"
 msgstr "Transportkonditionen"
 
@@ -126,7 +375,7 @@ msgstr "Transportkonditionen"
 msgid "Transport conditions"
 msgstr "Transportkonditionen"
 
-#: lasso_warehandling/models.py:217
+#: lasso_warehandling/models.py:217 lasso_warehandling/models.py:288
 msgid "Withdrawal"
 msgstr "Auslagerung"
 
@@ -134,31 +383,93 @@ msgstr "Auslagerung"
 msgid "Withdrawals"
 msgstr "Auslagerungen"
 
-#: lasso_warehandling/models.py:293
+#: lasso_warehandling/models.py:224
+msgid "Responsible"
+msgstr "Zuständig"
+
+#: lasso_warehandling/models.py:225
+msgid "Place of departure"
+msgstr "Abgangsort"
+
+#: lasso_warehandling/models.py:228
+msgid "Transport nr"
+msgstr "Lieferscheinnr."
+
+#: lasso_warehandling/models.py:229
+msgid "Order nr"
+msgstr "Bestellnr."
+
+#: lasso_warehandling/models.py:232
+msgid "Withdrawal date"
+msgstr "Ausgangsdatum"
+
+#: lasso_warehandling/models.py:233
+msgid "Arrival_date"
+msgstr "Eingangsdatum"
+
+#: lasso_warehandling/models.py:234
+msgid "Vehicle type"
+msgstr "Transportmittel"
+
+#: lasso_warehandling/models.py:235
+msgid "Opening hours"
+msgstr "Öffnungszeiten"
+
+#: lasso_warehandling/models.py:285
 msgid "Withdrawal row"
 msgstr "Produktausgang"
 
-#: lasso_warehandling/models.py:294
+#: lasso_warehandling/models.py:286
 msgid "Withdrawal rows"
-msgstr "Produktausgang"
+msgstr "Produktausgänge"
 
-#: lasso_warehandling/models.py:370
+#: lasso_warehandling/models.py:290
+msgid "Old units"
+msgstr "Alte Einheiten"
+
+#: lasso_warehandling/models.py:292
+msgid "Old nett weight"
+msgstr "Gewicht netto"
+
+#: lasso_warehandling/models.py:294
+msgid "Old gross weight"
+msgstr "Gewicht brutto"
+
+#: lasso_warehandling/models.py:328
+#, python-format
+msgid "%(id_str)s (%(units)s @ %(withdrawal.withdrawal_date)s from %(entry_row)s)"
+msgstr "%(id_str)s (%(units)s @ %(withdrawal.withdrawal_date)s von %(entry_row)s)"
+
+#: lasso_warehandling/models.py:362
 msgid "Unit work"
 msgstr "Leistung"
 
-#: lasso_warehandling/models.py:371
-msgid "Unit work instances"
-msgstr "Preis pro Leistung"
+#: lasso_warehandling/models.py:363
+msgid "Unit works"
+msgstr "Leistungen"
 
-#: lasso_warehandling/models.py:394
+#: lasso_warehandling/models.py:369 lasso_warehandling/models.py:390
+#: templates/lasso_warehandling/costlog.html:42
+msgid "Date"
+msgstr "Datum"
+
+#: lasso_warehandling/models.py:384
 msgid "Storage log"
 msgstr "Lagerung Logeinträge"
 
-#: lasso_warehandling/models.py:395
+#: lasso_warehandling/models.py:385
 msgid "Storage log entries"
 msgstr "Lagerung Logeintrag"
 
-#: lasso_warehouse/models.py:7
+#: lasso_warehandling/views.py:14
+msgid "Year"
+msgstr "Jahr"
+
+#: lasso_warehandling/views.py:15
+msgid "Month"
+msgstr "Monat"
+
+#: lasso_warehouse/models.py:7 lasso_warehouse/models.py:20
 msgid "Warehouse"
 msgstr "Lager"
 
@@ -166,13 +477,18 @@ msgstr "Lager"
 msgid "Warehouses"
 msgstr "Lager"
 
-#: lasso_warehouse/models.py:17
+#: lasso_warehouse/models.py:17 lasso_warehouse/models.py:31
 msgid "Row"
 msgstr "Regal"
 
 #: lasso_warehouse/models.py:18
 msgid "Rows"
 msgstr "Regale"
+
+#: lasso_warehouse/models.py:24
+#, python-format
+msgid "%(name)s in %(warehouse.name)s"
+msgstr "%(name)s in %(warehouse.name)s"
 
 #: lasso_warehouse/models.py:28
 msgid "Pallet space"
@@ -182,33 +498,54 @@ msgstr "Palettenplatz"
 msgid "Pallet spaces"
 msgstr "Palettenplätze"
 
-#: lasso_warehouse/models.py:43
-#, fuzzy
-msgid "Empty pallet space"
-msgstr "Palettenplatz"
+#: lasso_warehouse/models.py:34
+msgid "Width"
+msgstr "Breite"
+
+#: lasso_warehouse/models.py:35
+msgid "Height"
+msgstr "Höhe"
+
+#: lasso_warehouse/models.py:36
+msgid "Depth"
+msgstr "Tiefe"
+
+#: lasso_warehouse/models.py:39
+#, python-format
+msgid "%(row.name)s-%(name)s in %(row.warehouse.name)s"
+msgstr "%(row.name)s-%(name)s in %(row.warehouse.name)s"
+
+#: lasso_warehouse/models.py:42
+msgid "empty pallet space"
+msgstr "leeren Palettenplatz"
 
 #: lasso_warehouse/models.py:44
-#, fuzzy
+msgid "Empty pallet space"
+msgstr "leeren Palettenplatz"
+
+#: lasso_warehouse/models.py:45
 msgid "Empty pallet spaces"
-msgstr "Palettenplatz"
+msgstr "leere Palettenplätze"
 
 #: lasso_warehouse/models.py:50
-#, fuzzy
-msgid "Filled pallet space"
-msgstr "Palettenplatz"
+msgid "filled pallet space"
+msgstr " Vollen Palettenplatz"
 
-#: lasso_warehouse/models.py:51
-#, fuzzy
+#: lasso_warehouse/models.py:52
+msgid "Filled pallet space"
+msgstr "Volle Palettenplätze"
+
+#: lasso_warehouse/models.py:53
 msgid "Filled pallet spaces"
-msgstr "Palettenplatz"
+msgstr "Volle Palettenplätze"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
-msgstr ""
+msgstr "Seite nicht gefunden !"
 
 #: templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Es tut uns leid, aber die gewünschte Seite kann nicht gefunden werden !"
 
 #: templates/admin/500.html:4 templates/admin/app_index.html:8
 #: templates/admin/base.html:67 templates/admin/change_form.html:20
@@ -222,306 +559,306 @@ msgstr ""
 #: templates/lasso_warehandling/costlog.html:18
 #: templates/lasso_warehouse/overview.html:27
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: templates/admin/500.html:4
 msgid "Server error"
-msgstr ""
+msgstr "Server Fehler"
 
 #: templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr ""
+msgstr "Server Fehler (500)"
 
 #: templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr ""
+msgstr "Server Fehler <em>(500)</em>"
 
 #: templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+msgid "There's been an error. It's been reported to the site administrators via e-mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Es gab einen Fehler. Er wurde dem Administrator per E-Mail mitgeteilt und sollte in Kürze bereinigt sein.\n"
+"Herzlichen dank für ihre Geduld !"
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Führe die ausgewählte Aktion durch"
 
-#: templates/admin/actions.html:4 templates/lasso_warehandling/costlog.html:35
+#: templates/admin/actions.html:4 templates/admin/base.html:58
+#: templates/lasso_warehandling/costlog.html:35
 msgid "Go"
-msgstr ""
+msgstr "Go"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:24
 #, python-format
 msgid "%(name)s"
-msgstr ""
+msgstr "%(name)s"
 
 #: templates/admin/base.html:30
 msgid "Welcome,"
-msgstr ""
+msgstr "Willkommen !"
 
 #: templates/admin/base.html:35
 msgid "Documentation"
-msgstr "Position"
+msgstr "Dokumentation"
 
 #: templates/admin/base.html:43
 #: templates/admin/auth/user/change_password.html:14
 #: templates/admin/auth/user/change_password.html:47
 msgid "Change password"
-msgstr ""
+msgstr "Passwort verändern"
 
 #: templates/admin/base.html:50
 msgid "Log out"
-msgstr ""
+msgstr "Abmelden"
 
 #: templates/admin/base_site.html:4
 msgid "Lasso - warehousing"
-msgstr "Lager"
+msgstr "Lasso Lagerverwaltung"
 
 #: templates/admin/base_site.html:7
 msgid "Lasso"
-msgstr ""
+msgstr "Lasso"
 
 #: templates/admin/change_form.html:5 templates/admin/change_form.html:23
-#: templates/admin/index.html:30
+#: templates/admin/index.html:32
 msgid "Add"
-msgstr ""
+msgstr "Hinzufügen"
 
 #: templates/admin/change_form.html:31 templates/admin/object_history.html:10
 msgid "History"
-msgstr ""
+msgstr "Verlauf"
 
 #: templates/admin/change_form.html:32
 #: templates/admin/edit_inline/stacked.html:13
 #: templates/admin/edit_inline/tabular.html:29
 msgid "View on site"
-msgstr ""
+msgstr "Auf der Seite anschauen"
 
 #: templates/admin/change_form.html:54 templates/admin/change_list.html:56
 #: templates/admin/auth/user/change_password.html:23
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bitte korrigieren sie den unten stehenden Fehler."
+msgstr[1] "Bitte korrigieren sie die unten stehende Fehler."
 
 #: templates/admin/change_list.html:48
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Hinzufügen %(name)s"
 
 #: templates/admin/change_list.html:67
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: templates/admin/delete_confirmation.html:10
 #: templates/admin/submit_line.html:4
 msgid "Delete"
-msgstr "Datum"
+msgstr "Löschen"
 
 #: templates/admin/delete_confirmation.html:16
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
 msgstr ""
+"Das löschen von %(object_name)s '%(escaped_object)s' würde auch die damit zusammenhängenden Daten löschen.\n"
+"Sie haben nicht die Rechte um folgende Objekte zu löschen:"
 
 #: templates/admin/delete_confirmation.html:23
 #, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
+msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
 msgstr ""
+"Wollen Sie folgndes löschen %(object_name)s \"%(escaped_object)s\"?\n"
+"Alle folgende verbundene Objekte werden gelöscht: "
 
 #: templates/admin/delete_confirmation.html:28
 #: templates/admin/delete_selected_confirmation.html:33
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "Ja, ich bin sicher"
 
 #: templates/admin/delete_selected_confirmation.html:9
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Löschen von mehrere Objekte"
 
 #: templates/admin/delete_selected_confirmation.html:15
 #, python-format
-msgid ""
-"Deleting the %(object_name)s would result in deleting related objects, but "
-"your account doesn't have permission to delete the following types of "
-"objects:"
+msgid "Deleting the %(object_name)s would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
 msgstr ""
+"Das Löschen von \n"
+"%(object_name)s \n"
+"würde alle damit verbundene Daten löschen. Sie haben aber nicht die Rechte um Folgende Typen von Daten zu löschen:"
 
 #: templates/admin/delete_selected_confirmation.html:22
 #, python-format
-msgid ""
-"Are you sure you want to delete the selected %(object_name)s objects? All of "
-"the following objects and their related items will be deleted:"
+msgid "Are you sure you want to delete the selected %(object_name)s objects? All of the following objects and their related items will be deleted:"
 msgstr ""
+"Sind Sie sicher dass Sie die ausgewählten Objekte %(object_name)s löschen wollen ?\n"
+"Alle folgende Objekte und die damit verbundene werden gelöscht:"
 
 #: templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr ""
+msgstr "Durch %(filter_title)s"
 
 #: templates/admin/index.html:14 templates/admin/index.html.py:15
 msgid "Lasso modules"
-msgstr ""
+msgstr "Lasso Module"
 
 #: templates/admin/index.html:23
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "Zur Verfügung stehende Module in der Anwendung %(name)s."
 
-#: templates/admin/index.html:35
+#: templates/admin/index.html:37
 msgid "Change"
-msgstr ""
+msgstr "Verändere"
 
-#: templates/admin/index.html:50
+#: templates/admin/index.html:54
 msgid "You don't have permission to edit anything."
-msgstr ""
+msgstr "Sie haben nicht die Rechte um irgendwelche Daten zu bearbeiten."
 
-#: templates/admin/index.html:58
+#: templates/admin/index.html:62
 msgid "Recent Actions"
-msgstr ""
-
-#: templates/admin/index.html:59
-msgid "My Actions"
-msgstr "Position"
+msgstr "Kürzliche Aktionen"
 
 #: templates/admin/index.html:63
-msgid "None available"
-msgstr ""
+msgid "My Actions"
+msgstr "Meine Aktionen"
 
-#: templates/admin/index.html:77
+#: templates/admin/index.html:67
+msgid "None available"
+msgstr "nicht verfügbar"
+
+#: templates/admin/index.html:81
 msgid "Unknown content"
-msgstr ""
+msgstr "unbekannter Inhalt"
 
 #: templates/admin/invalid_setup.html:7
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
+msgid "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user."
+msgstr "Ihre Datenbank Installation ist fehlerhaft. Vegerwissern Sie sich, dass die entsprechenden Tabellen erstellt wurden und Sie über die nötige Rechte Verfügen um diese zu lesen."
 
 #: templates/admin/login.html:19
 msgid "Username:"
-msgstr ""
+msgstr "Benutzername"
 
 #: templates/admin/login.html:22
 msgid "Password:"
-msgstr ""
+msgstr "Passwort"
 
 #: templates/admin/login.html:26
 msgid "Log in"
-msgstr ""
+msgstr "Anmelden"
 
 #: templates/admin/object_history.html:22
 msgid "Date/time"
-msgstr "Datum"
+msgstr "Datum/Zeit"
 
 #: templates/admin/object_history.html:23
 msgid "User"
-msgstr ""
+msgstr "Benutzer"
 
 #: templates/admin/object_history.html:24
 msgid "Action"
-msgstr "Position"
+msgstr "Aktion"
 
 #: templates/admin/object_history.html:30
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "Tageszeit_Format"
 
 #: templates/admin/object_history.html:38
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr ""
+msgid "This object doesn't have a change history. It probably wasn't added via this admin site."
+msgstr "Dieses Objekt hat keinen Verlauf. Wahrscheinlich es nicht durch diese Seite hinzugefügt."
 
 #: templates/admin/pagination.html:10
 msgid "Show all"
-msgstr ""
+msgstr "Zeige alles"
 
 #: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
 msgid "Save"
-msgstr ""
+msgstr "speichern"
 
 #: templates/admin/search_form.html:8
 msgid "Search"
-msgstr ""
+msgstr "suchen"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 Resultat"
+msgstr[1] "%(counter)s Resultate"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s Total"
 
 #: templates/admin/submit_line.html:5
 msgid "Save as new"
-msgstr ""
+msgstr "Neu speichern"
 
 #: templates/admin/submit_line.html:6
 msgid "Save and add another"
-msgstr ""
+msgstr "Speichern und Neu hinzufügen"
 
 #: templates/admin/submit_line.html:7
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Speichern und weiter bearbeiten"
 
 #: templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
+msgid "First, enter a username and password. Then, you'll be able to edit more user options."
+msgstr "Zuerst ein Benutzername und Passwort eingeben. Sie können dann mehr Benutzer Optionen bearbeiten."
 
 #: templates/admin/auth/user/add_form.html:13
 msgid "Username"
-msgstr ""
-
-#: templates/admin/auth/user/add_form.html:20
-#: templates/admin/auth/user/change_password.html:34
-msgid "Password"
-msgstr ""
+msgstr "Benutzername"
 
 #: templates/admin/auth/user/add_form.html:26
 #: templates/admin/auth/user/change_password.html:40
 msgid "Password (again)"
-msgstr ""
+msgstr "Passwort (wiederholen)"
 
 #: templates/admin/auth/user/add_form.html:27
 #: templates/admin/auth/user/change_password.html:41
 msgid "Enter the same password as above, for verification."
-msgstr ""
+msgstr "Geben Sie nochmals obiges Passwort ein."
 
 #: templates/admin/auth/user/change_password.html:27
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
+"Geben Sie ein neues Passwort für folgender Benutzer ein:\n"
+"<strong>%(username)s</strong>."
 
 #: templates/admin/edit_inline/tabular.html:16
 msgid "Delete?"
-msgstr ""
+msgstr "Löschen ?"
 
 #: templates/lasso_labelprinting/addresses.html:30
 #: templates/lasso_labelprinting/admin/index.html:12
 msgid "Address upload"
-msgstr "ADRESSEN LADEN"
+msgstr "Vecom Adressen laden"
+
+#: templates/lasso_labelprinting/addresses.html:36
+#: templates/lasso_labelprinting/print_labels.html:36
+msgid "Upload"
+msgstr "laden"
 
 #: templates/lasso_labelprinting/print_labels.html:30
 #: templates/lasso_labelprinting/admin/index.html:5
 msgid "Print labels"
-msgstr "LABELS DRUCKEN"
+msgstr "Vecom Etiketten  drucken"
+
+#: templates/lasso_warehandling/costlog.html:22
+msgid "Warehandling"
+msgstr "Güterumschlag"
+
+#: templates/lasso_warehandling/costlog.html:25
+#: templates/lasso_warehandling/admin/index.html:5
+msgid "Cost log"
+msgstr "Lagerung Logeintrag"
 
 #: templates/lasso_warehandling/costlog.html:30
 msgid "Cost listing"
-msgstr ""
-
-#: templates/lasso_warehandling/costlog.html:42
-msgid "Date"
-msgstr "Datum"
+msgstr "Kosten Auflistung"
 
 #: templates/lasso_warehandling/costlog.html:43
 msgid "Gross transaction"
@@ -545,7 +882,7 @@ msgstr "Transaktionskosten"
 
 #: templates/lasso_warehandling/costlog.html:48
 msgid "Gross saldo"
-msgstr ""
+msgstr "Saldo Brutto"
 
 #: templates/lasso_warehandling/costlog.html:49
 msgid "Storage cost"
@@ -553,19 +890,15 @@ msgstr "Lagerung Logeinträge"
 
 #: templates/lasso_warehandling/costlog.html:50
 msgid "Cost"
-msgstr ""
+msgstr "Kosten"
 
 #: templates/lasso_warehandling/costlog.html:80
 msgid "Sum"
-msgstr ""
-
-#: templates/lasso_warehandling/admin/index.html:5
-msgid "Cost log"
-msgstr "Lagerung Logeintrag"
+msgstr "Summe"
 
 #: templates/lasso_warehandling/admin/withdrawal/change_form_object_tools.html:2
 msgid "Print"
-msgstr ""
+msgstr "Drucken"
 
 #: templates/lasso_warehouse/overview.html:39
 msgid "Storage overview"
@@ -577,11 +910,14 @@ msgstr "Lager"
 
 #: templates/sites/admin/index.html:5
 msgid "Translate this application"
-msgstr ""
+msgstr "Übersetzen dieser Anwendung"
 
-#: utils/__init__.py:20
+#: utils/__init__.py:23
 msgid "Enter real numbers."
-msgstr ""
+msgstr "Bitte Zahlen eingeben"
+
+#~ msgid "Unit work instances"
+#~ msgstr "Preis pro Leistung"
 
 #~ msgid "Lasso_Customer"
 #~ msgstr "Kunden"
@@ -589,35 +925,11 @@ msgstr ""
 #~ msgid "customer"
 #~ msgstr "Kunde"
 
-#~ msgid "Name"
-#~ msgstr "Name"
-
-#~ msgid "Price per kilo per day"
-#~ msgstr "Preis pro Kilo und Tag"
-
-#~ msgid "Price per kilo per entry"
-#~ msgstr "Preis pro Kilo und Einlagerung"
-
-#~ msgid "Price per kilo per withdrawal"
-#~ msgstr "Preis pro Kilo und Auslagerung"
-
-#~ msgid "Work type"
-#~ msgstr "Leistung"
-
-#~ msgid "Price per unit"
-#~ msgstr "Preis pro Einheit"
-
 #~ msgid "unit work type"
 #~ msgstr "Leistungsart"
 
-#~ msgid "Lasso_Warehandling"
-#~ msgstr "Güterumschlag"
-
 #~ msgid "entry"
 #~ msgstr "Einlagerung"
-
-#~ msgid "Arrival date"
-#~ msgstr "Eingangsdatum"
 
 #~ msgid "Entry Rows"
 #~ msgstr "Produkteingang"
@@ -625,80 +937,11 @@ msgstr ""
 #~ msgid "Entry Row"
 #~ msgstr "Produkteingang"
 
-#~ msgid "Custom handling date"
-#~ msgstr "Verzollungsdatum"
-
-#~ msgid "Customs receipt nr"
-#~ msgstr "Zollquittungsnr."
-
-#~ msgid "Customs testimony nr"
-#~ msgstr "Zeugnisnr."
-
-#~ msgid "Product nr"
-#~ msgstr "Produktenr."
-
-#~ msgid "Uom"
-#~ msgstr "Masseinheite"
-
-#~ msgid "Units"
-#~ msgstr "Anzahl / Menge"
-
-#~ msgid "Units left"
-#~ msgstr "Anzahl / Menge (Saldo)"
-
-#~ msgid "Nett weight"
-#~ msgstr "Gewicht netto"
-
-#~ msgid "Gross weight"
-#~ msgstr "Gewicht brutto"
-
-#~ msgid "Product value"
-#~ msgstr "Warenwert"
-
-#~ msgid "Use before"
-#~ msgstr "Haltbarkeitsdatum"
-
-#~ msgid "Product description"
-#~ msgstr "Artikelbezeichnung"
-
-#~ msgid "Product state"
-#~ msgstr "Äusseres Aussehen"
-
-#~ msgid "Arrival temperature"
-#~ msgstr "Temp. beim Eingang (°C)"
-
-#~ msgid "Unit works"
-#~ msgstr "Leistungen"
-
 #~ msgid "unit work"
 #~ msgstr "Leistung"
 
 #~ msgid "withdrawal"
 #~ msgstr "Auslagerung"
-
-#~ msgid "Reference nr"
-#~ msgstr "Referenznr"
-
-#~ msgid "Responsible"
-#~ msgstr "Zuständig"
-
-#~ msgid "Place of departure"
-#~ msgstr "Abgangsort"
-
-#~ msgid "Transport nr"
-#~ msgstr "Lieferscheinnr."
-
-#~ msgid "Order nr"
-#~ msgstr "Bestellnr."
-
-#~ msgid "Withdrawal date"
-#~ msgstr "Ausgangsdatum"
-
-#~ msgid "Vehicle type"
-#~ msgstr "Transportmittel"
-
-#~ msgid "Opening hours"
-#~ msgstr "Öffnungzseiten"
 
 #~ msgid "Size w"
 #~ msgstr "Breite"
