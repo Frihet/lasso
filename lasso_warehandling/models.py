@@ -99,10 +99,17 @@ class EntryRow(models.Model):
 
     @property
     def cost(self):
-        res = self.gross_weight * self.entry.price_per_kilo_per_entry + self.units * self.entry.price_per_unit_per_entry
-        if self.entry.insurance:
-            res += self.product_value * self.entry.insurance_percentage
-        return res
+        return self.entry_cost + self.insurance_cost
+
+    @property
+    def entry_cost(self):
+        return self.gross_weight * self.entry.price_per_kilo_per_entry + self.units * self.entry.price_per_unit_per_entry
+
+    @property
+    def insurance_cost(self):
+        if not self.entry.insurance:
+            return 0
+        return self.product_value * self.entry.insurance_percentage
 
     @property
     def nett_weight_per_unit(self):

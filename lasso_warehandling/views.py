@@ -49,6 +49,8 @@ def costlog(request, *arg, **kw):
                  'sum_in': {'units': 0,
                             'nett_weight':0,
                             'gross_weight':0,
+                            'entry_cost': 0,
+                            'insurance_cost': 0,
                             'cost':0},
                  'sum_out': {'units': 0,
                              'nett_weight':0,
@@ -98,6 +100,8 @@ def costlog(request, *arg, **kw):
                 'sum_in': {'units': 0,
                            'nett_weight':0,
                            'gross_weight':0,
+                           'entry_cost': 0,
+                           'insurance_cost': 0,
                            'cost':0},
                 'sum_out': {'units': 0,
                             'nett_weight':0,
@@ -119,6 +123,8 @@ def costlog(request, *arg, **kw):
                 i['sum_in']['units'] += item.units
                 i['sum_in']['nett_weight'] += item.nett_weight
                 i['sum_in']['gross_weight'] += item.gross_weight
+                i['sum_in']['entry_cost'] += item.entry_cost
+                i['sum_in']['insurance_cost'] += item.insurance_cost
                 i['sum_in']['cost'] += item.cost
                 i['sum']['total_cost'] += item.cost
 

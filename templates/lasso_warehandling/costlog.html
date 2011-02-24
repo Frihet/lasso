@@ -40,14 +40,16 @@
       <thead>
 	<tr>
 	  <th>{% trans "Date" %}</th>
-	  <th>{% trans "Gross transaction" %}</th>
-	  <th>{% trans "Nett transaction" %}</th>
-	  <th>{% trans "Transaction units" %}</th>
+	  <th class="align-right">{% trans "Gross transaction" %}</th>
+	  <th class="align-right">{% trans "Nett transaction" %}</th>
+	  <th class="align-right">{% trans "Transaction units" %}</th>
 	  <th>{% trans "Transaction details" %}</th>
-	  <th>{% trans "Transaction cost" %}</th>
-	  <th>{% trans "Gross saldo" %}</th>
-	  <th>{% trans "Storage cost" %}</th>
-	  <th>{% trans "Cost" %}</th>
+	  <th class="align-right">{% trans "Gross saldo" %}</th>
+	  <th class="align-right">{% trans "Entry cost" %}</th>
+	  <th class="align-right">{% trans "Withdrawal cost" %}</th>
+	  <th class="align-right">{% trans "Insurance cost" %}</th>
+	  <th class="align-right">{% trans "Storage cost" %}</th>
+	  <th class="align-right">{% trans "Cost" %}</th>
 	</tr>
       </thead>
       <tbody>
@@ -55,9 +57,9 @@
 	  {% with storage_log|nth:date as items_for_date %}
 	    <tr class="{% cycle 'row1' 'row2' %}">
 	      <td>{{ date|date:"Y-m-d" }}</td>
-	      <td>{{ items_for_date.sum_in.gross_weight|separateminus:items_for_date.sum_out.gross_weight }}</td>
-	      <td>{{ items_for_date.sum_in.nett_weight|separateminus:items_for_date.sum_out.nett_weight }}</td>
-	      <td>{{ items_for_date.sum_in.units|separateminus:items_for_date.sum_out.units }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.gross_weight|separateminus:items_for_date.sum_out.gross_weight }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.nett_weight|separateminus:items_for_date.sum_out.nett_weight }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.units|separateminus:items_for_date.sum_out.units }}</td>
 	      <td>
 		{% for entry in items_for_date.entry_items.values %}
 		  <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
@@ -67,10 +69,12 @@
 		  <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	      </td>
-	      <td>{{ items_for_date.sum_in.cost|add:items_for_date.sum_out.cost }}</td>
-	      <td>{{ items_for_date.sum.gross_weight }}</td>
-	      <td>{{ items_for_date.sum.cost }}</td>
-	      <td>{{ items_for_date.sum.total_cost }}</td>
+	      <td class="align-right">{{ items_for_date.sum.gross_weight }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.entry_cost|floatformat:"-2" }}</td>
+              <td class="align-right">{{ items_for_date.sum_out.cost|floatformat:"-2" }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.insurance_cost|floatformat:"-2" }}</td>
+	      <td class="align-right">{{ items_for_date.sum.cost|floatformat:"-2" }}</td>
+	      <td class="align-right">{{ items_for_date.sum.total_cost|floatformat:"-2" }}</td>
 	      <td></td>
 	    </tr>
 	  {% endwith %}
@@ -78,14 +82,16 @@
 	<tfoot>
 	<tr>
 	  <td>{% trans "Sum" %}</th>
-	  <td>{{ sum_in.gross_weight|separateminus:sum_out.gross_weight }}</td>
-	  <td>{{ sum_in.nett_weight|separateminus:sum_out.nett_weight }}</td>
-	  <td>{{ sum_in.units|separateminus:sum_out.units }}</td>
+	  <td class="align-right">{{ sum_in.gross_weight|separateminus:sum_out.gross_weight }}</td>
+	  <td class="align-right">{{ sum_in.nett_weight|separateminus:sum_out.nett_weight }}</td>
+	  <td class="align-right">{{ sum_in.units|separateminus:sum_out.units }}</td>
 	  <td></td>
-	  <td>{{ sum_in.cost|add:sum_out.cost }}</td>
 	  <td></td>
-	  <td>{{ sum.cost }}</td>
-	  <td>{{ sum.total_cost }}</td>
+	  <td class="align-right">{{ sum_in.entry_cost|floatformat:"-2" }}</td>
+          <td class="align-right">{{sum_out.cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ sum_in.insurance_cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ sum.cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ sum.total_cost|floatformat:"-2" }}</td>
 	</tr>
         </tfoot>
       </tbody>
