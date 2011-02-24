@@ -7,6 +7,9 @@ import datetime
 from lasso.utils import *
 import django.contrib.auth.models
 
+_name = _("Lasso_Global")
+_name2 = _("lasso_global")
+
 class Origin(models.Model):
     class Meta:
         verbose_name = _('Origin')

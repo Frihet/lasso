@@ -20,8 +20,8 @@
 {% if app_list %}
     {% for app in app_list %}
         <div class="module">
-        <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
-        <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></caption>
+        <table summary="{% blocktrans with app.name|_ as name %}Models available in the {{ name }} application.{% endblocktrans %}">
+        <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name|_ as name %}{{ name }}{% endblocktrans %}</a></caption>
         {% for model in app.models %}
 	    {% ifnotequal model.admin_url 'auth/group/' %}
 	    {% ifnotequal model.admin_url 'sites/site/' %}

@@ -2,6 +2,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from lasso.lasso_warehandling.models import *
 
+_name = _("Lasso_Warehouse")
+_name2 = _("lasso_warehouse")
+
 class Warehouse(models.Model):
     class Meta:
         verbose_name = _('Warehouse')

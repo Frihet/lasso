@@ -19,7 +19,7 @@
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ app_label|capfirst|_|escape }}</a> &rsaquo; 
+     <a href="../../">{{ app_label|_|capfirst|escape }}</a> &rsaquo; 
      {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst|_ }}</a>{% else %}{{ opts.verbose_name_plural|capfirst|_ }}{% endif %} &rsaquo; 
      {% if add %}{% trans "Add" %} {{ opts.verbose_name|_ }}{% else %}{{ original|truncatewords:"18" }}{% endif %} 
 </div>

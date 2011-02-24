@@ -11,6 +11,9 @@ import django.contrib.auth.models
 import operator
 import settings
 
+_name = _("Lasso_Warehandling")
+_name2 = _("lasso_warehandling")
+
 class Entry(models.Model):
     customer = models.ForeignKey(Customer, related_name="customer_for_entry", verbose_name=_("Customer"))
     original_seller = models.ForeignKey(OriginalSeller, blank=True, null=True, related_name="original_seller_for_entry", verbose_name=_("Original seller"))

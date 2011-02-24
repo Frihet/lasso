@@ -6,6 +6,9 @@ from django.db.models.signals import *
 import utils.modelhelpers
 import re
 
+_name = _("Lasso_Customer")
+_name2 = _("lasso_customer")
+
 User.__bases__ += (utils.modelhelpers.SubclasModelMixin,)
 
 @utils.modelhelpers.subclassproxy
