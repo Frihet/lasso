@@ -85,20 +85,23 @@ msgstr "Palettenplätzen"
 msgid "Entry Rows"
 msgstr "Produkt einlagerung"
 
-msgid "Product description"
-msgstr "Artikelbezeichnung"
+msgid "Entry Row"
+msgstr "Produkt einlagerung"
 
-msgid "Arrival temperature"
-msgstr "Temp. beim Eingang (°C)"
+msgid "Custom handling date"
+msgstr "Verzollungsdatum"
 
-msgid "Use before"
-msgstr "Haltbarkeitsdatum"
+msgid "Customs receipt nr"
+msgstr "Zollquittungs Nr."
 
-msgid "Nett weight"
-msgstr "Gewicht netto"
+msgid "Customs testimony nr"
+msgstr "Zeugnis Nr."
 
-msgid "Gross weight"
-msgstr "Gewicht brutto"
+msgid "Transporter"
+msgstr "Lieferant"
+
+msgid "Product nr"
+msgstr "Produkte Nr."
 
 msgid "Uom"
 msgstr "Maßeinheiten"
@@ -108,6 +111,27 @@ msgstr "Einheiten"
 
 msgid "Units left"
 msgstr "Einheit Saldo"
+
+msgid "Nett weight"
+msgstr "Gewicht netto"
+
+msgid "Gross weight"
+msgstr "Gewicht brutto"
+
+msgid "Product value"
+msgstr "Warenwert"
+
+msgid "Use before"
+msgstr "Haltbarkeitsdatum"
+
+msgid "Product description"
+msgstr "Artikelbezeichnung"
+
+msgid "Product state"
+msgstr "Äusseres Aussehen"
+
+msgid "Arrival temperature"
+msgstr "Temp. beim Eingang (°C)"
 
 #------------------------------------------------------------------------------#
 msgid "Storage logs"
@@ -145,11 +169,43 @@ msgstr "Auslagerung"
 msgid "Withdrawal"
 msgstr "Auslagerung"
 
-msgid "Withdrawal date"
-msgstr "Ausgangsdatum"
 
 msgid "Withdrawal rows"
 msgstr "Produkt auslagerung"
+
+msgid "Reference nr"
+msgstr "Referenz"
+
+msgid "Responsible"
+msgstr "Zustandig"
+
+msgid "Place of departure"
+msgstr "Abgangsort"
+
+msgid "Insurance"
+msgstr "Versicherung"
+
+msgid "Transport condition"
+msgstr "Kondition"
+
+msgid "Transport nr"
+msgstr "Liefershein Nr."
+
+msgid "Order nr"
+msgstr "Bestell-Nr."
+
+msgid "Destination address"
+msgstr "Zieladresse"
+
+msgid "Withdrawal date"
+msgstr "Ausgangsdatum"
+
+msgid "Vehicle type"
+msgstr "Transportmittel"
+
+msgid "Opening hours"
+msgstr "Öffnungzseiten"
+
 
 ################################################################################
 msgid "Lasso_Warehouse"

@@ -1,0 +1,93 @@
+{% extends "admin/base_site.html" %}
+{% load adminmedia admin_list %}
+{% load i18n %}
+{% load i18next %}
+{% load datatypes %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block bodyclass %}costlog{% endblock %}
+
+{% if not is_popup %}
+  {% block breadcrumbs %}
+    <div class="breadcrumbs">
+      <a href="{% url admin:index %}">
+        {% trans "Home" %}
+      </a>
+       &rsaquo; 
+       <a href="{% url admin:app_list app_label="lasso_warehandling" %}">
+         {{ "Warehandling"|_ }}
+      </a>
+      &rsaquo; 
+      {{ "Cost log"|_ }}
+    </div>
+  {% endblock %}
+{% endif %}
+
+{% block content_title %}<h1>{% trans "Cost listing" %}</h1>{% endblock %}
+
+{% block content %}
+  <form method="GET" action="{% url lasso_warehandling.views.costlog %}">
+    <label for="year">Year:</label> <input type="text" name="year" value="{{ year }}">
+    <label for="month">Month:</label> <input type="text" name="month" value="{{ month }}">
+    <input type="submit" value="{% trans "Go" %}">
+  </form>
+
+  <div id="changelist" class="module">
+    <table cellspacing="0">
+      <thead>
+	<tr>
+	  <th>{% trans "Date" %}</th>
+	  <th>{% trans "Gross transaction" %}</th>
+	  <th>{% trans "Nett transaction" %}</th>
+	  <th>{% trans "Transaction units" %}</th>
+	  <th>{% trans "Transaction details" %}</th>
+	  <th>{% trans "Transaction cost" %}</th>
+	  <th>{% trans "Gross saldo" %}</th>
+	  <th>{% trans "Storage cost" %}</th>
+	  <th>{% trans "Cost" %}</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for date in dates %}
+	  {% with storage_log|nth:date as items_for_date %}
+	    <tr>
+	      <td>{{ date|date:"Y-m-d" }}</td>
+	      <td>{{ items_for_date.sum_in.gross_weight|separateminus:items_for_date.sum_out.gross_weight }}</td>
+	      <td>{{ items_for_date.sum_in.nett_weight|separateminus:items_for_date.sum_out.nett_weight }}</td>
+	      <td>{{ items_for_date.sum_in.units|separateminus:items_for_date.sum_out.units }}</td>
+	      <td>
+		{% for entry in items_for_date.entry_items.values %}
+		  <a href="{% url admin:lasso_warehandling_entry_change object_id=entry.entry.id %}">E:{{ entry.id_str }}</a>
+		{% endfor %}
+		{% for entry in items_for_date.withdrawal_items.values %}
+		  <a href="{% url admin:lasso_warehandling_withdrawal_change object_id=entry.withdrawal.id %}">W:{{ entry.id_str }}</a>
+		{% endfor %}
+	      </td>
+	      <td>{{ items_for_date.sum_in.cost|add:items_for_date.sum_out.cost }}</td>
+	      <td>{{ items_for_date.sum.units }}</td>
+	      <td>{{ items_for_date.sum.cost }}</td>
+	      <td>{{ items_for_date.sum.total_cost }}</td>
+	      <td></td>
+	    </tr>
+	  {% endwith %}
+	{% endfor %}
+	<tfoot>
+	<tr>
+	  <td>{% trans "Sum" %}</th>
+	  <td>{{ sum_in.gross_weight|separateminus:sum_out.gross_weight }}</td>
+	  <td>{{ sum_in.nett_weight|separateminus:sum_out.nett_weight }}</td>
+	  <td>{{ sum_in.units|separateminus:sum_out.units }}</td>
+	  <td></td>
+	  <td>{{ sum_in.cost|add:sum_out.cost }}</td>
+	  <td></td>
+	  <td>{{ sum.cost }}</td>
+	  <td>{{ sum.total_cost }}</td>
+	</tr>
+        </tfoot>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

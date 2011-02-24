@@ -1,7 +1,9 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -18,4 +20,8 @@ urlpatterns = patterns('',
     (r'^rosetta/', include('rosetta.urls')),
 
     (r'^i18n/', include('django.conf.urls.i18n')),
+
+    (r'^costlog/', include('lasso_warehandling.urls.costlog')),
+
+    (r'^' + settings.MEDIA_URL + '(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )

@@ -9,6 +9,7 @@ admin.site.register(UnitWorkType)
 
 class Customer(models.Model):
     name = models.CharField(max_length=200)
+    address = models.TextField()
     price_per_kilo_per_day = models.FloatField()
     price_per_kilo_per_entry = models.FloatField()
     price_per_kilo_per_withdrawal = models.FloatField()
