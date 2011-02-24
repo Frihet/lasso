@@ -10,6 +10,7 @@ urlpatterns = patterns('',
 
     (r'^lasso_warehandling/costlog/', include('lasso_warehandling.urls.costlog')),
     (r'^lasso_warehouse/overview/', include('lasso_warehouse.urls.overview')),
+    (r'^lasso_labelprinting/', include('lasso_labelprinting.urls')),
     (r'^doc/', include('django.contrib.admindocs.urls')),
     (r'^rosetta/', include('rosetta.urls')),
     (r'^i18n/', include('django.conf.urls.i18n')),

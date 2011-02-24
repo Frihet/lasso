@@ -7,11 +7,14 @@ from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
 from extendable_permissions import *
+import utils
 
 class EntryRowAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
         queryset=PalletSpace.objects.all(),
         required=False)
+    withdrawal_links = utils.ModelLinkField(queryset=Withdrawal.objects.all(), required=False)
+
     class Meta:
         model = EntryRow
 
@@ -19,6 +22,7 @@ class EntryRowAdminForm(forms.ModelForm):
         super(EntryRowAdminForm, self).__init__(*args,**kwargs)
         if self.instance.pk is not None:
             self.initial['locations'] = [values[0] for values in self.instance.locations.values_list('pk')]
+            self.initial['withdrawal_links'] = [row.withdrawal for row in self.instance.withdrawal_rows.all()]
 
     def save(self, commit=True):
         instance = super(EntryRowAdminForm, self).save(commit)
@@ -49,24 +53,24 @@ class EntryRowInline(admin.StackedInline):
     model = EntryRow
     fieldsets = [('Product', {'fields': ('use_before',
                                          'product_nr',
-                                         'product_description',
-                                         'origin')
+                                         'product_description')
                               }),
-                 ('Arrival', {'fields': ('arrival_temperature',
-                                         'product_state',
-                                         'comment',
-                                         'locations')
-                              }),
-                 ('Customs', {'fields': ('custom_handling_date',
-                                         'customs_receipt_nr',
-                                         'customs_testimony_nr')
-                              }),
-                 ('Amount', {'fields': ('uom',
+                 ('Amount', {'fields': ('auto_weight',
+                                        'uom',
                                         'units',
                                         'nett_weight',
                                         'gross_weight',
                                         'product_value')
-                             })]
+                             }),
+                 ('Current status', {'fields': ('withdrawal_links',
+                                                )}),
+                 ('Arrival', {'fields': ('arrival_temperatures',
+                                         'product_state',
+                                         'comment',
+                                         'locations',
+                                         'customs_certificate_nr')
+                              }),
+                 ]
 
 class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [EntryRowInline,]
@@ -78,10 +82,33 @@ class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
 
 admin.site.register(Entry, EntryAdmin)
 
+admin.site.register(TransportCondition)
+
+class WithdrawalRowAdminForm(forms.ModelForm):
+    nett_weight = forms.FloatField(label="Nett weight")
+    gross_weight = forms.FloatField(label="Gross weight")
+
+    class Meta:
+        model = WithdrawalRow
+
+    def __init__(self, *args, **kwargs):
+        super(WithdrawalRowAdminForm, self).__init__(*args,**kwargs)
+        if self.instance.pk is not None:
+            self.initial['nett_weight'] = self.instance.nett_weight
+            self.initial['gross_weight'] = self.instance.gross_weight
+
+    def save(self, commit=True):
+        if not self.instance.entry_row.auto_weight:
+            self.instance.nett_weight = self.cleaned_data['nett_weight']
+            self.instance.gross_weight = self.cleaned_data['gross_weight']
+        return super(WithdrawalRowAdminForm, self).save(commit)
+
+    save.alters_data = True
 
 class WithdrawalRowInline(admin.TabularInline):
+    form = WithdrawalRowAdminForm
     model = WithdrawalRow
-    exclude = ('old_units',)
+    fields = ('entry_row', 'units', 'nett_weight', 'gross_weight')
 
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     inlines = [WithdrawalRowInline,]
@@ -109,6 +136,18 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
     owner_field = "customer"
+
+    def set_defaults(self, request, initial):
+        if 'responsible' not in initial:
+            initial['responsible'] = request.user.pk
+
+    def get_form(self, request, *arg, **kw):
+        Form = super(WithdrawalAdmin, self).get_form(request, *arg, **kw)
+        def model_form(*arg, **kw):
+            form = Form(*arg, **kw)
+            self.set_defaults(request, form.initial)
+            return form
+        return model_form
 
 admin.site.register(Withdrawal, WithdrawalAdmin)
 

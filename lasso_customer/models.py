@@ -2,7 +2,15 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User, UserManager
 from django.db.models.signals import *
+import utils.modelhelpers
 import re
+
+User.__bases__ += (utils.modelhelpers.SubclasModelMixin,)
+
+@utils.modelhelpers.subclassproxy
+def __unicode__(self):
+    return "%s (%s %s)" % (self.username, self.first_name, self.last_name)
+User.__unicode__ = __unicode__
 
 class UnitWorkType(models.Model):
     name = models.CharField(max_length=200)
@@ -27,11 +35,12 @@ def organization_pre_save(sender, instance, **kwargs):
 pre_save.connect(organization_pre_save, sender=Organization)
 
 class Contact(Organization):
-    _username_prefix = "c_"
+    _username_prefix = "co_"
     for_organization = models.ForeignKey(Organization, related_name = 'contacts')
 pre_save.connect(organization_pre_save, sender=Contact)
 
 class Customer(Organization):
+    _username_prefix = "cu_"
     price_per_kilo_per_day = models.FloatField()
     price_per_kilo_per_entry = models.FloatField()
     price_per_kilo_per_withdrawal = models.FloatField()
