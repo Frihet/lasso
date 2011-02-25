@@ -48,6 +48,7 @@ class Contact(User):
     phone = models.CharField(max_length=200, blank=True, verbose_name=_("Phone"))
     fax = models.CharField(max_length=200, blank=True, verbose_name=_("Fax"))
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"))
+    title = models.CharField(max_length=30, blank=True, verbose_name=_("Title"))
 
 def contact_pre_save(sender, instance, **kwargs):
     if instance.id is None:
