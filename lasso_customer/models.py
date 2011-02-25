@@ -79,6 +79,11 @@ class Customer(Organization):
     price_per_unit_per_day = models.FloatField(default=0.0, verbose_name=_("Price per unit per day"))
     price_per_unit_per_entry = models.FloatField(default=0.0, verbose_name=_("Price per unit per entry"))
     price_per_unit_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Price per unit per withdrawal"))
+
+    price_min_per_day = models.FloatField(default=0.0, verbose_name=_("Minimum price per day"))
+    price_min_per_entry = models.FloatField(default=0.0, verbose_name=_("Minimum price per entry"))
+    price_min_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Minimum price per withdrawal"))
+
 pre_save.connect(organization_pre_save, sender=Customer)
 
 class OriginalSeller(Organization):
