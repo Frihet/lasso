@@ -106,6 +106,10 @@ class WithdrawalRowAdminForm(forms.ModelForm):
 
     save.alters_data = True
 
+class WithdrawalUnitWorkInline(admin.TabularInline):
+    model = UnitWork
+    exclude = ('price_per_unit', 'date', 'entry')
+
 class WithdrawalRowInline(admin.TabularInline):
     form = WithdrawalRowAdminForm
     model = WithdrawalRow
@@ -122,7 +126,7 @@ class WithdrawalAdminForm(forms.ModelForm):
 
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = WithdrawalAdminForm
-    inlines = [WithdrawalRowInline,]
+    inlines = [WithdrawalUnitWorkInline, WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
     fieldsets = [(_('Arrival'), {'fields': ('destination',
@@ -165,7 +169,7 @@ admin.site.register(Withdrawal, WithdrawalAdmin)
 
 class UnitWorkAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     date_hierarchy = 'date'
-    exclude = ('price_per_unit',)
+    exclude = ('price_per_unit', 'entry', 'withdrawal')
     group_owner_field = "work_type__customer"
 
 admin.site.register(UnitWork, UnitWorkAdmin)

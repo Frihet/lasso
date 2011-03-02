@@ -395,6 +395,9 @@ class UnitWork(models.Model):
         permissions = (("view_unitwork", "View"),
                        ("view_own_unitwork", "View own"))
 
+    entry = models.ForeignKey(Entry, verbose_name=_("Entry"), null=True, related_name="unit_works")
+    withdrawal = models.ForeignKey(Withdrawal, verbose_name=_("Withdrawal"), null=True, related_name="unit_works")
+
     work_type = models.ForeignKey(UnitWorkPrices, verbose_name=_("Work type"))
     price_per_unit = models.FloatField(blank=True, verbose_name=_("Price per unit"))
     date = models.DateField(verbose_name=_("Date"))
@@ -406,8 +409,12 @@ class UnitWork(models.Model):
 def unitwork_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.price_per_unit = instance.work_type.price_per_unit
+    if instance.date is None:
+        if instance.entry is not None:
+            instance.date = instance.entry.arrival_date
+        elif instance.withdrawal is not None:
+            instance.date = instance.withdrawal.withdrawal_date
 pre_save.connect(unitwork_pre_save, sender=UnitWork)
-
 
 
 class StorageLog(models.Model):
