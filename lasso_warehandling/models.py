@@ -232,16 +232,6 @@ def entry_row_pre_save(sender, instance, **kwargs):
 #        log.delete()
 pre_save.connect(entry_row_pre_save, sender=EntryRow)
 
-class TransportCondition(models.Model):
-    class Meta:
-        verbose_name = _('Transport condition')
-        verbose_name_plural = _('Transport conditions')
-
-    name = models.CharField(max_length=200)
-
-    def __unicode__(self):
-        return self.name
-
 class Withdrawal(models.Model):
     class Meta:
         permissions = (("view_withdrawal", "View"),
@@ -264,7 +254,7 @@ class Withdrawal(models.Model):
     destination = models.ForeignKey(Destination, related_name='destination_for_withdrawal', verbose_name=_("Destination"))
     withdrawal_date = models.DateField(default=lambda: datetime.date.today(), verbose_name=_("Withdrawal date"))
     arrival_date = models.DateField(null=True, blank=True, default=lambda: datetime.date.today()+datetime.timedelta(1), verbose_name=_("Arrival_date"))
-    vehicle_type = models.CharField(max_length=200, blank=True, verbose_name=_("Vehicle type"))
+    vehicle_type = models.ForeignKey(VehicleType, verbose_name=_("Vehicle type"))
     opening_hours = models.CharField(max_length=200, blank=True, verbose_name=_("Opening hours"))
     transporter = models.ForeignKey(Transporter, verbose_name=_("Transporter"))
     comment = models.TextField(null=True, blank=True, verbose_name=_("Comment"))

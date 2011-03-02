@@ -85,8 +85,6 @@ class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
 
 admin.site.register(Entry, EntryAdmin)
 
-admin.site.register(TransportCondition)
-
 class WithdrawalRowAdminForm(forms.ModelForm):
     nett_weight = forms.FloatField(label="Nett weight", required=False)
     gross_weight = forms.FloatField(label="Gross weight", required=False)
