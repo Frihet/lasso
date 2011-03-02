@@ -26,7 +26,6 @@ class Entry(models.Model):
     price_min_per_entry = models.FloatField(default=0.0, verbose_name=_("Minimum price per entry"))
     custom_handling_date = models.DateField(null=True, blank=True, verbose_name=_("Custom handling date"))
     customs_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customs nr"))
-    origin = models.ForeignKey(Origin, blank=True, null=True, verbose_name=_("Origin"))
     customer_entry_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customer entry nr"))
 
     class Meta:
@@ -98,6 +97,8 @@ class EntryRow(models.Model):
     arrival_temperatures = FloatListField(verbose_name=_("Arrival temperatures"))
 
     auto_weight = models.BooleanField(default=True, verbose_name=_("Auto weight"))
+
+    origin = models.ForeignKey(Origin, blank=True, null=True, verbose_name=_("Origin"))
 
     @property
     def cost(self):
@@ -222,6 +223,9 @@ def entry_row_pre_save(sender, instance, **kwargs):
         if not instance.auto_weight:
             instance.nett_weight_left = instance.nett_weight
             instance.gross_weight_left = instance.gross_weight
+    if instance.origin is None and instance.entry.original_seller is not None:
+        instance.origin = instance.entry.original_seller.origin
+
 #    Saving a withdrawal updates units_left so deleting all logs then
 #    doesn't work...
 #    for log in instance.logs.all():

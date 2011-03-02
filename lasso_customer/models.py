@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import Group, User, UserManager, Permission
 from django.db.models.signals import *
+from lasso_global.models import *
 import utils.modelhelpers
 import re
 
@@ -102,6 +103,7 @@ class OriginalSeller(Organization):
     class Meta:
         verbose_name = _('Original seller')
         verbose_name_plural = _('Original sellers')
+    origin = models.ForeignKey(Origin, verbose_name=_("Default origin"), null=True, blank=True)
 pre_save.connect(organization_pre_save, sender=OriginalSeller)
 post_save.connect(organization_post_save, sender=OriginalSeller)
 

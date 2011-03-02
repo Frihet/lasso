@@ -55,7 +55,8 @@ class EntryRowInline(admin.StackedInline):
     model = EntryRow
     fieldsets = [(_('Product'), {'fields': ('use_before',
                                             'product_nr',
-                                            'product_description')
+                                            'product_description',
+                                            'origin')
                                  }),
                  (_('Amount'), {'fields': ('auto_weight',
                                            'uom',
