@@ -68,7 +68,7 @@ form ul.inline li {
     display: block;
     padding: 3px 10px 0 0;
     float: left;
-    width: 8em;
+    width: 12em;
 }
 
 .aligned ul label {
@@ -239,7 +239,6 @@ fieldset.monospace textarea {
 }
 
 .inline-group .aligned label {
-    width: 8em;
 }
 
 .inline-related {
