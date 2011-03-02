@@ -368,3 +368,49 @@ fieldset.monospace textarea {
     float: left;
     margin: 4pt;
 }
+
+
+
+.lasso_customer-customer .tabular.inline-related input,
+.lasso_customer-originalseller .tabular.inline-related input,
+.lasso_customer-transporter .tabular.inline-related input,
+.lasso_customer-destination .tabular.inline-related input {
+  width: 10em;
+}
+
+.lasso_customer-customer .tabular.inline-related .title input,
+.lasso_customer-originalseller .tabular.inline-related .title input,
+.lasso_customer-transporter .tabular.inline-related .title input,
+.lasso_customer-destination .tabular.inline-related .title input,
+.lasso_customer-destination .tabular.inline-related .title input {
+  width: 2em;
+}
+.lasso_customer-customer .tabular.inline-related .address textarea,
+.lasso_customer-originalseller .tabular.inline-related .address textarea,
+.lasso_customer-transporter .tabular.inline-related .address textarea,
+.lasso_customer-destination .tabular.inline-related .address textarea {
+  width: 15em;
+  height: 7em;
+}
+
+.lasso_customer-customer .tabular.inline-related .original p,
+.lasso_customer-originalseller .tabular.inline-related .original p,
+.lasso_customer-transporter .tabular.inline-related .original p,
+.lasso_customer-destination .tabular.inline-related .original p {
+  display: none;
+}
+
+.lasso_customer-customer .inline-group .tabular tr.has_original td,
+.lasso_customer-originalseller .inline-group .tabular tr.has_original td,
+.lasso_customer-transporter .inline-group .tabular tr.has_original td,
+.lasso_customer-destination .inline-group .tabular tr.has_original td {
+    padding-top: 5px;
+}
+
+.lasso_customer-customer .tabular.inline-related tr.has_original .original,
+.lasso_customer-originalseller .tabular.inline-related tr.has_original .original,
+.lasso_customer-transporter .tabular.inline-related tr.has_original .original,
+.lasso_customer-destination .tabular.inline-related tr.has_original .original {
+  background: #7CA0C7;
+  padding: 4px;
+}

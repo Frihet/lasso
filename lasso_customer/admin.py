@@ -38,7 +38,7 @@ class ContactInline(admin.TabularInline):
     form = ContactAdminForm
     model = Contact
     fk_name = "organization"
-    fields = ("first_name", "last_name", "title", "username", "password", "is_active", "email", "phone", "fax", "address")
+    fields = ("first_name", "last_name", "title", "email", "phone", "fax", "address", "username", "password", "is_active")
 
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [UnitWorkPricesInline, ContactInline]
