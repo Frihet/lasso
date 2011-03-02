@@ -84,13 +84,14 @@ class ExtendablePermissionAdminMixin(object):
         perm = self.opts.app_label + '.%s_' + self.opts.object_name.lower()
 
         exclude_fields = []
-        for field, permissions in self.access_controlled_fields.iteritems():
-            exclude = True
-            for permission in permissions:
-                if request.user.has_perm(perm % permission):
-                    exclude = False
-                    break
-            if exclude:
-                exclude_fields.append(field)
+        if hasattr(self, "access_controlled_fields"):
+            for field, permissions in self.access_controlled_fields.iteritems():
+                exclude = True
+                for permission in permissions:
+                    if request.user.has_perm(perm % permission):
+                        exclude = False
+                        break
+                if exclude:
+                    exclude_fields.append(field)
 
         return tuple(exclude_fields) + tuple(super(ExtendablePermissionAdminMixin, self).get_readonly_fields(request, *arg, **kw))
