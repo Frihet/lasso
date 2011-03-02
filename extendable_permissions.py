@@ -72,6 +72,11 @@ class ExtendablePermissionAdminMixin(object):
         if request.user.has_perm(perm % 'view'):
             return qs
         elif request.user.has_perm(perm % 'view_own'):
-            return qs.filter(**{self.owner_field: request.user})
+            if hasattr(self, "owner_field"):
+                return qs.filter(**{self.owner_field: request.user})
+            elif hasattr(self, "group_owner_field"):
+                return qs.filter(**{self.group_owner_field + "__in": request.user.groups.all()})
+            else:
+                raise Exception("User has 'view own' permission, but admin class has no owner_field or group_owner_field")
         else:
             return qs.filter(**{self.owner_field: -1}) # The empty QuerySet :)

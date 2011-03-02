@@ -43,24 +43,24 @@ class ContactInline(admin.TabularInline):
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [UnitWorkPricesInline, ContactInline]
     search_fields = ('title',)
-    exclude = ("name",)
+    exclude = ("name", "permissions")
 admin.site.register(Customer, CustomerAdmin)
 
 class OriginalSellerAdmin(admin.ModelAdmin):
     inlines = [ContactInline]
     search_fields = ('title',)
-    exclude = ("name",)
+    exclude = ("name", "permissions")
 admin.site.register(OriginalSeller, OriginalSellerAdmin)
 
 class DestinationAdmin(admin.ModelAdmin):
     inlines = [ContactInline]
     search_fields = ('title',)
-    exclude = ("name",)
+    exclude = ("name", "permissions")
 admin.site.register(Destination, DestinationAdmin)
 
 class TransporterAdmin(admin.ModelAdmin):
     inlines = [ContactInline]
     search_fields = ('title',)
-    exclude = ("name",)
+    exclude = ("name", "permissions")
 
 admin.site.register(Transporter, TransporterAdmin)

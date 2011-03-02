@@ -327,7 +327,7 @@ class WithdrawalRow(models.Model):
     @property
     def cost(self):
         return max(self.gross_weight * self.withdrawal.price_per_kilo_per_withdrawal + self.units * self.withdrawal.price_per_unit_per_withdrawal,
-                   self.entry.price_min_per_withdrawal)        
+                   self.withdrawal.price_min_per_withdrawal)
 
     def get_nett_weight(self):
         if self.entry_row.auto_weight:
