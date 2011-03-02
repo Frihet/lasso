@@ -52,6 +52,9 @@ def organization_post_save(sender, instance, **kwargs):
 post_save.connect(organization_post_save, sender=Organization)
 
 class Contact(User):
+    class Meta:
+        permissions = (("change_access_contact", "Change access"),)
+
     address = models.TextField(blank=True, verbose_name=_("Address"))
     phone = models.CharField(max_length=200, blank=True, verbose_name=_("Phone"))
     fax = models.CharField(max_length=200, blank=True, verbose_name=_("Fax"))

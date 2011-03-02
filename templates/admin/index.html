@@ -23,7 +23,6 @@
         <table summary="{% blocktrans with app.name|_ as name %}Models available in the {{ name }} application.{% endblocktrans %}">
         <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name|_ as name %}{{ name }}{% endblocktrans %}</a></caption>
         {% for model in app.models %}
-	    {% ifnotequal model.admin_url 'auth/group/' %}
 	    {% ifnotequal model.admin_url 'sites/site/' %}
 		<tr>
 		<th scope="row"><a href="{{ model.admin_url }}">{{ model.name|_ }}</a></th>
@@ -39,7 +38,6 @@
 		    <td>&nbsp;</td>
 		{% endif %}
 		</tr>
-	    {% endifnotequal %}
 	    {% endifnotequal %}
         {% endfor %}
 	{% with app.name|lower as app_label %}

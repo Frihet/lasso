@@ -66,9 +66,10 @@ class ExtendablePermissionAdminMixin(object):
         ], context, context_instance=context_instance)
 
     def queryset(self, request):
-        qs = admin.ModelAdmin.queryset(self, request)
+        qs = super(ExtendablePermissionAdminMixin, self).queryset(request)
         opts = self.opts
         perm = opts.app_label + '.%s_' + opts.object_name.lower()
+
         if request.user.has_perm(perm % 'view'):
             return qs
         elif request.user.has_perm(perm % 'view_own'):
@@ -76,7 +77,20 @@ class ExtendablePermissionAdminMixin(object):
                 return qs.filter(**{self.owner_field: request.user})
             elif hasattr(self, "group_owner_field"):
                 return qs.filter(**{self.group_owner_field + "__in": request.user.groups.all()})
-            else:
-                raise Exception("User has 'view own' permission, but admin class has no owner_field or group_owner_field")
-        else:
-            return qs.filter(**{self.owner_field: -1}) # The empty QuerySet :)
+
+        return qs.filter(id=-1)
+
+    def get_readonly_fields(self, request, *arg, **kw):
+        perm = self.opts.app_label + '.%s_' + self.opts.object_name.lower()
+
+        exclude_fields = []
+        for field, permissions in self.access_controlled_fields.iteritems():
+            exclude = True
+            for permission in permissions:
+                if request.user.has_perm(perm % permission):
+                    exclude = False
+                    break
+            if exclude:
+                exclude_fields.append(field)
+
+        return tuple(exclude_fields) + tuple(super(ExtendablePermissionAdminMixin, self).get_readonly_fields(request, *arg, **kw))

@@ -4,6 +4,7 @@ from django.db import models
 from lasso.lasso_customer.models import *
 from django.contrib import admin
 from django.db.models.signals import *
+from extendable_permissions import *
 from django import forms
 
 admin.site.register(UnitWorkType)
@@ -29,16 +30,15 @@ class ContactAdminForm(forms.ModelForm):
 
     save.alters_data = True
 
-    def __init__(self, *arg, **kw):
-        super(ContactAdminForm, self).__init__(*arg, **kw)
-        self.fields['username'].required = False
 
-
-class ContactInline(admin.TabularInline):
+class ContactInline(ExtendablePermissionAdminMixin, admin.TabularInline):
     form = ContactAdminForm
     model = Contact
     fk_name = "organization"
     fields = ("first_name", "last_name", "title", "email", "phone", "fax", "address", "username", "password", "is_active")
+    access_controlled_fields = {'username': ['change_access'],
+                                'password': ['change_access'],
+                                'is_active': ['change_access']}
 
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [UnitWorkPricesInline, ContactInline]
