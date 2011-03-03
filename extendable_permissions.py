@@ -103,8 +103,9 @@ class IntermediateFormHandlingAdminMixin(object):
     def get_form(self, request, *arg, **kw):
         Form = super(IntermediateFormHandlingAdminMixin, self).get_form(request, *arg, **kw)
 
-#        if '_intermediate' not in request.POST:
-#            return Form
+        if '_intermediate' not in request.POST:
+            class BugfixForm(Form): pass
+            return BugfixForm
 
         class IntermediateForm(Form):
             def is_valid(self):
