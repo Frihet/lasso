@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django import template
 from django.shortcuts import get_object_or_404, render_to_response
 from django.contrib import admin
+import django.forms.util
 
 class ExtendablePermissionAdminMixin(object):
     def get_model_perms(self, request):
@@ -95,3 +96,26 @@ class ExtendablePermissionAdminMixin(object):
                     exclude_fields.append(field)
 
         return tuple(exclude_fields) + tuple(super(ExtendablePermissionAdminMixin, self).get_readonly_fields(request, *arg, **kw))
+
+
+
+class IntermediateFormHandlingAdminMixin(object):
+    def get_form(self, request, *arg, **kw):
+        Form = super(IntermediateFormHandlingAdminMixin, self).get_form(request, *arg, **kw)
+
+#        if '_intermediate' not in request.POST:
+#            return Form
+
+        class IntermediateForm(Form):
+            def is_valid(self):
+                return False
+
+            @property
+            def errors(self):
+                return django.forms.util.ErrorDict()
+
+        return IntermediateForm
+
+    def render_change_form(self, request, context, *arg, **kw):
+        self.cross_verify_forms(context['adminform'], context['inline_admin_formsets'])
+        return super(IntermediateFormHandlingAdminMixin, self).render_change_form(request, context, *arg, **kw)

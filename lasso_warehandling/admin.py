@@ -9,6 +9,7 @@ from django.db.models.signals import *
 from django import forms
 from extendable_permissions import *
 import utils
+import django.forms.util
 
 class EntryRowAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
@@ -122,8 +123,9 @@ class WithdrawalAdminForm(forms.ModelForm):
         super(WithdrawalAdminForm, self).__init__(*args,**kwargs)
         if self.instance is not None:
             self.initial['reference_nr'] = self.instance.reference_nr
+        self.fields['customer'].widget.attrs['class'] = 'autosubmit'
 
-class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
+class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = WithdrawalAdminForm
     inlines = [WithdrawalUnitWorkInline, WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
@@ -150,6 +152,18 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
     group_owner_field = "customer"
+
+    def cross_verify_forms(self, adminform, inlines_forms):
+        if adminform.form['customer'].data is not None:
+            customer = Customer.objects.get(id=adminform.form['customer'].data)
+
+            for unit_work_row in inlines_forms[self.inlines.index(WithdrawalUnitWorkInline)].formset.forms:
+                unit_work_row['work_type'].field.queryset = unit_work_row['work_type'].field.queryset.filter(customer = customer)
+
+            for withdrawal_row in inlines_forms[self.inlines.index(WithdrawalRowInline)].formset.forms:
+                withdrawal_row['entry_row'].field.queryset = withdrawal_row['entry_row'].field.queryset.filter(entry__customer = customer)
+
+
 
     def set_defaults(self, request, initial):
         if 'responsible' not in initial:

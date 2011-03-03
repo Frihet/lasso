@@ -30,7 +30,10 @@
 					},
 					select: function( event, ui ) {
 						ui.item.option.selected = true;
-						self._trigger( "selected", event, {
+						$(self).trigger( "change", event, {
+							item: ui.item.option
+						});
+						$(select).trigger( "change", event, {
 							item: ui.item.option
 						});
 					},
@@ -49,9 +52,9 @@
 								$( this ).val( "" );
 								select.val( "" );
 								return false;
-							}
+						        }
 						}
-					}
+				        }
 				})
 				.addClass( "ui-widget ui-widget-content ui-corner-left" );
 
