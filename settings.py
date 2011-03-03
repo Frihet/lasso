@@ -1,5 +1,5 @@
 # Django settings for lasso project.
-import os.path
+import os.path, sys
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
