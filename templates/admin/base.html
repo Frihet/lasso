@@ -1,19 +1,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
-  <title>{% block title %}{% endblock %}</title>
+<title>{% block title %}{% endblock %}</title>
 
-  <script src="{% block jquery %}{% load adminmedia %}{% admin_media_prefix %}js/jquery.js{% endblock %}" type="text/javascript"></script>
-  <script src="{% block jquery-ui %}{% load adminmedia %}{% admin_media_prefix %}js/jquery-ui.js{% endblock %}" type="text/javascript"></script>
-  <script src="{% block jquery-ui-comboboxing %}{% load adminmedia %}{% admin_media_prefix %}js/jquery-ui-comboboxing.js{% endblock %}" type="text/javascript"></script>
-  {% block extrascript %}{% endblock %}
-  <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/base.css{% endblock %}" />
-  {% block extrastyle %}{% endblock %}
+<script src="{% block jquery %}{% load adminmedia %}{% admin_media_prefix %}js/jquery.js{% endblock %}" type="text/javascript"></script>
+<script src="{% block jquery-ui %}{% load adminmedia %}{% admin_media_prefix %}js/jquery-ui.js{% endblock %}" type="text/javascript"></script>
+<script src="{% block jquery-ui-comboboxing %}{% load adminmedia %}{% admin_media_prefix %}js/jquery-ui-comboboxing.js{% endblock %}" type="text/javascript"></script>
+{% block extrascript %}{% endblock %}
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/base.css{% endblock %}" />
+{% block extrastyle %}{% endblock %}
   <link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/ui-lightness/jquery-ui.css" />
-  <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% load adminmedia %}{% admin_media_prefix %}css/ie.css{% endblock %}" /><![endif]-->
-  {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% admin_media_prefix %}css/rtl.css{% endblock %}" />{% endif %}
-  {% block extrahead %}{% endblock %}
-  {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% load adminmedia %}{% admin_media_prefix %}css/ie.css{% endblock %}" /><![endif]-->
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% admin_media_prefix %}css/rtl.css{% endblock %}" />{% endif %}
+<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% admin_media_prefix %}{% endfilter %}";</script>
+{% block extrahead %}{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
 {% load i18n %}
 
@@ -25,10 +26,10 @@
     {% if not is_popup %}
     <!-- Header -->
     <div id="header">
-        {% if user.is_authenticated and user.is_staff %}
+        {% if user.is_active and user.is_staff %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
-            <strong>{% firstof user.first_name user.username %}</strong>.
+            <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong>.
             {% block userlinks %}
                 {% url django-admindocs-docroot as docsroot %}
                 {% if docsroot %}
@@ -50,6 +51,7 @@
                 {% trans 'Log out' %}</a>
 
 		<form action="/i18n/setlang/" method="post" class="langselectorform">
+                    {% csrf_token %}
 		    <select name="language">
 			{% for lang in LANGUAGES %}
 			    <option value="{{ lang.0 }}" {% ifequal lang.0 LANGUAGE_CODE %}selected="true"{% endifequal %} >{{ lang.1 }}</option>
@@ -68,7 +70,9 @@
     {% endif %}
 
         {% if messages %}
-        <ul class="messagelist">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        <ul class="messagelist">{% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	{% endfor %}</ul>
         {% endif %}
         {% if global_errors %}
         <ul class="errorlist">{% for error in global_errors %}<li>{{ error }}</li>{% endfor %}</ul>

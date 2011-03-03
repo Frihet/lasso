@@ -6,6 +6,8 @@
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}lasso_warehandling/withdrawal_print.css" />
   </head>
   <body>
+<img src="{{ MEDIA_URL }}fls-logo.png" height="80" style="float: right;">
+<div style="clear:both;"></div>
     {% block header %}
 <table class="header">
 	<tbody>
@@ -216,7 +218,7 @@
 			<td>
 				&nbsp;</td>
 			<td>
-				{{ withdrawal.transporter.title }}</td>
+				{{ withdrawal.transporter.address|linebreaksbr }}</td>
 			<td>
 				&nbsp;</td>
 		</tr>
@@ -251,7 +253,7 @@
 	    <td>{{ row.entry_row.id_str }}</td>
 	    <td>{{ row.entry_row.product_nr }}</td>
 	    <td>{{ row.entry_row.product_description }}</td>
-	    <td>{{ row.entry_row.entry.origin }}</td>
+	    <td>{{ row.entry_row.origin|default_if_none:"-" }}</td>
 	    <td class="numeric">{{ row.units }}</td>
 	    <td class="numeric">{{ row.nett_weight }}</td>
 	    <td class="numeric">{{ row.gross_weight }}</td>

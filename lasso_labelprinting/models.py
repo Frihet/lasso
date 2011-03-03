@@ -1,6 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
+_name = _("Lasso_Labelprinting")
+_name2 = _("lasso_labelprinting")
+
 class Address(models.Model):
     class Meta:
         verbose_name = _('Address')

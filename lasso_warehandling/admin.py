@@ -55,7 +55,8 @@ class EntryRowInline(admin.StackedInline):
     model = EntryRow
     fieldsets = [(_('Product'), {'fields': ('use_before',
                                             'product_nr',
-                                            'product_description')
+                                            'product_description',
+                                            'origin')
                                  }),
                  (_('Amount'), {'fields': ('auto_weight',
                                            'uom',
@@ -80,11 +81,9 @@ class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     exclude = ('insurance_percentage', 'price_per_kilo_per_entry','price_per_unit_per_entry',)
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
     search_fields = ('customer__name', 'arrival_date', 'rows__product_description')
-    owner_field = "customer"
+    group_owner_field = "customer"
 
 admin.site.register(Entry, EntryAdmin)
-
-admin.site.register(TransportCondition)
 
 class WithdrawalRowAdminForm(forms.ModelForm):
     nett_weight = forms.FloatField(label="Nett weight", required=False)
@@ -106,6 +105,10 @@ class WithdrawalRowAdminForm(forms.ModelForm):
 
     save.alters_data = True
 
+class WithdrawalUnitWorkInline(admin.TabularInline):
+    model = UnitWork
+    exclude = ('price_per_unit', 'date', 'entry')
+
 class WithdrawalRowInline(admin.TabularInline):
     form = WithdrawalRowAdminForm
     model = WithdrawalRow
@@ -122,7 +125,7 @@ class WithdrawalAdminForm(forms.ModelForm):
 
 class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = WithdrawalAdminForm
-    inlines = [WithdrawalRowInline,]
+    inlines = [WithdrawalUnitWorkInline, WithdrawalRowInline,]
     date_hierarchy = 'withdrawal_date'
 
     fieldsets = [(_('Arrival'), {'fields': ('destination',
@@ -146,7 +149,7 @@ class WithdrawalAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
 
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
-    owner_field = "customer"
+    group_owner_field = "customer"
 
     def set_defaults(self, request, initial):
         if 'responsible' not in initial:
@@ -165,7 +168,7 @@ admin.site.register(Withdrawal, WithdrawalAdmin)
 
 class UnitWorkAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
     date_hierarchy = 'date'
-    exclude = ('price_per_unit',)
-    owner_field = "work_type__customer"
+    exclude = ('price_per_unit', 'entry', 'withdrawal')
+    group_owner_field = "work_type__customer"
 
 admin.site.register(UnitWork, UnitWorkAdmin)

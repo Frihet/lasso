@@ -34,21 +34,13 @@ def costlog(request, *arg, **kw):
         kw['month'] = today.month
         redirect = True
 
-    if not request.user.has_perm('lasso_warehandling.view_costlog'):
-        if not not request.user.has_perm('lasso_warehandling.view_own_costlog'):
-            return render_to_response('lasso_warehandling/costlog.html', info, context_instance=template.RequestContext(request))
-        if 'customer' not in kw or int(kw['customer']) != request.user.id:
-            kw['customer'] = request.user.id
-            redirect = True
-
-    if redirect:
-        return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
-
     info = dict(kw)
     info.update({'config_form': CostlogForm(kw),
                  'sum_in': {'units': 0,
                             'nett_weight':0,
                             'gross_weight':0,
+                            'entry_cost': 0,
+                            'insurance_cost': 0,
                             'cost':0},
                  'sum_out': {'units': 0,
                              'nett_weight':0,
@@ -62,9 +54,20 @@ def costlog(request, *arg, **kw):
                  'dates': [],
                  'storage_log': {}})
 
+    if not request.user.has_perm('lasso_warehandling.view_storagelog'):
+        customers = Customer.objects.filter(id__in = [group.id for group in request.user.groups.all()])
+        if not request.user.has_perm('lasso_warehandling.view_own_storagelog') or len(customers) == 0:
+            return render_to_response('lasso_warehandling/costlog.html', info, context_instance=template.RequestContext(request))
+        if 'customer' not in kw or int(kw['customer']) not in [customer.id for customer in customers]:
+            kw['customer'] = customers[0].id
+            redirect = True
+
+    if redirect:
+        return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
+
     if not request.user.has_perm('lasso_warehandling.view_costlog'):
         info['config_form'].fields['customer'].widget.attrs['disabled'] = 'disabled'
-        info['config_form'].fields['entry'].queryset = info['config_form'].fields['entry'].queryset.filter(customer = request.user)
+        info['config_form'].fields['entry'].queryset = info['config_form'].fields['entry'].queryset.filter(customer__in = request.user.groups.all())
 
     if 'year' in kw:
         entry_filter = {'entry__arrival_date__year': kw['year']}
@@ -98,6 +101,8 @@ def costlog(request, *arg, **kw):
                 'sum_in': {'units': 0,
                            'nett_weight':0,
                            'gross_weight':0,
+                           'entry_cost': 0,
+                           'insurance_cost': 0,
                            'cost':0},
                 'sum_out': {'units': 0,
                             'nett_weight':0,
@@ -119,6 +124,8 @@ def costlog(request, *arg, **kw):
                 i['sum_in']['units'] += item.units
                 i['sum_in']['nett_weight'] += item.nett_weight
                 i['sum_in']['gross_weight'] += item.gross_weight
+                i['sum_in']['entry_cost'] += item.entry_cost
+                i['sum_in']['insurance_cost'] += item.insurance_cost
                 i['sum_in']['cost'] += item.cost
                 i['sum']['total_cost'] += item.cost
 

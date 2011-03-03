@@ -68,7 +68,13 @@ form ul.inline li {
     display: block;
     padding: 3px 10px 0 0;
     float: left;
-    width: 8em;
+    width: 12em;
+}
+
+.aligned ul label {
+    display: inline;
+    float: none;
+    width: auto;
 }
 
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
@@ -144,7 +150,6 @@ fieldset.collapsed h2 {
 }
 
 fieldset.collapsed .collapse-toggle {
-    padding: 3px 5px !important;
     background: transparent;
     display: inline !important;
 }
@@ -234,7 +239,6 @@ fieldset.monospace textarea {
 }
 
 .inline-group .aligned label {
-    width: 8em;
 }
 
 .inline-related {
@@ -252,10 +256,7 @@ fieldset.monospace textarea {
 }
 
 .inline-related h3 span.delete {
-    padding-left: 20px;
-    position: absolute;
-    top: 2px;
-    right: 10px;
+    float: right;
 }
 
 .inline-related h3 span.delete label {
@@ -277,6 +278,11 @@ fieldset.monospace textarea {
     font-weight: bold;
     background: #bcd;
     color: #fff;
+}
+
+.inline-group .tabular fieldset.module {
+    border: none;
+    border-bottom: 1px solid #ddd;
 }
 
 .inline-related.tabular fieldset.module table {
@@ -325,9 +331,30 @@ fieldset.monospace textarea {
     padding: 0 5px;
 }
 
-.inline-group ul.tools a.add {
+.inline-group div.add-row,
+.inline-group .tabular tr.add-row td {
+    color: #666;
+    padding: 3px 5px;
+    border-bottom: 1px solid #ddd;
+    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
+}
+
+.inline-group .tabular tr.add-row td {
+    padding: 4px 5px 3px;
+    border-bottom: none;
+}
+
+.inline-group ul.tools a.add,
+.inline-group div.add-row a,
+.inline-group .tabular tr.add-row td a {
     background: url(../img/admin/icon_addlink.gif) 0 50% no-repeat;
     padding-left: 14px;
+    font-size: 11px;
+    outline: 0; /* Remove dotted border around link */
+}
+
+.empty-form {
+    display: none;
 }
 
 .submit-row,
@@ -340,4 +367,50 @@ fieldset.monospace textarea {
 .module {
     float: left;
     margin: 4pt;
+}
+
+
+
+.lasso_customer-customer .tabular.inline-related input,
+.lasso_customer-originalseller .tabular.inline-related input,
+.lasso_customer-transporter .tabular.inline-related input,
+.lasso_customer-destination .tabular.inline-related input {
+  width: 10em;
+}
+
+.lasso_customer-customer .tabular.inline-related .title input,
+.lasso_customer-originalseller .tabular.inline-related .title input,
+.lasso_customer-transporter .tabular.inline-related .title input,
+.lasso_customer-destination .tabular.inline-related .title input,
+.lasso_customer-destination .tabular.inline-related .title input {
+  width: 2em;
+}
+.lasso_customer-customer .tabular.inline-related .address textarea,
+.lasso_customer-originalseller .tabular.inline-related .address textarea,
+.lasso_customer-transporter .tabular.inline-related .address textarea,
+.lasso_customer-destination .tabular.inline-related .address textarea {
+  width: 15em;
+  height: 7em;
+}
+
+.lasso_customer-customer .tabular.inline-related .original p,
+.lasso_customer-originalseller .tabular.inline-related .original p,
+.lasso_customer-transporter .tabular.inline-related .original p,
+.lasso_customer-destination .tabular.inline-related .original p {
+  display: none;
+}
+
+.lasso_customer-customer .inline-group .tabular tr.has_original td,
+.lasso_customer-originalseller .inline-group .tabular tr.has_original td,
+.lasso_customer-transporter .inline-group .tabular tr.has_original td,
+.lasso_customer-destination .inline-group .tabular tr.has_original td {
+    padding-top: 5px;
+}
+
+.lasso_customer-customer .tabular.inline-related tr.has_original .original,
+.lasso_customer-originalseller .tabular.inline-related tr.has_original .original,
+.lasso_customer-transporter .tabular.inline-related tr.has_original .original,
+.lasso_customer-destination .tabular.inline-related tr.has_original .original {
+  background: #7CA0C7;
+  padding: 4px;
 }
