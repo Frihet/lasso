@@ -84,17 +84,17 @@ class Customer(Organization):
 
     customer_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customer nr"))
 
-    price_per_kilo_per_day = models.FloatField(default=0.0, verbose_name=_("Price per kilo per day"))
-    price_per_kilo_per_entry = models.FloatField(default=0.0, verbose_name=_("Price per kilo per entry"))
-    price_per_kilo_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Price per kilo per withdrawal"))
+    price_per_kilo_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per kilo per day"))
+    price_per_kilo_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per kilo per entry"))
+    price_per_kilo_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per kilo per withdrawal"))
 
-    price_per_unit_per_day = models.FloatField(default=0.0, verbose_name=_("Price per unit per day"))
-    price_per_unit_per_entry = models.FloatField(default=0.0, verbose_name=_("Price per unit per entry"))
-    price_per_unit_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Price per unit per withdrawal"))
+    price_per_unit_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per unit per day"))
+    price_per_unit_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per unit per entry"))
+    price_per_unit_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per unit per withdrawal"))
 
-    price_min_per_day = models.FloatField(default=0.0, verbose_name=_("Minimum price per day"))
-    price_min_per_entry = models.FloatField(default=0.0, verbose_name=_("Minimum price per entry"))
-    price_min_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Minimum price per withdrawal"))
+    price_min_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per day"))
+    price_min_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per entry"))
+    price_min_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per withdrawal"))
 
 pre_save.connect(organization_pre_save, sender=Customer)
 post_save.connect(organization_post_save, sender=Customer)
@@ -128,7 +128,7 @@ class UnitWorkPrices(models.Model):
         unique_together = ("customer", "work_type")
     customer = models.ForeignKey(Customer, verbose_name=_("Customer"))
     work_type = models.ForeignKey(UnitWorkType, verbose_name=_("Work type"))
-    price_per_unit = models.FloatField(verbose_name=_("Price per unit"))
+    price_per_unit = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Price per unit"))
 
     def __unicode__(self):
         return _("%(customer)s: %(price_per_unit)s for %(work_type)s") % {"customer":self.customer, "price_per_unit":self.price_per_unit, "work_type":self.work_type}

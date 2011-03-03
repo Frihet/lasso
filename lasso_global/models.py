@@ -16,7 +16,7 @@ class Insurance(models.Model):
         verbose_name = _('Insurance')
         verbose_name_plural = _('Insurances')
 
-    percent = models.FloatField(verbose_name=_("Percent"))
+    percent = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Percent"))
 
     def __unicode__(self):
         return unicode(self.percent)
@@ -55,8 +55,8 @@ class VehicleType(models.Model):
         verbose_name_plural = _('Vehicle types')
 
     name = models.CharField(max_length=200)
-    min_temp = models.FloatField(verbose_name=_("Min. temp."))
-    max_temp = models.FloatField(verbose_name=_("Max. temp."))
+    min_temp = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Min. temp."))
+    max_temp = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Max. temp."))
 
     def __unicode__(self):
         return self.name

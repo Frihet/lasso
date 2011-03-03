@@ -34,9 +34,9 @@ class PalletSpace(models.Model):
     row = models.ForeignKey(Row, verbose_name=_("Row"))
     entry_row = models.ForeignKey(EntryRow, null=True, blank=True, related_name="locations", verbose_name=_("Entry row"))
     name = models.CharField(max_length=200, verbose_name=_("Name"))
-    size_w = models.FloatField(verbose_name=_("Width"))
-    size_h = models.FloatField(verbose_name=_("Height"))
-    size_d = models.FloatField(verbose_name=_("Depth"))
+    size_w = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Width"))
+    size_h = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Height"))
+    size_d = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Depth"))
 
     def __unicode__(self):
         return _("%(row.name)s-%(name)s in %(row.warehouse.name)s") % {"row.name":self.row.name, "name":self.name, "row.warehouse.name":self.row.warehouse.name}

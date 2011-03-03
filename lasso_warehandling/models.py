@@ -20,10 +20,10 @@ class Entry(models.Model):
     arrival_date = models.DateField(default=lambda: datetime.date.today(), verbose_name=_("Arrival date"))
     insurance = models.BooleanField(blank=True, verbose_name=_("Insurance"))
     transporter = models.ForeignKey(Transporter, verbose_name=_("Transporter"))
-    insurance_percentage = models.FloatField(blank=True, verbose_name=_("Insurance percentage"))
-    price_per_kilo_per_entry = models.FloatField(blank=True, verbose_name=_("Price per kilo per entry"))
-    price_per_unit_per_entry = models.FloatField(blank=True, verbose_name=_("Price per unit per entry"))
-    price_min_per_entry = models.FloatField(default=0.0, verbose_name=_("Minimum price per entry"))
+    insurance_percentage = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Insurance percentage"))
+    price_per_kilo_per_entry = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per kilo per entry"))
+    price_per_unit_per_entry = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per unit per entry"))
+    price_min_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per entry"))
     custom_handling_date = models.DateField(null=True, blank=True, verbose_name=_("Custom handling date"))
     customs_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customs nr"))
     customer_entry_nr = models.CharField(max_length=200, blank=True, verbose_name=_("Customer entry nr"))
@@ -84,11 +84,11 @@ class EntryRow(models.Model):
     uom = models.CharField(max_length=200, blank=True, verbose_name=_("UoM"))
     units = models.IntegerField(verbose_name=_("Units"))
     units_left = models.IntegerField(blank=True, verbose_name=_("Units left"))
-    nett_weight = models.FloatField(verbose_name=_("Nett weight"))
-    _nett_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Nett weight left"))
-    gross_weight = models.FloatField(verbose_name=_("Gross weight"))
-    _gross_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Gross weight left"))
-    product_value = models.FloatField(null=True, blank=True, verbose_name=_("Product value"))
+    nett_weight = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Nett weight"))
+    _nett_weight_left = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Nett weight left"))
+    gross_weight = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Gross weight"))
+    _gross_weight_left = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Gross weight left"))
+    product_value = models.DecimalField(max_digits=12, decimal_places=6, null=True, blank=True, verbose_name=_("Product value"))
 
     use_before = models.DateField(null=True, blank=True, verbose_name=_("Use before"))
     product_description = models.CharField(max_length=400, blank=True, verbose_name=_("Product description"))
@@ -240,9 +240,9 @@ class Withdrawal(models.Model):
         verbose_name_plural = _('Withdrawals')
 
     customer = models.ForeignKey(Customer, related_name='customer_for_withdrawal', verbose_name=_("Customer"))
-    price_per_kilo_per_withdrawal = models.FloatField(blank=True, verbose_name=_("Price per kilo per withdrawal"))
-    price_per_unit_per_withdrawal = models.FloatField(blank=True, verbose_name=_("Price per unit per withdrawal"))
-    price_min_per_withdrawal = models.FloatField(default=0.0, verbose_name=_("Minimum price per withdrawal"))
+    price_per_kilo_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per kilo per withdrawal"))
+    price_per_unit_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per unit per withdrawal"))
+    price_min_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per withdrawal"))
 
     responsible = models.ForeignKey(django.contrib.auth.models.User, related_name="responsible_for", verbose_name=_("Responsible"))
     place_of_departure = models.CharField(max_length=200, blank=True, verbose_name=_("Place of departure"), default=settings.LASSO_DEFAULT_PLACE_OF_DEPARTURE)
@@ -313,10 +313,10 @@ class WithdrawalRow(models.Model):
     entry_row = models.ForeignKey(EntryRow, related_name="withdrawal_rows", verbose_name=_("Entry row"))
     old_units = models.IntegerField(blank=True, verbose_name=_("Old units"))
     units = models.IntegerField(verbose_name=_("Units"))
-    old_nett_weight = models.FloatField(blank=True, null=True, verbose_name=_("Old nett weight"))
-    _nett_weight = models.FloatField(blank=True, null=True, default=0, verbose_name=_("Nett weight"))
-    old_gross_weight = models.FloatField(blank=True, null=True, verbose_name=_("Old gross weight"))
-    _gross_weight = models.FloatField(blank=True, null=True, default=0, verbose_name=_("Gross weight"))
+    old_nett_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Old nett weight"))
+    _nett_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, default=0, verbose_name=_("Nett weight"))
+    old_gross_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Old gross weight"))
+    _gross_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, default=0, verbose_name=_("Gross weight"))
 
     @property
     def cost(self):
@@ -393,7 +393,7 @@ class UnitWork(models.Model):
     withdrawal = models.ForeignKey(Withdrawal, verbose_name=_("Withdrawal"), null=True, related_name="unit_works")
 
     work_type = models.ForeignKey(UnitWorkPrices, verbose_name=_("Work type"))
-    price_per_unit = models.FloatField(blank=True, verbose_name=_("Price per unit"))
+    price_per_unit = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per unit"))
     date = models.DateField(verbose_name=_("Date"))
     units = models.IntegerField(verbose_name=_("Units"))
 
@@ -420,12 +420,12 @@ class StorageLog(models.Model):
 
     entry_row = models.ForeignKey(EntryRow, related_name="logs", verbose_name=_("Entry row"))
     date = models.DateField(verbose_name=_("Date"))
-    price_per_kilo_per_day = models.FloatField(verbose_name=_("Price per kilo per day"))
-    price_per_unit_per_day = models.FloatField(verbose_name=_("Price per unit per day"))
-    price_min_per_day = models.FloatField(default=0.0, verbose_name=_("Minimum price per day"))
+    price_per_kilo_per_day = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Price per kilo per day"))
+    price_per_unit_per_day = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Price per unit per day"))
+    price_min_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per day"))
     units_left = models.IntegerField(verbose_name=_("Units left"))
-    _nett_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Nett weight left"))
-    _gross_weight_left = models.FloatField(blank=True, null=True, verbose_name=_("Gross weight left"))
+    _nett_weight_left = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Nett weight left"))
+    _gross_weight_left = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Gross weight left"))
 
     @property
     def cost(self):

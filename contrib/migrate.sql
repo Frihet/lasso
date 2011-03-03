@@ -29,3 +29,41 @@ alter table "lasso_warehandling_storagelog" add column "price_min_per_day" doubl
 
 alter table "lasso_customer_contact" add column "title" varchar(30) NOT NULL default '';
 
+
+
+alter table "lasso_customer_customer" alter column "price_per_kilo_per_day" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_per_kilo_per_entry" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_per_kilo_per_withdrawal" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_per_unit_per_day" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_per_unit_per_entry" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_per_unit_per_withdrawal" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_min_per_day" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_min_per_entry" type numeric(12, 6);
+alter table "lasso_customer_customer" alter column "price_min_per_withdrawal" type numeric(12, 6);
+alter table "lasso_customer_unitworkprices" alter column "price_per_unit" type numeric(12, 6);
+alter table "lasso_warehouse_palletspace" alter column "size_w" type numeric(12, 6);
+alter table "lasso_warehouse_palletspace" alter column "size_h" type numeric(12, 6);
+alter table "lasso_warehouse_palletspace" alter column "size_d" type numeric(12, 6);
+alter table "lasso_warehandling_entry" alter column "insurance_percentage" type numeric(12, 6);
+alter table "lasso_warehandling_entry" alter column "price_per_kilo_per_entry" type numeric(12, 6);
+alter table "lasso_warehandling_entry" alter column "price_per_unit_per_entry" type numeric(12, 6);
+alter table "lasso_warehandling_entry" alter column "price_min_per_entry" type numeric(12, 6);
+alter table "lasso_warehandling_entryrow" alter column "nett_weight" type numeric(12, 6);
+alter table "lasso_warehandling_entryrow" alter column "_nett_weight_left" type numeric(12, 6);
+alter table "lasso_warehandling_entryrow" alter column "gross_weight" type numeric(12, 6);
+alter table "lasso_warehandling_entryrow" alter column "_gross_weight_left" type numeric(12, 6);
+alter table "lasso_warehandling_entryrow" alter column "product_value" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawal" alter column "price_per_kilo_per_withdrawal" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawal" alter column "price_per_unit_per_withdrawal" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawal" alter column "price_min_per_withdrawal" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawalrow" alter column "old_nett_weight" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawalrow" alter column "_nett_weight" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawalrow" alter column "old_gross_weight" type numeric(12, 6);
+alter table "lasso_warehandling_withdrawalrow" alter column "_gross_weight" type numeric(12, 6);
+alter table "lasso_warehandling_unitwork" alter column "price_per_unit" type numeric(12, 6);
+alter table "lasso_warehandling_storagelog" alter column "price_per_kilo_per_day" type numeric(12, 6);
+alter table "lasso_warehandling_storagelog" alter column "price_per_unit_per_day" type numeric(12, 6);
+alter table "lasso_warehandling_storagelog" alter column "price_min_per_day" type numeric(12, 6);
+alter table "lasso_warehandling_storagelog" alter column "_nett_weight_left" type numeric(12, 6);
+alter table "lasso_warehandling_storagelog" alter column "_gross_weight_left" type numeric(12, 6);
+
