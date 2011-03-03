@@ -47,11 +47,10 @@ MEDIA_URL = '/media/'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = 'http://www.lasso.fls-furness.ch/media/admin/'
-#ADMIN_MEDIA_PREFIX = 'http://217.193.154.12/media/admin/'
+ADMIN_MEDIA_PREFIX = 'http://localhost:8000/media/admin/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '+dacm+#gpsk=l8(yvnpb*=pe1=n5^4g%dk$_a8=&b#)c*iah(l'
+SECRET_KEY = 'SALTGURKASALTGURKASALTGURKASALTGURKASALTGURKASALTG'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -92,8 +91,17 @@ INSTALLED_APPS = (
     'rosetta',
 )
 
-LASSO_LABELPRINTING_PRINTER = ("10.111.7.240", 9100)
+LASSO_LABELPRINTING_PRINTER = ("127.0.0.1", 9100)
 
 LASSO_DEFAULT_PLACE_OF_DEPARTURE="Pratteln"
 
 USE_L10N=True
+
+# local_settings.py can be used to override environment-specific settings
+# like database and email that differ between development and production.
+for name in ['/etc/lasso.py', os.path.join(os.path.dirname(__file__), "local_settings.py")]:
+    if os.path.exists(name):
+        sys.stderr.write("Loading local settings from " + name + "\n")
+        with open(name) as f:
+            exec f
+        break

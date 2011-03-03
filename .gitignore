@@ -14,3 +14,4 @@
 data.csv
 dbbackup.log
 storage.log
+local_settings.py
