@@ -1,3 +1,16 @@
 *.pyc
 *~
 *.mo
+.Xauthority
+.bash_history
+.cache
+.fontconfig
+.gitconfig
+.lesshst
+.openoffice.org
+.psql_history
+.selected_editor
+.ssh
+data.csv
+dbbackup.log
+storage.log
