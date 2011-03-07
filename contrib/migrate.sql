@@ -69,3 +69,76 @@ alter table "lasso_warehandling_storagelog" alter column "_gross_weight_left" ty
 
 alter table "lasso_global_transportcondition" add column "is_default" boolean NOT NULL default false;
 alter table "lasso_global_vehicletype" add column "is_default" boolean NOT NULL default false;
+
+
+
+CREATE TABLE "lasso_customer_warehandlingprice" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "customer_id" integer NOT NULL REFERENCES "lasso_customer_customer" ("organization_ptr_id") DEFERRABLE INITIALLY DEFERRED,
+    "name" varchar(200) NOT NULL,
+    "is_default" boolean NOT NULL,
+    "price_per_kilo_per_day" numeric(12, 6) NOT NULL,
+    "price_per_kilo_per_entry" numeric(12, 6) NOT NULL,
+    "price_per_kilo_per_withdrawal" numeric(12, 6) NOT NULL,
+    "price_per_unit_per_day" numeric(12, 6) NOT NULL,
+    "price_per_unit_per_entry" numeric(12, 6) NOT NULL,
+    "price_per_unit_per_withdrawal" numeric(12, 6) NOT NULL,
+    "price_min_per_day" numeric(12, 6) NOT NULL,
+    "price_min_per_entry" numeric(12, 6) NOT NULL,
+    "price_min_per_withdrawal" numeric(12, 6) NOT NULL
+);
+
+insert into "lasso_customer_warehandlingprice" (
+  "name",
+  "is_default",
+  "customer_id",
+  "price_per_kilo_per_day",
+  "price_per_kilo_per_entry",
+  "price_per_kilo_per_withdrawal",
+  "price_per_unit_per_day",
+  "price_per_unit_per_entry",
+  "price_per_unit_per_withdrawal",
+  "price_min_per_day",
+  "price_min_per_entry",
+  "price_min_per_withdrawal")
+  (select
+    'default',
+    true,
+    "organization_ptr_id",
+    "price_per_kilo_per_day",
+    "price_per_kilo_per_entry",
+    "price_per_kilo_per_withdrawal",
+    "price_per_unit_per_day",
+    "price_per_unit_per_entry",
+    "price_per_unit_per_withdrawal",
+    "price_min_per_day",
+    "price_min_per_entry",
+    "price_min_per_withdrawal"
+   from "lasso_customer_customer");
+
+alter table "lasso_customer_customer" drop column "price_per_kilo_per_day";
+alter table "lasso_customer_customer" drop column"price_per_kilo_per_entry";
+alter table "lasso_customer_customer" drop column"price_per_kilo_per_withdrawal";
+alter table "lasso_customer_customer" drop column"price_per_unit_per_day";
+alter table "lasso_customer_customer" drop column"price_per_unit_per_entry";
+alter table "lasso_customer_customer" drop column"price_per_unit_per_withdrawal";
+alter table "lasso_customer_customer" drop column"price_min_per_day";
+alter table "lasso_customer_customer" drop column"price_min_per_entry";
+alter table "lasso_customer_customer" drop column"price_min_per_withdrawal";
+
+
+alter table "lasso_warehandling_entry" add column "price_id" integer REFERENCES "lasso_customer_warehandlingprice";
+update "lasso_warehandling_entry" set "price_id" = (select "id" from "lasso_customer_warehandlingprice" where "lasso_customer_warehandlingprice"."customer_id" = "lasso_warehandling_entry"."customer_id");
+
+alter table lasso_global_insurance alter column percent type numeric(12,6);
+
+
+alter table "lasso_warehandling_withdrawalrow" add column "price_per_kilo_per_withdrawal" numeric(12, 6) NOT NULL default 0.0;
+alter table "lasso_warehandling_withdrawalrow" add column "price_per_unit_per_withdrawal" numeric(12, 6) NOT NULL default 0.0;
+alter table "lasso_warehandling_withdrawalrow" add column "price_min_per_withdrawal" numeric(12, 6) NOT NULL default 0.0;
+
+update "lasso_warehandling_withdrawalrow" set "price_per_kilo_per_withdrawal" = (select "price_per_kilo_per_withdrawal" from "lasso_warehandling_withdrawal" where "lasso_warehandling_withdrawal".id = "lasso_warehandling_withdrawalrow"."withdrawal_id"), "price_per_unit_per_withdrawal" = (select "price_per_unit_per_withdrawal" from "lasso_warehandling_withdrawal" where "lasso_warehandling_withdrawal".id = "lasso_warehandling_withdrawalrow"."withdrawal_id"), "price_min_per_withdrawal" = (select "price_min_per_withdrawal" from "lasso_warehandling_withdrawal" where "lasso_warehandling_withdrawal".id = "lasso_warehandling_withdrawalrow"."withdrawal_id");
+
+alter table "lasso_warehandling_withdrawal" drop column "price_per_kilo_per_withdrawal";
+alter table "lasso_warehandling_withdrawal" drop column "price_per_unit_per_withdrawal";
+alter table "lasso_warehandling_withdrawal" drop column "price_min_per_withdrawal";

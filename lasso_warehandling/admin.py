@@ -77,13 +77,34 @@ class EntryRowInline(admin.StackedInline):
                                  }),
                  ]
 
-class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
+class EntryAdminForm(forms.ModelForm):
+    class Meta:
+        model = Entry
+
+    def __init__(self, *args, **kwargs):
+        super(EntryAdminForm, self).__init__(*args,**kwargs)
+        self.fields['customer'].widget.attrs['class'] = 'autosubmit'
+
+class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):
+    form = EntryAdminForm
     inlines = [EntryRowInline,]
     date_hierarchy = 'arrival_date'
-    exclude = ('insurance_percentage', 'price_per_kilo_per_entry','price_per_unit_per_entry',)
+    exclude = ('insurance_percentage', 'price_per_kilo_per_entry','price_per_unit_per_entry','price_min_per_entry',)
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
     search_fields = ('customer__name', 'arrival_date', 'rows__product_description')
     group_owner_field = "customer"
+
+    def cross_verify_forms(self, adminform, inlines_forms):
+        if adminform.form['customer'].data is not None:
+            customer = Customer.objects.get(id=adminform.form['customer'].data)
+
+            if not hasattr(adminform.form['price'].field, 'orig_queryset'):
+                adminform.form['price'].field.orig_queryset = adminform.form['price'].field.queryset
+            adminform.form['price'].field.queryset = adminform.form['price'].field.orig_queryset.filter(customer = customer) 
+            if adminform.form.data['price'] == '' or adminform.form['price'].field.queryset.filter(id=adminform.form.data['price']).count() == 0:
+                defaults = adminform.form['price'].field.queryset.filter(is_default=True)
+                if len(defaults) > 0:
+                    adminform.form.data['price'] = defaults[0].id
 
 admin.site.register(Entry, EntryAdmin)
 

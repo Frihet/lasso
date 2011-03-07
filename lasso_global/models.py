@@ -6,6 +6,7 @@ from django import forms
 import datetime
 from lasso.utils import *
 import django.contrib.auth.models
+import decimal
 
 _name = _("Lasso_Global")
 _name2 = _("lasso_global")
@@ -26,7 +27,7 @@ class Insurance(models.Model):
         all = cls.objects.all()
         if all:
             return all[0].percent
-        return 0.0
+        return decimal.Decimal("0.0")
 
 class Origin(models.Model):
     class Meta:

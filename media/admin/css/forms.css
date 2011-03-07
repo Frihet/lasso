@@ -398,7 +398,7 @@ fieldset.monospace textarea {
 }
 
 .inline-group .tabular tr.has_original td {
-    padding-top: 5px;
+  padding-top: 5px;
 }
 
 .tabular.inline-related tr.has_original .original {
@@ -406,9 +406,3 @@ fieldset.monospace textarea {
   padding: 4px;
 }
 
-
-/*
-.tabular.inline-related .module {
-  float: none;
-}
-*/
