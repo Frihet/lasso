@@ -40,27 +40,65 @@ class ContactInline(ExtendablePermissionAdminMixin, admin.TabularInline):
                                 'password': ['change_access'],
                                 'is_active': ['change_access']}
 
-class CustomerAdmin(admin.ModelAdmin):
-    inlines = [UnitWorkPricesInline, ContactInline]
+class OrganizationAdminForm(forms.ModelForm):
+    copy_from = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=False,
+        label=_("Copy from"),
+        widget = forms.ModelChoiceField.widget(attrs = {'class': 'autosubmit'}))
+
+class OrganizationAdmin(IntermediateFormHandlingAdminMixin, admin.ModelAdmin):
+    inlines = [ContactInline]
     search_fields = ('title',)
-    exclude = ("name", "permissions")
+    fields = ('copy_from', 'title', 'address', 'phone', 'fax')
+
+    def cross_verify_forms(self, adminform, inlines_forms):
+        if adminform.form['copy_from'].data is not None:
+            org = Organization.objects.get(id=adminform.form['copy_from'].data)
+            for attr in ["title", "address", "phone", "fax"]:
+                adminform.form.data[attr] = getattr(org, attr)
+            adminform.form.data['copy_from'] = None
+
+
+class CustomerAdminForm(OrganizationAdminForm):
+    class Meta:
+        model = Customer
+class CustomerAdmin(OrganizationAdmin):
+    form = CustomerAdminForm
+    inlines = [UnitWorkPricesInline] + OrganizationAdmin.inlines
+    fields = OrganizationAdmin.fields + ('customer_nr',
+                                         
+                                         'price_per_kilo_per_day',
+                                         'price_per_kilo_per_entry',
+                                         'price_per_kilo_per_withdrawal',
+                                         
+                                         'price_per_unit_per_day',
+                                         'price_per_unit_per_entry',
+                                         'price_per_unit_per_withdrawal',
+                                         
+                                         'price_min_per_day',
+                                         'price_min_per_entry',
+                                         'price_min_per_withdrawal')
 admin.site.register(Customer, CustomerAdmin)
 
-class OriginalSellerAdmin(admin.ModelAdmin):
-    inlines = [ContactInline]
-    search_fields = ('title',)
-    exclude = ("name", "permissions")
+class OriginalSellerAdminForm(OrganizationAdminForm):
+    class Meta:
+        model = OriginalSeller
+class OriginalSellerAdmin(OrganizationAdmin):
+    form = OriginalSellerAdminForm
 admin.site.register(OriginalSeller, OriginalSellerAdmin)
 
-class DestinationAdmin(admin.ModelAdmin):
-    inlines = [ContactInline]
-    search_fields = ('title',)
-    exclude = ("name", "permissions")
+class DestinationAdminForm(OrganizationAdminForm):
+    class Meta:
+        model = Destination
+class DestinationAdmin(OrganizationAdmin):
+    form = DestinationAdminForm
 admin.site.register(Destination, DestinationAdmin)
 
-class TransporterAdmin(admin.ModelAdmin):
-    inlines = [ContactInline]
-    search_fields = ('title',)
-    exclude = ("name", "permissions")
+class TransporterAdminForm(OrganizationAdminForm):
+    class Meta:
+        model = Transporter
+class TransporterAdmin(OrganizationAdmin):
+    form = TransporterAdminForm
 
 admin.site.register(Transporter, TransporterAdmin)
