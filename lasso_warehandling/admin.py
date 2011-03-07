@@ -10,6 +10,7 @@ from django import forms
 from extendable_permissions import *
 import utils
 import django.forms.util
+import decimal
 
 class EntryRowAdminForm(forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
@@ -87,8 +88,8 @@ class EntryAdmin(ExtendablePermissionAdminMixin, admin.ModelAdmin):
 admin.site.register(Entry, EntryAdmin)
 
 class WithdrawalRowAdminForm(forms.ModelForm):
-    nett_weight = forms.FloatField(label="Nett weight", required=False)
-    gross_weight = forms.FloatField(label="Gross weight", required=False)
+    nett_weight = forms.DecimalField(label="Nett weight", required=False)
+    gross_weight = forms.DecimalField(label="Gross weight", required=False)
 
     class Meta:
         model = WithdrawalRow
@@ -105,6 +106,25 @@ class WithdrawalRowAdminForm(forms.ModelForm):
         return super(WithdrawalRowAdminForm, self).save(commit)
 
     save.alters_data = True
+
+    def clean_units(self):
+        old = getattr(self.instance, "old_units", 0) or 0
+        if self.cleaned_data.get("entry_row", None) is not None and self.cleaned_data['units'] is not None and self.cleaned_data["entry_row"].units_left + old - self.cleaned_data['units'] < 0:
+            raise ValidationError(_("Not enough units left"))
+        return self.cleaned_data["units"]
+
+    def clean_nett_weight(self):
+        old = decimal.Decimal(str(getattr(self.instance, "old_nett_weight", 0) or 0))
+        if self.cleaned_data.get("entry_row", None) is not None and self.cleaned_data['nett_weight'] is not None and not self.cleaned_data["entry_row"].auto_weight and self.cleaned_data["entry_row"].nett_weight_left + old - decimal.Decimal(str(self.cleaned_data['nett_weight'])) < 0:
+            raise ValidationError(_("Not enough nett weight left"))
+        return self.cleaned_data["nett_weight"]
+
+    def clean_gross_weight(self):
+        old = decimal.Decimal(str(getattr(self.instance, "old_gross_weight", 0) or 0))
+        if self.cleaned_data.get("entry_row", None) is not None and self.cleaned_data['gross_weight'] is not None and not self.cleaned_data["entry_row"].auto_weight and self.cleaned_data["entry_row"].gross_weight_left + old - decimal.Decimal(str(self.cleaned_data['gross_weight'])) < 0:
+            raise ValidationError(_("Not enough gross weight left"))
+        return self.cleaned_data["gross_weight"]
+
 
 class WithdrawalUnitWorkInline(admin.TabularInline):
     model = UnitWork
@@ -165,9 +185,10 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
                 unit_work_row['work_type'].field.queryset = unit_work_row['work_type'].field.queryset.filter(customer = customer)
 
             for withdrawal_row in inlines_forms[self.inlines.index(WithdrawalRowInline)].formset.forms:
-                withdrawal_row['entry_row'].field.queryset = withdrawal_row['entry_row'].field.queryset.filter(entry__customer = customer)
-
-
+                if not hasattr(withdrawal_row['entry_row'].field, 'orig_queryset'):
+                    withdrawal_row['entry_row'].field.orig_queryset = withdrawal_row['entry_row'].field.queryset
+                #old = getattr(withdrawal_row.instance, "old_units_left", 0)
+                withdrawal_row['entry_row'].field.queryset = withdrawal_row['entry_row'].field.orig_queryset.filter(entry__customer = customer, units_left__gte = 0) 
 
     def set_defaults(self, request, initial):
         if 'responsible' not in initial:

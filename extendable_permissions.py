@@ -118,5 +118,6 @@ class IntermediateFormHandlingAdminMixin(object):
         return IntermediateForm
 
     def render_change_form(self, request, context, *arg, **kw):
-        self.cross_verify_forms(context['adminform'], context['inline_admin_formsets'])
+        if hasattr(self, "cross_verify_forms"):
+            self.cross_verify_forms(context['adminform'], context['inline_admin_formsets'])
         return super(IntermediateFormHandlingAdminMixin, self).render_change_form(request, context, *arg, **kw)

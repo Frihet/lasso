@@ -215,7 +215,7 @@ class EntryRow(models.Model):
         return log_items
 
     def __unicode__(self):
-        return _(u"%(id_str)s: %(product_description)s (%(units_left)s %(uom)s à %(nett_weight_per_unit)skg @ %(entry.arrival_date)s for %(entry.customer)s)") % {"id_str": self.id_str, "product_description": self.product_description, "units_left": self.units_left, "uom": self.uom, "nett_weight_per_unit": self.nett_weight_per_unit, "entry.arrival_date": self.entry.arrival_date, "entry.customer": self.entry.customer}
+        return _(u"%(id_str)s: %(product_description)s: %(units_left)s %(uom)s left à %(nett_weight_per_unit).2fkg (arr.: %(entry.arrival_date)s, for: %(entry.customer)s)") % {"id_str": self.id_str, "product_description": self.product_description, "units_left": self.units_left, "uom": self.uom or _('units'), "nett_weight_per_unit": self.nett_weight_per_unit, "entry.arrival_date": self.entry.arrival_date, "entry.customer": self.entry.customer}
 
 def entry_row_pre_save(sender, instance, **kwargs):
     if instance.id is None:
