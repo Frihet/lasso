@@ -45,6 +45,7 @@ class TransportCondition(models.Model):
         verbose_name_plural = _('Transport conditions')
 
     name = models.CharField(max_length=200)
+    is_default = models.BooleanField(blank=True, verbose_name=_("Is default"), default=False)
 
     def __unicode__(self):
         return self.name
@@ -55,6 +56,7 @@ class VehicleType(models.Model):
         verbose_name_plural = _('Vehicle types')
 
     name = models.CharField(max_length=200)
+    is_default = models.BooleanField(blank=True, verbose_name=_("Is default"), default=False)
     min_temp = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Min. temp."))
     max_temp = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Max. temp."))
 

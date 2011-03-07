@@ -123,6 +123,10 @@ class WithdrawalAdminForm(forms.ModelForm):
         super(WithdrawalAdminForm, self).__init__(*args,**kwargs)
         if self.instance is not None:
             self.initial['reference_nr'] = self.instance.reference_nr
+        if self.instance and not self.instance.id:
+            vts = VehicleType.objects.filter(is_default=True)
+            if len(vts) > 0:
+                self.initial['vehicle_type'] = vts[0]
         self.fields['customer'].widget.attrs['class'] = 'autosubmit'
 
 class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):

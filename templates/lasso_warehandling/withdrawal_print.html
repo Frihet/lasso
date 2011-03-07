@@ -277,8 +277,20 @@
 	    EMPFANGS-BESTÄTIGUNG<br>
 	    CONFIRMATION DE RECEPTION DES MARCHANDISES<br>
 	    <br>
-	    Wir bestätigen, obige Sendung in ordnungsgemässem Zustand (Temp. -18°C) empfangen zu haben. Beanstandungen sind innerhalb 48 Stunden zu melden, ansonsten gilt die Lieferung als akzeptiert.<br>
-	    Nous confirmons avoir réceptionné la marchandise sus-mentionnée en bon état (temp. -18° C ) les dégats éventuels ou toute autre réclamation doivent être signalés sous 48 heures.Au delà de ce délai, la livraison est considérée comme acceptée.<br><br>
+	    Wir bestätigen, obige Sendung in ordnungsgemässem Zustand (Temp.
+              {% if  withdrawal.vehicle_type.min_temp == withdrawal.vehicle_type.max_temp %}
+                {{ withdrawal.vehicle_type.min_temp }}°C
+	      {% else %}
+                {{ withdrawal.vehicle_type.min_temp }}°C - {{ withdrawal.vehicle_type.max_temp }}°C
+	      {% endif %}
+            ) empfangen zu haben. Beanstandungen sind innerhalb 48 Stunden zu melden, ansonsten gilt die Lieferung als akzeptiert.<br>
+	    Nous confirmons avoir réceptionné la marchandise sus-mentionnée en bon état (temp.
+              {% if  withdrawal.vehicle_type.min_temp == withdrawal.vehicle_type.max_temp %}
+                {{ withdrawal.vehicle_type.min_temp }}°C
+	      {% else %}
+                {{ withdrawal.vehicle_type.min_temp }}°C - {{ withdrawal.vehicle_type.max_temp }}°C
+	      {% endif %}
+            ) les dégats éventuels ou toute autre réclamation doivent être signalés sous 48 heures.Au delà de ce délai, la livraison est considérée comme acceptée.<br><br>
 	  </td>
         </tr>
         <tr>

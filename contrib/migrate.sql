@@ -67,3 +67,5 @@ alter table "lasso_warehandling_storagelog" alter column "price_min_per_day" typ
 alter table "lasso_warehandling_storagelog" alter column "_nett_weight_left" type numeric(12, 6);
 alter table "lasso_warehandling_storagelog" alter column "_gross_weight_left" type numeric(12, 6);
 
+alter table "lasso_global_transportcondition" add column "is_default" boolean NOT NULL default false;
+alter table "lasso_global_vehicletype" add column "is_default" boolean NOT NULL default false;
