@@ -3,6 +3,7 @@ import os.path, sys
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+DEBUG_IN_TERMINAL = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -64,6 +65,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'excware.ExcWare',
 )
 
 ROOT_URLCONF = 'lasso.urls'
