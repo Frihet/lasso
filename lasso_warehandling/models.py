@@ -397,12 +397,15 @@ class UnitWork(models.Model):
     date = models.DateField(verbose_name=_("Date"))
     units = models.IntegerField(verbose_name=_("Units"))
 
+    @property
+    def cost(self):
+        return self.units * self.price_per_unit
+
     def __unicode__(self):
         return u"%s of %s @ %s for %s" % (self.work_type.work_type, self.units, self.date, self.work_type.customer)
 
 def unitwork_pre_save(sender, instance, **kwargs):
-    if instance.id is None:
-        instance.price_per_unit = instance.work_type.price_per_unit
+    instance.price_per_unit = instance.work_type.price_per_unit
     if instance.date is None:
         if instance.entry is not None:
             instance.date = instance.entry.arrival_date

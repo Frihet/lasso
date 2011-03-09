@@ -47,6 +47,7 @@
 	  <th class="align-right">{% trans "Gross saldo" %}</th>
 	  <th class="align-right">{% trans "Entry cost" %}</th>
 	  <th class="align-right">{% trans "Withdrawal cost" %}</th>
+	  <th class="align-right">{% trans "Work cost" %}</th>
 	  <th class="align-right">{% trans "Insurance cost" %}</th>
 	  <th class="align-right">{% trans "Storage cost" %}</th>
 	  <th class="align-right">{% trans "Cost" %}</th>
@@ -57,9 +58,9 @@
 	  {% with storage_log|nth:date as items_for_date %}
 	    <tr class="{% cycle 'row1' 'row2' %}">
 	      <td>{{ date|date:"Y-m-d" }}</td>
-	      <td class="align-right">{{ items_for_date.sum_in.gross_weight|separateminus:items_for_date.sum_out.gross_weight }}</td>
-	      <td class="align-right">{{ items_for_date.sum_in.nett_weight|separateminus:items_for_date.sum_out.nett_weight }}</td>
-	      <td class="align-right">{{ items_for_date.sum_in.units|separateminus:items_for_date.sum_out.units }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.gross_weight|lst|append:items_for_date.sum_out.gross_weight|sepformat:-6 }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.nett_weight|lst|append:items_for_date.sum_out.nett_weight|sepformat:-6 }}</td>
+	      <td class="align-right">{{ items_for_date.sum_in.units|lst|append:items_for_date.sum_out.units|sepformat:-6 }}</td>
 	      <td>
 		{% for entry in items_for_date.entry_items.values %}
 		  <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
@@ -69,9 +70,10 @@
 		  <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
 		{% endfor %}
 	      </td>
-	      <td class="align-right">{{ items_for_date.sum.gross_weight }}</td>
+	      <td class="align-right">{{ items_for_date.sum.gross_weight|floatformat:"-6" }}</td>
 	      <td class="align-right">{{ items_for_date.sum_in.entry_cost|floatformat:"-2" }}</td>
               <td class="align-right">{{ items_for_date.sum_out.cost|floatformat:"-2" }}</td>
+              <td class="align-right">{{ items_for_date.sum_work.cost|floatformat:"-2" }}</td>
 	      <td class="align-right">{{ items_for_date.sum_in.insurance_cost|floatformat:"-2" }}</td>
 	      <td class="align-right">{{ items_for_date.sum.cost|floatformat:"-2" }}</td>
 	      <td class="align-right">{{ items_for_date.sum.total_cost|floatformat:"-2" }}</td>
@@ -82,13 +84,14 @@
 	<tfoot>
 	<tr>
 	  <td>{% trans "Sum" %}</th>
-	  <td class="align-right">{{ sum_in.gross_weight|separateminus:sum_out.gross_weight }}</td>
-	  <td class="align-right">{{ sum_in.nett_weight|separateminus:sum_out.nett_weight }}</td>
-	  <td class="align-right">{{ sum_in.units|separateminus:sum_out.units }}</td>
+	  <td class="align-right">{{ sum_in.gross_weight|lst|append:sum_out.gross_weight|sepformat:-6 }}</td>
+	  <td class="align-right">{{ sum_in.nett_weight|lst|append:sum_out.nett_weight|sepformat:-6 }}</td>
+	  <td class="align-right">{{ sum_in.units|lst|append:sum_out.units|sepformat:-6 }}</td>
 	  <td></td>
 	  <td></td>
 	  <td class="align-right">{{ sum_in.entry_cost|floatformat:"-2" }}</td>
           <td class="align-right">{{sum_out.cost|floatformat:"-2" }}</td>
+          <td class="align-right">{{sum_work.cost|floatformat:"-2" }}</td>
 	  <td class="align-right">{{ sum_in.insurance_cost|floatformat:"-2" }}</td>
 	  <td class="align-right">{{ sum.cost|floatformat:"-2" }}</td>
 	  <td class="align-right">{{ sum.total_cost|floatformat:"-2" }}</td>

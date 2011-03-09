@@ -42,6 +42,8 @@ def costlog(request, *arg, **kw):
 
     info = dict(kw)
     info.update({'config_form': CostlogForm(kw),
+                 'sum_work': {'units': 0,
+                              'cost':0},
                  'sum_in': {'units': 0,
                             'nett_weight':0,
                             'gross_weight':0,
@@ -79,21 +81,25 @@ def costlog(request, *arg, **kw):
         entry_filter = {'entry__arrival_date__year': kw['year']}
         withdrawal_filter = {'withdrawal__withdrawal_date__year': kw['year']}
         storage_filter = {'date__year': kw['year']}
+        unit_filter = {'date__year': kw['year']}
         year = int(kw['year'])
         months = range(1, 13)
 
         if 'month' in kw:
+            unit_filter['date__month'] = kw['month']
             entry_filter['entry__arrival_date__month'] = kw['month']
             withdrawal_filter['withdrawal__withdrawal_date__month'] = kw['month']
             storage_filter['date__month'] = kw['month']
             months = [int(kw['month'])]
          
         if 'customer' in kw:
+            unit_filter['work_type__customer__id'] = kw['customer']
             entry_filter['entry__customer__id'] = kw['customer']
             withdrawal_filter['withdrawal__customer__id'] = kw['customer']
             storage_filter['entry_row__entry__customer__id'] = kw['customer']
 
         if 'entry' in kw:
+            unit_filter['entry__id'] = kw['entry']
             entry_filter['entry__id'] = kw['entry']
             withdrawal_filter['entry_row__entry__id'] = kw['entry']
             storage_filter['entry_row__entry__id'] = kw['entry']
@@ -104,6 +110,8 @@ def costlog(request, *arg, **kw):
 
         for d in info['dates']:
             info['storage_log'][d] = {
+                'sum_work': {'units': 0,
+                             'cost':0},
                 'sum_in': {'units': 0,
                            'nett_weight':0,
                            'gross_weight':0,
@@ -120,8 +128,17 @@ def costlog(request, *arg, **kw):
                         'cost':0,
                         'total_cost':0},
                 'entry_items': {},
+                'work_items': {},
                 'withdrawal_items': {},
                 'storage_items': {}}
+
+        for item in UnitWork.objects.filter(**unit_filter):
+            e = info['storage_log'][item.date]
+            e['work_items'][item.id] = item 
+            for i in (e,info):
+                i['sum_work']['units'] += item.units
+                i['sum_work']['cost'] += item.cost
+                i['sum']['total_cost'] += item.cost
 
         for item in EntryRow.objects.filter(**entry_filter):
             e = info['storage_log'][item.entry.arrival_date]
