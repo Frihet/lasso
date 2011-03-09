@@ -49,7 +49,8 @@ def latex_escape(s):
              ('}', '\\}'),
              ('#', '\\#'),
              ('%', '\\%'),
-             ('&', '\\&'))
+             ('&', '\\&'),
+             ('\n', '\n\n'))
     
     for orig, repl in repld:
         s = s.replace(orig, repl)

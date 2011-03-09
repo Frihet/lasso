@@ -1,0 +1,88 @@
+{% load datatypes %}
+
+\documentclass[english, a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{longtable}
+\usepackage[top=120pt,left=40pt,right=40pt,bottom=40pt,head=70pt]{geometry}
+\usepackage{babel}
+\usepackage{multirow}
+\usepackage{fancyhdr}
+\usepackage{dcolumn}
+\pagestyle{fancy}
+
+\newcolumntype{d}[1]{D{.}{,}{#1}}
+\newcolumntype{I}[1]{D{.}{.}{#1}}
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[C]{
+  \begin{tiny}
+    \begin{longtable}{p{120pt}p{120pt}p{120pt}p{120pt}}
+      Postanschrift &
+      Bankverbindung Inland &
+      Bankverbindung Ausland &
+      Postcheckkonto: 40-187-1
+    \tabularnewline
+      FLS Furness Lagerhaus \& Spedition AG &
+      Crédit Suisse &
+      Deutsche Bank &
+      MWST-Nr.: 263 873
+    \tabularnewline
+      Güterstrasse 66 &
+      CH-4133 Pratteln &
+      D-79539 Lörrach &
+      Telefon (+41)(0)61 / 8262800
+    \tabularnewline
+      CH-4133 Pratteln &
+      IBAN CH93 0458 0056 6000 7100 0 &
+      IBAN DE62 6837 0034 0065 1430 00 &
+      Telefax (+41)(0)61 / 8212075
+    \tabularnewline
+      E-Mail: info@fls-furness.ch &
+      BIC: CRESCHZZ41H &
+      BIC: DEUTDE6F683 &
+      http://www.fls-furness.ch
+    \tabularnewline
+      \hline
+    \end{longtable}
+  \end{tiny}
+}
+
+\fancyfoot[C]{}
+\fancyfoot[L]{}
+
+\begin{document}
+
+  {% for group in groups %}
+    Lager Nr. {{ group.obj.id_str }}
+
+    \begin{longtable}{p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}}
+      Lagerhalter: &
+      {{ group.obj.entry.customer }} &
+      &
+      &
+      &
+    \tabularnewline
+      Lieferant: &
+      {{ group.obj.entry.original_seller }}
+      &
+      &
+      &
+    \tabularnewline
+      Verzollt: &
+      {{ group.obj.entry.custom_handling_date }} &
+      Einlagerung: &
+      {{ group.obj.entry.arrival_date }} &
+      Haltbarkeit: &
+      {{ group.obj.use_before }}
+    \tabularnewline
+      Artikelbezeichnung: &
+      {{ group.obj.product_description }}
+    \end{longtable}
+
+
+
+    \newpage
+  {% endfor %}
+
+\end{document}

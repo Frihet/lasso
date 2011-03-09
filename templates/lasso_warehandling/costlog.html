@@ -43,11 +43,11 @@
         <tbody>
 	  {% if group.obj %}
             <tr>
-              <th colspan="{% if format == "short" %}13{% else %}12{% endif %}">{{ group.obj }}</th>
+              <th colspan="{% if style == "short" %}13{% else %}12{% endif %}">{{ group.obj }}</th>
             </tr>
 	  {% endif %}
 	  <tr>
-	    {% if format == "short" %}
+	    {% if style == "short" %}
 	      <th>{% trans "Start date" %}</th>
 	      <th>{% trans "End date" %}</th>
 	    {% else %}
@@ -67,7 +67,7 @@
 	  </tr>
 	</tbody>
 	<tbody>
-	  {% if format == "short" %}
+	  {% if style == "short" %}
 	    {% for log_item in group.short_storage_log %}
 	      <tr class="{% cycle 'row1' 'row2' %}">
 		<td>{{ log_item.start_date|date:"Y-m-d" }}</td>
@@ -125,7 +125,7 @@
 	  {% endif %}
 	<tbody>
 	  <tr>
-	    {% if format == "short" %}
+	    {% if style == "short" %}
 	      <th></th>
 	    {% endif %}
 	    <th style="padding-bottom: 20pt">{% trans "Sum" %}</th>
