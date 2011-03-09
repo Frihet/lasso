@@ -22,63 +22,43 @@ class CostlogForm(forms.Form):
     customer = forms.ModelChoiceField(queryset = Customer.objects.all(), required=False, label=_("Customer"))
     entry = forms.ModelChoiceField(queryset = Entry.objects.all(), required=False, label=_("Entry"))
     format = forms.ChoiceField(choices=(('long', _('Long')), ('short', _('Short'))), required=False, label=_("Format"))
+    group_by = forms.ChoiceField(choices=(('all', _("Don't group")), ('customer', _('Customer')), ('entry', _('Entry'))), required=False, label=_("Format"))
 
 def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filter, year, months):
-    info = {'sum_work': {'units': 0,
-                         'cost':0},
-            'sum_in': {'units': 0,
-                       'nett_weight':0,
-                       'gross_weight':0,
-                       'entry_cost': 0,
-                       'insurance_cost': 0,
-                       'cost':0},
-            'sum_out': {'units': 0,
+    def setup_info():
+        return {'sum_work': {'units': 0,
+                             'cost':0},
+                'sum_in': {'units': 0,
+                           'nett_weight':0,
+                           'gross_weight':0,
+                           'entry_cost': 0,
+                           'insurance_cost': 0,
+                           'cost':0},
+                'sum_out': {'units': 0,
+                            'nett_weight':0,
+                            'gross_weight':0,
+                            'cost':0},
+                'sum': {'units':0,
                         'nett_weight':0,
                         'gross_weight':0,
-                        'cost':0},
-            'sum': {'units':0,
-                    'nett_weight':0,
-                    'gross_weight':0,
-                    'cost':0,
-                    'total_cost':0},
-            'dates': [],
-            'storage_log': {}}
+                        'cost':0,
+                        'total_cost':0},
+                'entry_items': {},
+                'work_items': {},
+                'withdrawal_items': {},
+                'storage_items': {},
+                'dates': [],
+                'storage_log': {},
+                'short_storage_log': []}
+
+    info = setup_info()
 
     for month in months:
         for day in xrange(1, calendar.monthrange(year, month)[1]+1):
             info['dates'].append(datetime.date(year, month, day) )
 
     for d in info['dates']:
-        info['storage_log'][d] = {
-            'sum_work': {'units': 0,
-                         'cost':0},
-            'sum_in': {'units': 0,
-                       'nett_weight':0,
-                       'gross_weight':0,
-                       'entry_cost': 0,
-                       'insurance_cost': 0,
-                       'cost':0},
-            'sum_out': {'units': 0,
-                        'nett_weight':0,
-                        'gross_weight':0,
-                        'cost':0},
-            'sum': {'units':0,
-                    'nett_weight':0,
-                    'gross_weight':0,
-                    'cost':0,
-                    'total_cost':0},
-            'entry_items': {},
-            'work_items': {},
-            'withdrawal_items': {},
-            'storage_items': {}}
-
-    for item in UnitWork.objects.filter(**unit_filter):
-        e = info['storage_log'][item.date]
-        e['work_items'][item.id] = item 
-        for i in (e,info):
-            i['sum_work']['units'] += item.units
-            i['sum_work']['cost'] += item.cost
-            i['sum']['total_cost'] += item.cost
+        info['storage_log'][d] = setup_info()
 
     for item in EntryRow.objects.filter(**entry_filter):
         e = info['storage_log'][item.entry.arrival_date]
@@ -90,6 +70,14 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum_in']['entry_cost'] += item.entry_cost
             i['sum_in']['insurance_cost'] += item.insurance_cost
             i['sum_in']['cost'] += item.cost
+            i['sum']['total_cost'] += item.cost
+
+    for item in UnitWork.objects.filter(**unit_filter):
+        e = info['storage_log'][item.date]
+        e['work_items'][item.id] = item 
+        for i in (e,info):
+            i['sum_work']['units'] += item.units
+            i['sum_work']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
     for item in WithdrawalRow.objects.filter(**withdrawal_filter):
@@ -112,7 +100,6 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
-    info['short_storage_log'] = []
     last = None
     for d in info['dates']:
         if (last is None or
