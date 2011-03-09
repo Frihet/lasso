@@ -22,7 +22,7 @@ class CostlogForm(forms.Form):
     customer = forms.ModelChoiceField(queryset = Customer.objects.all(), required=False, label=_("Customer"))
     entry = forms.ModelChoiceField(queryset = Entry.objects.all(), required=False, label=_("Entry"))
     format = forms.ChoiceField(choices=(('long', _('Long')), ('short', _('Short'))), required=False, label=_("Format"))
-    group_by = forms.ChoiceField(choices=(('all', _("Don't group")), ('customer', _('Customer')), ('entry', _('Entry'))), required=False, label=_("Format"))
+    group_by = forms.ChoiceField(choices=(('all', _("Don't group")), ('customer', _('Customer')), ('entry', _('Entry'))), required=False, label=_("Group by"))
 
 def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filter, year, months):
     def setup_info():
@@ -69,18 +69,16 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
         entry_id = entry and entry.id or None
         if customer_id not in info['per_customer']:
             info['per_customer'][customer_id] = setup_full_info()
+            info['per_customer'][customer_id]['obj'] = customer
         if entry_id not in info['per_entry']:
             info['per_entry'][entry_id] = setup_full_info()
-        infos = (info['total'],
-                 info['total']['storage_log'][d],
-                 info['per_customer'][customer_id],
-                 info['per_customer'][customer_id]['storage_log'][d],
-                 info['per_entry'][entry_id],
-                 info['per_entry'][entry_id]['storage_log'][d])
-        for i in infos:
-            i['customers'][customer_id] = customer
-            i['entries'][entry_id] = entry
-        return infos
+            info['per_entry'][entry_id]['obj'] = entry
+        return (info['total'],
+                info['total']['storage_log'][d],
+                info['per_customer'][customer_id],
+                info['per_customer'][customer_id]['storage_log'][d],
+                info['per_entry'][entry_id],
+                info['per_entry'][entry_id]['storage_log'][d])
 
     def calculate_short_storage_log(info):
         last = None
@@ -145,9 +143,7 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
     for entry, entry_info in info['per_entry'].iteritems():
         calculate_short_storage_log(entry_info)
 
-    info['total']['dates'] = info['dates']
-
-    return info['total']
+    return info
 
 def kw_to_filters(year, month=None, customer=None, entry=None):
     year = int(year)
@@ -230,6 +226,14 @@ def costlog(request, *arg, **kw):
 
     if 'year' in kw:
         info.update(sum_costlog_data(**kw_to_filters(**kw)))
+
+    group_by = request.GET.get('group_by', 'all')
+    if group_by == 'all':
+        info['groups'] = [info['total']]
+    elif group_by == 'customer':
+        info['groups'] = info['per_customer'].values()
+    elif group_by == 'entry':
+        info['groups'] = info['per_entry'].values()
 
     return render_to_response('lasso_warehandling/costlog.html', info, template.RequestContext(request))
 

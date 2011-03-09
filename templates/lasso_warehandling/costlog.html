@@ -35,14 +35,24 @@
     <input type="submit" value="{% trans "Go" %}">
   </form>
 
-  {% if format == "short" %}
 
-    <div id="changelist" class="module">
-      <table cellspacing="0">
-	<thead>
+
+  <div id="changelist" class="module">
+    <table cellspacing="0">
+      {% for group in groups %}
+        <tbody>
+	  {% if group.obj %}
+            <tr>
+              <th colspan="{% if format == "short" %}13{% else %}12{% endif %}">{{ group.obj }}</th>
+            </tr>
+	  {% endif %}
 	  <tr>
-	    <th>{% trans "Start date" %}</th>
-	    <th>{% trans "End date" %}</th>
+	    {% if format == "short" %}
+	      <th>{% trans "Start date" %}</th>
+	      <th>{% trans "End date" %}</th>
+	    {% else %}
+	       <th>{% trans "Date" %}</th>
+	    {% endif %}
 	    <th class="align-right">{% trans "Gross transaction" %}</th>
 	    <th class="align-right">{% trans "Nett transaction" %}</th>
 	    <th class="align-right">{% trans "Transaction units" %}</th>
@@ -55,123 +65,85 @@
 	    <th class="align-right">{% trans "Storage cost" %}</th>
 	    <th class="align-right">{% trans "Cost" %}</th>
 	  </tr>
-	</thead>
-	<tbody>
-	  {% for log_item in short_storage_log %}
-	    <tr class="{% cycle 'row1' 'row2' %}">
-	      <td>{{ log_item.start_date|date:"Y-m-d" }}</td>
-	      <td>{{ log_item.end_date|date:"Y-m-d" }}</td>
-	      <td class="align-right">{{ log_item.sum_in.gross_weight|lst|append:log_item.sum_out.gross_weight|sepformat:-6 }}</td>
-	      <td class="align-right">{{ log_item.sum_in.nett_weight|lst|append:log_item.sum_out.nett_weight|sepformat:-6 }}</td>
-	      <td class="align-right">{{ log_item.sum_in.units|lst|append:log_item.sum_out.units|sepformat:-6 }}</td>
-	      <td>
-		{% for entry in log_item.entry_items.values %}
-		  <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
-		{% endfor %}
-		{% if log_item.withdrawal_items %}- {% endif %}
-		{% for entry in log_item.withdrawal_items.values %}
-		  <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
-		{% endfor %}
-	      </td>
-	      <td class="align-right">{{ log_item.sum.gross_weight|floatformat:"-6" }}</td>
-	      <td class="align-right">{{ log_item.sum_in.entry_cost|floatformat:"-2" }}</td>
-	      <td class="align-right">{{ log_item.sum_out.cost|floatformat:"-2" }}</td>
-	      <td class="align-right">{{ log_item.sum_work.cost|floatformat:"-2" }}</td>
-	      <td class="align-right">{{ log_item.sum_in.insurance_cost|floatformat:"-2" }}</td>
-	      <td class="align-right">{{ log_item.sum.cost|floatformat:"-2" }}</td>
-	      <td class="align-right">{{ log_item.sum.total_cost|floatformat:"-2" }}</td>
-	      <td></td>
-	    </tr>
-	  {% endfor %}
-	  <tfoot>
-	  <tr>
-	    <th></th>
-	    <th>{% trans "Sum" %}</th>
-	    <td class="align-right">{{ sum_in.gross_weight|lst|append:sum_out.gross_weight|sepformat:-6 }}</td>
-	    <td class="align-right">{{ sum_in.nett_weight|lst|append:sum_out.nett_weight|sepformat:-6 }}</td>
-	    <td class="align-right">{{ sum_in.units|lst|append:sum_out.units|sepformat:-6 }}</td>
-	    <td></td>
-	    <td></td>
-	    <td class="align-right">{{ sum_in.entry_cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{sum_out.cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{sum_work.cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{ sum_in.insurance_cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{ sum.cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{ sum.total_cost|floatformat:"-2" }}</td>
-	  </tr>
-	  </tfoot>
 	</tbody>
-      </table>
-    </div>
-
-  {% else %}
-
-    <div id="changelist" class="module">
-      <table cellspacing="0">
-	<thead>
-	  <tr>
-	    <th>{% trans "Date" %}</th>
-	    <th class="align-right">{% trans "Gross transaction" %}</th>
-	    <th class="align-right">{% trans "Nett transaction" %}</th>
-	    <th class="align-right">{% trans "Transaction units" %}</th>
-	    <th>{% trans "Transaction details" %}</th>
-	    <th class="align-right">{% trans "Gross saldo" %}</th>
-	    <th class="align-right">{% trans "Entry cost" %}</th>
-	    <th class="align-right">{% trans "Withdrawal cost" %}</th>
-	    <th class="align-right">{% trans "Work cost" %}</th>
-	    <th class="align-right">{% trans "Insurance cost" %}</th>
-	    <th class="align-right">{% trans "Storage cost" %}</th>
-	    <th class="align-right">{% trans "Cost" %}</th>
-	  </tr>
-	</thead>
 	<tbody>
-	  {% for date in dates %}
-	    {% with storage_log|nth:date as items_for_date %}
+	  {% if format == "short" %}
+	    {% for log_item in group.short_storage_log %}
 	      <tr class="{% cycle 'row1' 'row2' %}">
-		<td>{{ date|date:"Y-m-d" }}</td>
-		<td class="align-right">{{ items_for_date.sum_in.gross_weight|lst|append:items_for_date.sum_out.gross_weight|sepformat:-6 }}</td>
-		<td class="align-right">{{ items_for_date.sum_in.nett_weight|lst|append:items_for_date.sum_out.nett_weight|sepformat:-6 }}</td>
-		<td class="align-right">{{ items_for_date.sum_in.units|lst|append:items_for_date.sum_out.units|sepformat:-6 }}</td>
+		<td>{{ log_item.start_date|date:"Y-m-d" }}</td>
+		<td>{{ log_item.end_date|date:"Y-m-d" }}</td>
+		<td class="align-right">{{ log_item.sum_in.gross_weight|lst|append:log_item.sum_out.gross_weight|sepformat:-6 }}</td>
+		<td class="align-right">{{ log_item.sum_in.nett_weight|lst|append:log_item.sum_out.nett_weight|sepformat:-6 }}</td>
+		<td class="align-right">{{ log_item.sum_in.units|lst|append:log_item.sum_out.units|sepformat:-6 }}</td>
 		<td>
-		  {% for entry in items_for_date.entry_items.values %}
+		  {% for entry in log_item.entry_items.values %}
 		    <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
 		  {% endfor %}
-		  {% if items_for_date.withdrawal_items %}- {% endif %}
-		  {% for entry in items_for_date.withdrawal_items.values %}
+		  {% if log_item.withdrawal_items %}- {% endif %}
+		  {% for entry in log_item.withdrawal_items.values %}
 		    <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
 		  {% endfor %}
 		</td>
-		<td class="align-right">{{ items_for_date.sum.gross_weight|floatformat:"-6" }}</td>
-		<td class="align-right">{{ items_for_date.sum_in.entry_cost|floatformat:"-2" }}</td>
-		<td class="align-right">{{ items_for_date.sum_out.cost|floatformat:"-2" }}</td>
-		<td class="align-right">{{ items_for_date.sum_work.cost|floatformat:"-2" }}</td>
-		<td class="align-right">{{ items_for_date.sum_in.insurance_cost|floatformat:"-2" }}</td>
-		<td class="align-right">{{ items_for_date.sum.cost|floatformat:"-2" }}</td>
-		<td class="align-right">{{ items_for_date.sum.total_cost|floatformat:"-2" }}</td>
+		<td class="align-right">{{ log_item.sum.gross_weight|floatformat:"-6" }}</td>
+		<td class="align-right">{{ log_item.sum_in.entry_cost|floatformat:"-2" }}</td>
+		<td class="align-right">{{ log_item.sum_out.cost|floatformat:"-2" }}</td>
+		<td class="align-right">{{ log_item.sum_work.cost|floatformat:"-2" }}</td>
+		<td class="align-right">{{ log_item.sum_in.insurance_cost|floatformat:"-2" }}</td>
+		<td class="align-right">{{ log_item.sum.cost|floatformat:"-2" }}</td>
+		<td class="align-right">{{ log_item.sum.total_cost|floatformat:"-2" }}</td>
 		<td></td>
 	      </tr>
-	    {% endwith %}
-	  {% endfor %}
-	  <tfoot>
+	    {% endfor %}
+	  {% else %}
+	    {% for date in dates %}
+	      {% with group.storage_log|nth:date as items_for_date %}
+		<tr class="{% cycle 'row1' 'row2' %}">
+		  <td>{{ date|date:"Y-m-d" }}</td>
+		  <td class="align-right">{{ items_for_date.sum_in.gross_weight|lst|append:items_for_date.sum_out.gross_weight|sepformat:-6 }}</td>
+		  <td class="align-right">{{ items_for_date.sum_in.nett_weight|lst|append:items_for_date.sum_out.nett_weight|sepformat:-6 }}</td>
+		  <td class="align-right">{{ items_for_date.sum_in.units|lst|append:items_for_date.sum_out.units|sepformat:-6 }}</td>
+		  <td>
+		    {% for entry in items_for_date.entry_items.values %}
+		      <a href="{% url admin:lasso_warehandling_entry_change entry.entry.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
+		    {% endfor %}
+		    {% if items_for_date.withdrawal_items %}- {% endif %}
+		    {% for entry in items_for_date.withdrawal_items.values %}
+		      <a href="{% url admin:lasso_warehandling_withdrawal_change entry.withdrawal.id %}">{{ entry.id_str }}</a>{% if not forloop.last %},{% endif %}
+		    {% endfor %}
+		  </td>
+		  <td class="align-right">{{ items_for_date.sum.gross_weight|floatformat:"-6" }}</td>
+		  <td class="align-right">{{ items_for_date.sum_in.entry_cost|floatformat:"-2" }}</td>
+		  <td class="align-right">{{ items_for_date.sum_out.cost|floatformat:"-2" }}</td>
+		  <td class="align-right">{{ items_for_date.sum_work.cost|floatformat:"-2" }}</td>
+		  <td class="align-right">{{ items_for_date.sum_in.insurance_cost|floatformat:"-2" }}</td>
+		  <td class="align-right">{{ items_for_date.sum.cost|floatformat:"-2" }}</td>
+		  <td class="align-right">{{ items_for_date.sum.total_cost|floatformat:"-2" }}</td>
+		  <td></td>
+		</tr>
+	      {% endwith %}
+	    {% endfor %}
+	  {% endif %}
+	<tbody>
 	  <tr>
-	    <th>{% trans "Sum" %}</th>
-	    <td class="align-right">{{ sum_in.gross_weight|lst|append:sum_out.gross_weight|sepformat:-6 }}</td>
-	    <td class="align-right">{{ sum_in.nett_weight|lst|append:sum_out.nett_weight|sepformat:-6 }}</td>
-	    <td class="align-right">{{ sum_in.units|lst|append:sum_out.units|sepformat:-6 }}</td>
+	    {% if format == "short" %}
+	      <th></th>
+	    {% endif %}
+	    <th style="padding-bottom: 20pt">{% trans "Sum" %}</th>
+	    <td class="align-right">{{ group.sum_in.gross_weight|lst|append:group.sum_out.gross_weight|sepformat:-6 }}</td>
+	    <td class="align-right">{{ group.sum_in.nett_weight|lst|append:group.sum_out.nett_weight|sepformat:-6 }}</td>
+	    <td class="align-right">{{ group.sum_in.units|lst|append:group.sum_out.units|sepformat:-6 }}</td>
 	    <td></td>
 	    <td></td>
-	    <td class="align-right">{{ sum_in.entry_cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{sum_out.cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{sum_work.cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{ sum_in.insurance_cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{ sum.cost|floatformat:"-2" }}</td>
-	    <td class="align-right">{{ sum.total_cost|floatformat:"-2" }}</td>
+	    <td class="align-right">{{ group.sum_in.entry_cost|floatformat:"-2" }}</td>
+	    <td class="align-right">{{ group.sum_out.cost|floatformat:"-2" }}</td>
+	    <td class="align-right">{{ group.sum_work.cost|floatformat:"-2" }}</td>
+	    <td class="align-right">{{ group.sum_in.insurance_cost|floatformat:"-2" }}</td>
+	    <td class="align-right">{{ group.sum.cost|floatformat:"-2" }}</td>
+	    <td class="align-right">{{ group.sum.total_cost|floatformat:"-2" }}</td>
 	  </tr>
-	  </tfoot>
-	</tbody>
-      </table>
-    </div>
-
-  {% endif %}
-
+        </tbody>
+      {% endfor %}
+    </table>
+  </div>
+  
 {% endblock %}
