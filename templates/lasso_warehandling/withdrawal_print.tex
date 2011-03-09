@@ -198,8 +198,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
   {% for row in withdrawal.rows.all %}
@@ -208,8 +208,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
   {% for row in withdrawal.rows.all %}
@@ -218,8 +218,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
   {% for row in withdrawal.rows.all %}
@@ -228,8 +228,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
   {% for row in withdrawal.rows.all %}
@@ -238,8 +238,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
   {% for row in withdrawal.rows.all %}
@@ -248,8 +248,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
   {% for row in withdrawal.rows.all %}
@@ -258,8 +258,8 @@
       {{ row.entry_row.product_description }} &
       {{ row.entry_row.origin|default_if_none:"-" }} &
       {{ row.units }} &
-      {{ row.nett_weight|floatformat:6 }} &
-      {{ row.gross_weight|floatformat:6 }}
+      {{ row.nett_weight|floatformat:-6 }} &
+      {{ row.gross_weight|floatformat:-6 }}
       \tabularnewline
   {% endfor %}
     \hline
@@ -268,8 +268,8 @@
     &
     \em{Total:} &
     {{ units }} &
-    {{ nett_weight|floatformat:6 }} &
-    {{ gross_weight|floatformat:6 }}
+    {{ nett_weight|floatformat:-6 }} &
+    {{ gross_weight|floatformat:-6 }}
   \end{longtable}
 \end{small}
 

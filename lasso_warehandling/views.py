@@ -21,6 +21,7 @@ class CostlogForm(forms.Form):
     month = forms.IntegerField(required=False, label=_("Month"))
     customer = forms.ModelChoiceField(queryset = Customer.objects.all(), required=False, label=_("Customer"))
     entry = forms.ModelChoiceField(queryset = Entry.objects.all(), required=False, label=_("Entry"))
+    format = forms.ChoiceField(choices=(('long', _('Long')), ('short', _('Short'))), required=False, label=_("Format"))
 
 def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filter, year, months):
     info = {'sum_work': {'units': 0,
@@ -111,6 +112,22 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
+    info['short_storage_log'] = []
+    last = None
+    for d in info['dates']:
+        if (last is None or
+            info['storage_log'][d]['entry_items'] or
+            info['storage_log'][d]['work_items'] or
+            info['storage_log'][d]['withdrawal_items']):
+
+            last = dict((key, dict(value)) for key, value in info['storage_log'][d].iteritems())
+            last['start_date'] = d
+            info['short_storage_log'].append(last)
+        else:
+            for key in ('cost', 'total_cost'):
+                last['sum'][key] += info['storage_log'][d]['sum'][key]
+        last['end_date'] = d
+
     return info
 
 def kw_to_filters(year, month=None, customer=None, entry=None):
@@ -156,24 +173,26 @@ def empty_filters():
 
 @staff_member_required
 def costlog(request, *arg, **kw):
-    redirect = False
+    oldkw = dict(kw)
+    info = {}
+
     if request.GET:
-        for name, value in request.GET.items():
-            if value == '':
-                 if name in kw:
-                     del kw[name]
-            else:
-                kw[name] = value
-        redirect = True
+        info.update(request.GET.iteritems())
+        for name in ('year', 'month', 'customer', 'entry'):
+            if name in request.GET:
+                if request.GET[name]:
+                    kw[name] = request.GET[name]
+                elif name in kw:
+                    del kw[name]
 
     if 'year' in kw and kw['year'] == '0':
         today = datetime.date.today()
         kw['year'] = today.year
         kw['month'] = today.month
-        redirect = True
 
-    info = dict(kw)
-    info['config_form'] = CostlogForm(kw)
+    info.update(kw)
+
+    info['config_form'] = CostlogForm(info)
 
     if not request.user.has_perm('lasso_warehandling.view_storagelog'):
         customers = Customer.objects.filter(id__in = [group.id for group in request.user.groups.all()])
@@ -182,9 +201,8 @@ def costlog(request, *arg, **kw):
             return render_to_response('lasso_warehandling/costlog.html', info, context_instance=template.RequestContext(request))
         if 'customer' not in kw or int(kw['customer']) not in [customer.id for customer in customers]:
             kw['customer'] = customers[0].id
-            redirect = True
 
-    if redirect:
+    if kw != oldkw:
         return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw))
 
     if not request.user.has_perm('lasso_warehandling.view_costlog'):
