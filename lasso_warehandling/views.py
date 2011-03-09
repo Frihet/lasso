@@ -43,27 +43,69 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
                         'gross_weight':0,
                         'cost':0,
                         'total_cost':0},
+                'customers': {},
+                'entries': {},
                 'entry_items': {},
                 'work_items': {},
                 'withdrawal_items': {},
-                'storage_items': {},
-                'dates': [],
-                'storage_log': {},
-                'short_storage_log': []}
+                'storage_items': {}}
 
-    info = setup_info()
-
+    dates = []
     for month in months:
         for day in xrange(1, calendar.monthrange(year, month)[1]+1):
-            info['dates'].append(datetime.date(year, month, day) )
+            dates.append(datetime.date(year, month, day) )
 
-    for d in info['dates']:
-        info['storage_log'][d] = setup_info()
+    def setup_full_info():
+        res = setup_info()
+        res['storage_log'] = {}
+        res['short_storage_log'] = []
+        for d in dates:
+            res['storage_log'][d] = setup_info()
+        return res
+
+    def get_infos(customer, entry, d):
+        "Ensure sum-collection-info-dicts exists and return them!"
+        customer_id = customer and customer.id or None
+        entry_id = entry and entry.id or None
+        if customer_id not in info['per_customer']:
+            info['per_customer'][customer_id] = setup_full_info()
+        if entry_id not in info['per_entry']:
+            info['per_entry'][entry_id] = setup_full_info()
+        infos = (info['total'],
+                 info['total']['storage_log'][d],
+                 info['per_customer'][customer_id],
+                 info['per_customer'][customer_id]['storage_log'][d],
+                 info['per_entry'][entry_id],
+                 info['per_entry'][entry_id]['storage_log'][d])
+        for i in infos:
+            i['customers'][customer_id] = customer
+            i['entries'][entry_id] = entry
+        return infos
+
+    def calculate_short_storage_log(info):
+        last = None
+        for d in dates:
+            if (last is None or
+                info['storage_log'][d]['entry_items'] or
+                info['storage_log'][d]['work_items'] or
+                info['storage_log'][d]['withdrawal_items']):
+
+                last = dict((key, dict(value)) for key, value in info['storage_log'][d].iteritems())
+                last['start_date'] = d
+                info['short_storage_log'].append(last)
+            else:
+                for key in ('cost', 'total_cost'):
+                    last['sum'][key] += info['storage_log'][d]['sum'][key]
+            last['end_date'] = d
+
+    info = {'dates': dates,
+            'total': setup_full_info(),
+            'per_customer': {},
+            'per_entry': {}}
 
     for item in EntryRow.objects.filter(**entry_filter):
-        e = info['storage_log'][item.entry.arrival_date]
-        e['entry_items'][item.id] = item 
-        for i in (e,info):
+        for i in get_infos(item.entry.customer, item.entry, item.entry.arrival_date):
+            i['entry_items'][item.id] = item
             i['sum_in']['units'] += item.units
             i['sum_in']['nett_weight'] += item.nett_weight
             i['sum_in']['gross_weight'] += item.gross_weight
@@ -73,17 +115,15 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum']['total_cost'] += item.cost
 
     for item in UnitWork.objects.filter(**unit_filter):
-        e = info['storage_log'][item.date]
-        e['work_items'][item.id] = item 
-        for i in (e,info):
+        for i in get_infos(item.work_type.customer, item.entry, item.date):
+            i['work_items'][item.id] = item
             i['sum_work']['units'] += item.units
             i['sum_work']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
     for item in WithdrawalRow.objects.filter(**withdrawal_filter):
-        e = info['storage_log'][item.withdrawal.withdrawal_date]
-        e['withdrawal_items'][item.id] = item
-        for i in (e,info):
+        for i in get_infos(item.entry_row.entry.customer, item.entry_row.entry, item.withdrawal.withdrawal_date):
+            i['withdrawal_items'][item.id] = item
             i['sum_out']['units'] += item.units
             i['sum_out']['nett_weight'] += item.nett_weight
             i['sum_out']['gross_weight'] += item.gross_weight
@@ -91,31 +131,23 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum']['total_cost'] += item.cost
 
     for item in StorageLog.objects.filter(**storage_filter):
-        e = info['storage_log'][item.date]
-        e['storage_items'][item.entry_row.id] = item 
-        for i in (e,info):
+        for i in get_infos(item.entry_row.entry.customer, item.entry_row.entry, item.date):
+            i['storage_items'][item.id] = item
             i['sum']['units'] += item.units_left
             i['sum']['nett_weight'] += item.nett_weight_left
             i['sum']['gross_weight'] += item.gross_weight_left
             i['sum']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
-    last = None
-    for d in info['dates']:
-        if (last is None or
-            info['storage_log'][d]['entry_items'] or
-            info['storage_log'][d]['work_items'] or
-            info['storage_log'][d]['withdrawal_items']):
+    calculate_short_storage_log(info['total'])
+    for customer, customer_info in info['per_customer'].iteritems():
+        calculate_short_storage_log(customer_info)
+    for entry, entry_info in info['per_entry'].iteritems():
+        calculate_short_storage_log(entry_info)
 
-            last = dict((key, dict(value)) for key, value in info['storage_log'][d].iteritems())
-            last['start_date'] = d
-            info['short_storage_log'].append(last)
-        else:
-            for key in ('cost', 'total_cost'):
-                last['sum'][key] += info['storage_log'][d]['sum'][key]
-        last['end_date'] = d
+    info['total']['dates'] = info['dates']
 
-    return info
+    return info['total']
 
 def kw_to_filters(year, month=None, customer=None, entry=None):
     year = int(year)
