@@ -77,6 +77,10 @@ class EntryRowInline(admin.StackedInline):
                                  }),
                  ]
 
+class EntryUnitWorkInline(admin.TabularInline):
+    model = UnitWork
+    exclude = ('price_per_unit', 'date', 'withdrawal')
+
 class EntryAdminForm(forms.ModelForm):
     class Meta:
         model = Entry
@@ -87,7 +91,7 @@ class EntryAdminForm(forms.ModelForm):
 
 class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = EntryAdminForm
-    inlines = [EntryRowInline,]
+    inlines = [EntryUnitWorkInline,EntryRowInline]
     date_hierarchy = 'arrival_date'
     exclude = ('insurance_percentage', 'price_per_kilo_per_entry','price_per_unit_per_entry','price_min_per_entry',)
     list_display_links = list_display = ('id', 'customer', 'arrival_date', 'product_description', 'nett_weight', 'gross_weight', 'product_value', 'nett_weight_left', 'gross_weight_left', 'product_value_left')
@@ -97,6 +101,9 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
     def cross_verify_forms(self, adminform, inlines_forms):
         if adminform.form['customer'].data is not None:
             customer = Customer.objects.get(id=adminform.form['customer'].data)
+
+            for unit_work_row in inlines_forms[self.inlines.index(EntryUnitWorkInline)].formset.forms:
+                unit_work_row['work_type'].field.queryset = unit_work_row['work_type'].field.queryset.filter(customer = customer)
 
             if not hasattr(adminform.form['price'].field, 'orig_queryset'):
                 adminform.form['price'].field.orig_queryset = adminform.form['price'].field.queryset
