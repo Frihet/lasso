@@ -3,6 +3,7 @@ from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.utils import simplejson
 import django.db.models.base
+import django.utils.safestring
 
 register = template.Library()
 
@@ -50,3 +51,16 @@ register.filter('sum', sum_filter)
 register.filter('separateminus', separateminus_filter)
 register.filter('aadd', aadd_filter)
 
+@register.filter
+def latex_escape(s):
+    repld = (('\\', '\\textbackslash{}'),
+             ('{', '\\{'),
+             ('}', '\\}'),
+             ('#', '\\#'),
+             ('%', '\\%'),
+             ('&', '\\&'))
+    
+    for orig, repl in repld:
+        s = s.replace(orig, repl)
+    
+    return django.utils.safestring.mark_safe(s)

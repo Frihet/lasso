@@ -7,8 +7,13 @@ from django.shortcuts import *
 from django.contrib.admin.views.decorators import *
 from django import template
 from django.core.urlresolvers import *
+import django.template.loader
 import datetime
 import calendar
+import django.http
+import shutil
+import tempfile
+import subprocess
 
 class CostlogForm(forms.Form):
     year = forms.IntegerField(required=False, label=_("Year"))
@@ -159,4 +164,27 @@ def withdrawal_print(request, withdrawal_id, *arg, **kw):
     info['nett_weight'] = sum(row.nett_weight for row in info['withdrawal'].rows.all())
     info['gross_weight'] = sum(row.gross_weight for row in info['withdrawal'].rows.all())
 
-    return render_to_response('lasso_warehandling/withdrawal_print.html', info, context_instance=template.RequestContext(request))
+    ctx = template.RequestContext(request)
+
+    if request.GET.get('format', '') == 'tex':
+        return django.http.HttpResponse(django.template.loader.render_to_string("lasso_warehandling/withdrawal_print.tex", info, ctx).encode('utf-8'), mimetype="text/plain")
+
+    workdir = tempfile.mkdtemp()
+
+    try:
+        texfile = os.path.join(workdir, 'withdrawal_print.tex')
+        with open(texfile, 'w') as f:
+            f.write(django.template.loader.render_to_string("lasso_warehandling/withdrawal_print.tex", info, ctx).encode('utf-8'))
+
+        try:
+            subprocess.check_call(["pdflatex", "-interaction=batchmode", texfile], cwd=workdir)
+        except:
+            pass
+
+        pdffile = os.path.join(workdir, 'withdrawal_print.pdf')
+        with open(pdffile) as f:
+            pdf = f.read()
+
+        return django.http.HttpResponse(pdf, mimetype="application/pdf")
+    finally:
+        shutil.rmtree(workdir)
