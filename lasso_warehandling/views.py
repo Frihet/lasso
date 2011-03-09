@@ -14,6 +14,7 @@ import django.http
 import shutil
 import tempfile
 import subprocess
+import utils.latex
 
 class CostlogForm(forms.Form):
     year = forms.IntegerField(required=False, label=_("Year"))
@@ -154,7 +155,7 @@ def costlog(request, *arg, **kw):
                 i['sum']['cost'] += item.cost
                 i['sum']['total_cost'] += item.cost
 
-    return render_to_response('lasso_warehandling/costlog.html', info, context_instance=template.RequestContext(request))
+    return render_to_response('lasso_warehandling/costlog.html', info, template.RequestContext(request))
 
 @staff_member_required
 def withdrawal_print(request, withdrawal_id, *arg, **kw):
@@ -164,27 +165,4 @@ def withdrawal_print(request, withdrawal_id, *arg, **kw):
     info['nett_weight'] = sum(row.nett_weight for row in info['withdrawal'].rows.all())
     info['gross_weight'] = sum(row.gross_weight for row in info['withdrawal'].rows.all())
 
-    ctx = template.RequestContext(request)
-
-    if request.GET.get('format', '') == 'tex':
-        return django.http.HttpResponse(django.template.loader.render_to_string("lasso_warehandling/withdrawal_print.tex", info, ctx).encode('utf-8'), mimetype="text/plain")
-
-    workdir = tempfile.mkdtemp()
-
-    try:
-        texfile = os.path.join(workdir, 'withdrawal_print.tex')
-        with open(texfile, 'w') as f:
-            f.write(django.template.loader.render_to_string("lasso_warehandling/withdrawal_print.tex", info, ctx).encode('utf-8'))
-
-        try:
-            subprocess.check_call(["pdflatex", "-interaction=batchmode", texfile], cwd=workdir)
-        except:
-            pass
-
-        pdffile = os.path.join(workdir, 'withdrawal_print.pdf')
-        with open(pdffile) as f:
-            pdf = f.read()
-
-        return django.http.HttpResponse(pdf, mimetype="application/pdf")
-    finally:
-        shutil.rmtree(workdir)
+    return utils.latex.render_to_response("lasso_warehandling/withdrawal_print.tex", info, template.RequestContext(request))
