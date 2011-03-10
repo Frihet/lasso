@@ -239,6 +239,10 @@ def costlog(request, *arg, **kw):
     if kw != oldkw:
         return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw) + '?' + urllib.urlencode(request.GET))
 
+    params = dict(request.GET.iteritems())
+    params['format'] = 'pdf'
+    info['print_link'] = reverse('lasso_warehandling.views.costlog', kwargs=kw) + '?' + urllib.urlencode(params)
+
     if not request.user.has_perm('lasso_warehandling.view_costlog'):
         info['config_form'].fields['customer'].widget.attrs['disabled'] = 'disabled'
         info['config_form'].fields['entry'].queryset = info['config_form'].fields['entry'].queryset.filter(customer__in = request.user.groups.all())
