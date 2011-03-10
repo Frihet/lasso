@@ -11,7 +11,7 @@ def render_to_response(template, dct, context_instance):
 
     workdir = tempfile.mkdtemp()
     try:
-        texfile = os.path.join(workdir, 'withdrawal_print.tex')
+        texfile = os.path.join(workdir, 'print.tex')
         with open(texfile, 'w') as f:
             f.write(django.template.loader.render_to_string(template, dct, context_instance).encode('utf-8'))
 
@@ -20,7 +20,7 @@ def render_to_response(template, dct, context_instance):
         except:
             pass
 
-        pdffile = os.path.join(workdir, 'withdrawal_print.pdf')
+        pdffile = os.path.join(workdir, 'print.pdf')
         with open(pdffile) as f:
             pdf = f.read()
 

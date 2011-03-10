@@ -25,6 +25,8 @@ class CostlogForm(forms.Form):
     style = forms.ChoiceField(choices=(('long', _('Long')), ('short', _('Short'))), required=False, label=_("Style"))
     group_by = forms.ChoiceField(choices=(('all', _("Don't group")), ('customer', _('Customer')), ('entry', _('Entry')), ('entry_row', _('Entry row'))), required=False, label=_("Group by"))
 
+KWARG_PARAMS = ('year', 'month', 'customer', 'entry')
+
 def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filter, year, months, group_by = None):
     def setup_info():
         return {'sum_work': {'units': 0,
@@ -210,14 +212,14 @@ def costlog(request, *arg, **kw):
 
     if request.GET:
         info.update(request.GET.iteritems())
-        for name in ('year', 'month', 'customer', 'entry'):
+        for name in KWARG_PARAMS:
             if name in request.GET:
                 if request.GET[name]:
                     kw[name] = request.GET[name]
                 elif name in kw:
                     del kw[name]
 
-    if 'year' in kw and kw['year'] == '0':
+    if 'year' not in kw or kw['year'] == '0':
         today = datetime.date.today()
         kw['year'] = today.year
         kw['month'] = today.month
@@ -225,7 +227,7 @@ def costlog(request, *arg, **kw):
     group_by = request.GET.get('group_by', 'all')
 
     info.update(kw)
-
+    info['groups'] = []
     info['config_form'] = CostlogForm(info)
 
     if not request.user.has_perm('lasso_warehandling.view_storagelog'):
@@ -239,9 +241,18 @@ def costlog(request, *arg, **kw):
     if kw != oldkw:
         return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw) + '?' + urllib.urlencode(request.GET))
 
-    params = dict(request.GET.iteritems())
-    params['format'] = 'pdf'
-    info['print_link'] = reverse('lasso_warehandling.views.costlog', kwargs=kw) + '?' + urllib.urlencode(params)
+    def make_link(**kwargs):
+        new_params = dict(request.GET.iteritems())
+        new_kwargs = dict(kw)
+        for name, value in kwargs.iteritems():
+            if name in KWARG_PARAMS:
+                new_kwargs[name] = value
+            else:
+                new_params[name] = value
+        return reverse('lasso_warehandling.views.costlog', kwargs=new_kwargs) + '?' + urllib.urlencode(new_params)
+
+    info['print_link_lager_monatuebersicht'] = make_link(group_by = 'entry_row', format = 'pdf', template = 'lager_monatuebersicht')
+    info['print_link_lager_inventar_monat'] = make_link(group_by = 'entry_row', format = 'pdf', template = 'inventar_monat')
 
     if not request.user.has_perm('lasso_warehandling.view_costlog'):
         info['config_form'].fields['customer'].widget.attrs['disabled'] = 'disabled'
@@ -250,17 +261,19 @@ def costlog(request, *arg, **kw):
     if 'year' in kw:
         info.update(sum_costlog_data(group_by = [group_by], **kw_to_filters(**kw)))
 
-    if group_by == 'all':
-        info['groups'] = [info['total']]
-    elif group_by == 'customer':
-        info['groups'] = info['per_customer'].values()
-    elif group_by == 'entry':
-        info['groups'] = info['per_entry'].values()
-    elif group_by == 'entry_row':
-        info['groups'] = info['per_entry_row'].values()
+        if group_by == 'all':
+            info['groups'] = [info['total']]
+        elif group_by == 'customer':
+            info['groups'] = info['per_customer'].values()
+        elif group_by == 'entry':
+            info['groups'] = info['per_entry'].values()
+        elif group_by == 'entry_row':
+            info['groups'] = info['per_entry_row'].values()
 
     if request.GET.get('format', 'html') in ('tex', 'pdf'):
-        return utils.latex.render_to_response("lasso_warehandling/costlog.tex", info, template.RequestContext(request))
+        tpl = request.GET.get('template', 'lager_monatuebersicht')
+        assert '/' not in tpl
+        return utils.latex.render_to_response("lasso_warehandling/costlog/%s.tex" % (tpl,), info, template.RequestContext(request))
 
     return render_to_response('lasso_warehandling/costlog.html', info, template.RequestContext(request))
 
