@@ -88,6 +88,7 @@ class EntryAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EntryAdminForm, self).__init__(*args,**kwargs)
         self.fields['customer'].widget.attrs['class'] = 'autosubmit'
+        self.fields['original_seller'].widget.attrs['class'] = 'autosubmit'
 
 class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = EntryAdminForm
@@ -99,7 +100,7 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['customer'].data is not None:
+        if adminform.form['customer'].data:
             customer = Customer.objects.get(id=adminform.form['customer'].data)
 
             for unit_work_row in inlines_forms[self.inlines.index(EntryUnitWorkInline)].formset.forms:
@@ -112,6 +113,13 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
                 defaults = adminform.form['price'].field.queryset.filter(is_default=True)
                 if len(defaults) > 0:
                     adminform.form.data['price'] = defaults[0].id
+
+        if adminform.form['original_seller'].data:
+            original_seller = OriginalSeller.objects.get(id=adminform.form['original_seller'].data)
+
+            for entry_row in inlines_forms[self.inlines.index(EntryRowInline)].formset.forms:
+                if not entry_row.data[entry_row['origin'].html_name]:
+                    entry_row.data[entry_row['origin'].html_name] = original_seller.origin.id
 
 admin.site.register(Entry, EntryAdmin)
 
@@ -206,7 +214,7 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['customer'].data is not None:
+        if adminform.form['customer'].data:
             customer = Customer.objects.get(id=adminform.form['customer'].data)
 
             for unit_work_row in inlines_forms[self.inlines.index(WithdrawalUnitWorkInline)].formset.forms:

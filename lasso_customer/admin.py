@@ -55,7 +55,7 @@ class OrganizationAdmin(IntermediateFormHandlingAdminMixin, admin.ModelAdmin):
     fields = ('copy_from', 'title', 'address', 'phone', 'fax')
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['copy_from'].data is not None:
+        if adminform.form['copy_from'].data:
             org = Organization.objects.get(id=adminform.form['copy_from'].data)
             for attr in ["title", "address", "phone", "fax"]:
                 adminform.form.data[attr] = getattr(org, attr)
@@ -88,6 +88,7 @@ class OriginalSellerAdminForm(OrganizationAdminForm):
         model = OriginalSeller
 class OriginalSellerAdmin(OrganizationAdmin):
     form = OriginalSellerAdminForm
+    fields = OrganizationAdmin.fields + ('origin',)
 admin.site.register(OriginalSeller, OriginalSellerAdmin)
 
 class DestinationAdminForm(OrganizationAdminForm):
