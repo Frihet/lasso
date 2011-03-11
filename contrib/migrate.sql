@@ -142,3 +142,7 @@ update "lasso_warehandling_withdrawalrow" set "price_per_kilo_per_withdrawal" = 
 alter table "lasso_warehandling_withdrawal" drop column "price_per_kilo_per_withdrawal";
 alter table "lasso_warehandling_withdrawal" drop column "price_per_unit_per_withdrawal";
 alter table "lasso_warehandling_withdrawal" drop column "price_min_per_withdrawal";
+
+
+
+alter table "lasso_warehandling_withdrawalrow" add column "labels" integer NOT NULL default 0;

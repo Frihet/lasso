@@ -16,6 +16,8 @@ import tempfile
 import subprocess
 import utils.latex
 import urllib
+import socket
+import settings
 
 class CostlogForm(forms.Form):
     year = forms.IntegerField(required=False, label=_("Year"))
@@ -286,3 +288,80 @@ def withdrawal_print(request, withdrawal_id, *arg, **kw):
     info['gross_weight'] = sum(row.gross_weight for row in info['withdrawal'].rows.all())
 
     return utils.latex.render_to_response("lasso_warehandling/withdrawal_print.tex", info, template.RequestContext(request))
+
+def zencode(str):
+    return unicode(str).encode('cp850')
+
+def zprint(args,copies,lmarg=50, tmarg=25):
+    data = ''
+    for job in xrange(0, copies):
+        lheight = 60
+        lpos = tmarg
+        data += "^XA\n"
+        data += "^CI13\n"
+
+        platsize = 200
+        #data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg, tmarg, platsize, platsize, zencode(args['platform']))
+
+        # The barcode
+        text = zencode("%(id)s;%(arrival_date)s;%(units)s;%(use_before)s;%(product_description)s" % args)
+        data += "^FO%s,%s\n" % (lmarg + 300, tmarg)
+        data += "^BQN,N,5,N,N,N\n"
+        data +="^FD>;%s^FS\n" % (text,)
+
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg, 50, 50, zencode("FLS"))
+        #data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg + 50, 50, 50, zencode("Vecom"))
+
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg + 150, 50, 50, zencode(args['id']))
+
+        data += "^FO%s,%s^A0N,40,40^FD%s^FS\n" % (lmarg, tmarg + 200, "-------------------")
+
+        lpos = tmarg + 200 + lheight
+
+        text = zencode("""E. Datum: %(arrival_date)s
+Anz. Kart.: %(units)s
+Halt. Datum: %(use_before)s
+Art. Bez.: %(product_description)s""" % args)
+        for line in text.split("\n"):
+            data += "^FO%s,%s^A0N,40,40^A0,%s,%s^FD%s^FS\n" % (lmarg, lpos, lheight-5, lheight-5, line.strip())
+            lpos += lheight
+
+        # Job number
+        text = "%s/%s" % (job+1, copies)
+        data += "^FO%s,%s^A0N,40,40^A0,%s,%s^FD%s^FS\n" % (775-lmarg-len(text)*23, 600-lheight, lheight-5, lheight-5, text)
+
+        data += "^XZ\n"
+
+    print "==========================================================="
+    print data
+    return
+    fp = socket.create_connection(settings.LASSO_LABELPRINTING_PRINTER)
+    try:
+        # Not supported by ZPL emulation mode for Citizen
+        # fp.send("~HS\n")
+        # pstat = fp.recv(128).strip().split(",")
+        # paper_out = pstat[1]
+        # paused = pstat[2]
+        # if paper_out != "0":
+        #     raise Exception("Out of paper")
+        # if paused != "0":
+        #     raise Exception("Paused")
+        fp.send(data)
+    finally:
+        fp.close()
+
+
+@staff_member_required
+def withdrawal_print_labels(request, withdrawal_id, *arg, **kw):
+    withdrawal = Withdrawal.objects.get(id=withdrawal_id)
+    
+    for row in withdrawal.rows.all():
+        zprint(
+            {'id': row.id_str,
+             'arrival_date': row.entry_row.entry.arrival_date,
+             'units': row.entry_row.units,
+             'use_before': row.entry_row.use_before,
+             'product_description': row.entry_row.product_description},
+            row.labels)
+        
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

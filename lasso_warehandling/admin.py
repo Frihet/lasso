@@ -169,7 +169,7 @@ class WithdrawalUnitWorkInline(admin.TabularInline):
 class WithdrawalRowInline(admin.TabularInline):
     form = WithdrawalRowAdminForm
     model = WithdrawalRow
-    fields = ('entry_row', 'units', 'nett_weight', 'gross_weight')
+    fields = ('entry_row', 'units', 'nett_weight', 'gross_weight', 'labels')
 
 class WithdrawalAdminForm(forms.ModelForm):
     class Meta:
