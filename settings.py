@@ -78,6 +78,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'lasso.lasso_auth',
     'lasso.lasso_global',
     'lasso.lasso_warehouse',
     'lasso.lasso_customer',
