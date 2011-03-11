@@ -100,7 +100,7 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['customer'].data or adminform.form.initial['customer'] is not None:
+        if adminform.form['customer'].data or adminform.form.initial.get('customer', None) is not None:
             customer = Customer.objects.get(id=adminform.form['customer'].data or adminform.form.initial['customer'])
 
             for unit_work_row in inlines_forms[self.inlines.index(EntryUnitWorkInline)].formset.forms:
@@ -214,7 +214,7 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['customer'].data or adminform.form.initial['customer'] is not None:
+        if adminform.form['customer'].data or adminform.form.initial.get('customer', None) is not None:
             customer = Customer.objects.get(id=adminform.form['customer'].data or adminform.form.initial['customer'])
 
             for unit_work_row in inlines_forms[self.inlines.index(WithdrawalUnitWorkInline)].formset.forms:
@@ -224,7 +224,7 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
                 if not hasattr(withdrawal_row['entry_row'].field, 'orig_queryset'):
                     withdrawal_row['entry_row'].field.orig_queryset = withdrawal_row['entry_row'].field.queryset
                 #old = getattr(withdrawal_row.instance, "old_units_left", 0)
-                withdrawal_row['entry_row'].field.queryset = withdrawal_row['entry_row'].field.orig_queryset.filter(entry__customer = customer, units_left__gte = 0) 
+                withdrawal_row['entry_row'].field.queryset = withdrawal_row['entry_row'].field.orig_queryset.filter(entry__customer = customer, units_left__gt = 0).order_by("-entry__id", "-id")
 
     def set_defaults(self, request, initial):
         if 'responsible' not in initial:
