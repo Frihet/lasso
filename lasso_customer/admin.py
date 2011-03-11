@@ -17,6 +17,7 @@ class WarehandlingPriceInline(admin.TabularInline):
 
 class ContactAdminForm(forms.ModelForm):
     password = forms.CharField(label=_("Password"), required=False, widget=forms.PasswordInput)
+    username = forms.CharField(label=_("Username"), required=False, widget=forms.TextInput)
 
     class Meta:
         model = Contact
@@ -25,9 +26,11 @@ class ContactAdminForm(forms.ModelForm):
         super(ContactAdminForm, self).__init__(*args,**kwargs)
         if self.instance.pk is not None:
             self.initial['password'] = self.instance.password
+            self.initial['username'] = self.instance.username
 
     def save(self, commit=True):
         self.instance.password = self.cleaned_data['password']
+        self.instance.username = self.cleaned_data['username']
         return super(ContactAdminForm, self).save(commit)
 
     save.alters_data = True
