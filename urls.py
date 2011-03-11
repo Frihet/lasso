@@ -9,6 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
 
     (r'^lasso_warehandling/costlog/', include('lasso_warehandling.urls.costlog')),
+    (r'^lasso_warehandling/entry/', include('lasso_warehandling.urls.entry')),
     (r'^lasso_warehandling/withdrawal/', include('lasso_warehandling.urls.withdrawal')),
     (r'^lasso_warehouse/overview/', include('lasso_warehouse.urls.overview')),
     (r'^lasso_labelprinting/', include('lasso_labelprinting.urls')),

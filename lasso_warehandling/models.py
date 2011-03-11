@@ -308,7 +308,6 @@ class WithdrawalRow(models.Model):
     _nett_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, default=0, verbose_name=_("Nett weight"))
     old_gross_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, verbose_name=_("Old gross weight"))
     _gross_weight = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True, default=0, verbose_name=_("Gross weight"))
-    labels = models.IntegerField(verbose_name=_("Labels"), default=0)
 
     price_per_kilo_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per kilo per withdrawal"))
     price_per_unit_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, blank=True, verbose_name=_("Price per unit per withdrawal"))

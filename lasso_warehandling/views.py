@@ -352,16 +352,22 @@ Art. Bez.: %(product_description)s""" % args)
 
 
 @staff_member_required
-def withdrawal_print_labels(request, withdrawal_id, *arg, **kw):
-    withdrawal = Withdrawal.objects.get(id=withdrawal_id)
-    
-    for row in withdrawal.rows.all():
-        zprint(
-            {'id': row.id_str,
-             'arrival_date': row.entry_row.entry.arrival_date,
-             'units': row.entry_row.units,
-             'use_before': row.entry_row.use_before,
-             'product_description': row.entry_row.product_description},
-            row.labels)
-        
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+def entry_print(request, entry_id, *arg, **kw):
+    entry = Entry.objects.get(id=entry_id)
+    info = {'entry': entry}
+
+    if request.method == 'POST':
+        labels = 0
+        for row in entry.rows.all():
+            row_labels = int(request.POST.get(row.id_str + '_labels') or '0')
+            labels += row_labels
+            zprint(
+                {'id': row.id_str,
+                 'arrival_date': entry.arrival_date,
+                 'units': row.units,
+                 'use_before': row.use_before,
+                 'product_description': row.product_description},
+                row_labels)
+        info['messages'] = [_('%(labels)s labels printed') % {'labels': labels}]
+
+    return render_to_response('lasso_warehandling/print_entry.html', info, template.RequestContext(request))

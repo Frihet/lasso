@@ -109,7 +109,7 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
             if not hasattr(adminform.form['price'].field, 'orig_queryset'):
                 adminform.form['price'].field.orig_queryset = adminform.form['price'].field.queryset
             adminform.form['price'].field.queryset = adminform.form['price'].field.orig_queryset.filter(customer = customer) 
-            if adminform.form.data['price'] == '' or adminform.form['price'].field.queryset.filter(id=adminform.form.data['price']).count() == 0:
+            if adminform.form.data.get('price', '') == '' or adminform.form['price'].field.queryset.filter(id=adminform.form.data['price']).count() == 0:
                 defaults = adminform.form['price'].field.queryset.filter(is_default=True)
                 if len(defaults) > 0:
                     adminform.form.data['price'] = defaults[0].id
@@ -169,7 +169,7 @@ class WithdrawalUnitWorkInline(admin.TabularInline):
 class WithdrawalRowInline(admin.TabularInline):
     form = WithdrawalRowAdminForm
     model = WithdrawalRow
-    fields = ('entry_row', 'units', 'nett_weight', 'gross_weight', 'labels')
+    fields = ('entry_row', 'units', 'nett_weight', 'gross_weight')
 
 class WithdrawalAdminForm(forms.ModelForm):
     class Meta:

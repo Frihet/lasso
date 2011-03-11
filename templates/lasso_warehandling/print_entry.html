@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% load adminmedia %}
+{% load admin_list %}
+{% load i18n %}
+{% load i18next %}
+{% load datatypes %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block bodyclass %}costlog{% endblock %}
+
+{% if not is_popup %}
+  {% block breadcrumbs %}
+    <div class="breadcrumbs">
+      <a href="{% url admin:index %}">
+        {% trans "Home" %}
+      </a>
+      &rsaquo; 
+      <a href="{% url admin:app_list app_label="lasso_warehandling" %}">
+        {% trans "Warehandling" %}
+      </a>
+      &rsaquo; 
+      {% trans "Print labels" %}
+    </div>
+  {% endblock %}
+{% endif %}
+
+{% block content_title %}<h1>{% trans "Cost listing" %}</h1>{% endblock %}
+
+{% block content %}
+  <form method="POST">
+    <table>
+      <tr><th>{% trans "Product" %}</th><th>{% trans "Nr. of labels" %}</th></tr>
+      {% for row in entry.rows.all %}
+        <tr><td>{{ row }}</td><td><input name="{{ row.id_str }}_labels" value="{{ row.units }}"></td></tr>
+      {% endfor %}
+    </table>
+    <input type="submit" value="{% trans "Print labels" %}">
+  </form>  
+{% endblock %}
