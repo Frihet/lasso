@@ -12,17 +12,22 @@ def render_to_response(template, dct, context_instance):
     workdir = tempfile.mkdtemp()
     try:
         texfile = os.path.join(workdir, 'print.tex')
+        pdffile = os.path.join(workdir, 'print.pdf')
+        logfile = os.path.join(workdir, 'out.log')
+
         with open(texfile, 'w') as f:
             f.write(django.template.loader.render_to_string(template, dct, context_instance).encode('utf-8'))
 
-        try:
-            subprocess.check_call(["pdflatex", "-interaction=batchmode", texfile], cwd=workdir)
-        except:
-            pass
+        with open(logfile, 'w') as f:
+            status = subprocess.call(["pdflatex", "-interaction=batchmode", texfile], cwd=workdir, stdout=f, stderr=subprocess.STDOUT)
 
-        pdffile = os.path.join(workdir, 'print.pdf')
-        with open(pdffile) as f:
-            pdf = f.read()
+        if os.path.exists(pdffile):
+            with open(pdffile) as f:
+                pdf = f.read()
+        else:
+            with open(logfile) as f:
+                log = f.read()
+            raise Exception("Unable to render document (status=%s): %s" % (status, log))
 
         return django.http.HttpResponse(pdf, mimetype="application/pdf")
     finally:
