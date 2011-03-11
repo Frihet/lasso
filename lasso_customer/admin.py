@@ -14,6 +14,7 @@ class UnitWorkPricesInline(admin.TabularInline):
 
 class WarehandlingPriceInline(admin.TabularInline):
     model = WarehandlingPrice
+    exclude = ('price_per_unit_per_day', 'price_per_kilo_per_withdrawal', 'price_per_unit_per_withdrawal', 'price_min_per_withdrawal')
 
 class ContactAdminForm(forms.ModelForm):
     password = forms.CharField(label=_("Password"), required=False, widget=forms.PasswordInput)
@@ -72,18 +73,7 @@ class CustomerAdmin(OrganizationAdmin):
     form = CustomerAdminForm
     inlines = [UnitWorkPricesInline, WarehandlingPriceInline] + OrganizationAdmin.inlines
     fields = OrganizationAdmin.fields + ('customer_nr',)
-                                         
-                                         # 'price_per_kilo_per_day',
-                                         # 'price_per_kilo_per_entry',
-                                         # 'price_per_kilo_per_withdrawal',
-                                         
-                                         # 'price_per_unit_per_day',
-                                         # 'price_per_unit_per_entry',
-                                         # 'price_per_unit_per_withdrawal',
-                                         
-                                         # 'price_min_per_day',
-                                         # 'price_min_per_entry',
-                                         # 'price_min_per_withdrawal')
+
 admin.site.register(Customer, CustomerAdmin)
 
 class OriginalSellerAdminForm(OrganizationAdminForm):
