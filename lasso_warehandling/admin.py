@@ -100,8 +100,8 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['customer'].data:
-            customer = Customer.objects.get(id=adminform.form['customer'].data)
+        if adminform.form['customer'].data or adminform.form.initial['customer'] is not None:
+            customer = Customer.objects.get(id=adminform.form['customer'].data or adminform.form.initial['customer'])
 
             for unit_work_row in inlines_forms[self.inlines.index(EntryUnitWorkInline)].formset.forms:
                 unit_work_row['work_type'].field.queryset = unit_work_row['work_type'].field.queryset.filter(customer = customer)
@@ -214,8 +214,8 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
-        if adminform.form['customer'].data:
-            customer = Customer.objects.get(id=adminform.form['customer'].data)
+        if adminform.form['customer'].data or adminform.form.initial['customer'] is not None:
+            customer = Customer.objects.get(id=adminform.form['customer'].data or adminform.form.initial['customer'])
 
             for unit_work_row in inlines_forms[self.inlines.index(WithdrawalUnitWorkInline)].formset.forms:
                 unit_work_row['work_type'].field.queryset = unit_work_row['work_type'].field.queryset.filter(customer = customer)
