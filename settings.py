@@ -100,6 +100,8 @@ LASSO_DEFAULT_PLACE_OF_DEPARTURE="Pratteln"
 
 USE_L10N=True
 
+CONTENTTYPE_NO_TRAVERSE_PROXY=True
+
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
 for name in ['/etc/lasso.py', os.path.join(os.path.dirname(__file__), "local_settings.py")]:
