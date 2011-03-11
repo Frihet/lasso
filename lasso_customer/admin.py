@@ -44,7 +44,7 @@ class ContactInline(ExtendablePermissionAdminMixin, admin.TabularInline):
 
 class OrganizationAdminForm(forms.ModelForm):
     copy_from = forms.ModelChoiceField(
-        queryset=Organization.objects.all(),
+        queryset=Organization.objects.order_by("title").all(),
         required=False,
         label=_("Copy from"),
         widget = forms.ModelChoiceField.widget(attrs = {'class': 'autosubmit'}))
