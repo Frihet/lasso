@@ -114,12 +114,12 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
                 if len(defaults) > 0:
                     adminform.form.data['price'] = defaults[0].id
 
-        if adminform.form['original_seller'].data:
-            original_seller = OriginalSeller.objects.get(id=adminform.form['original_seller'].data)
+        # if adminform.form['original_seller'].data:
+        #     original_seller = OriginalSeller.objects.get(id=adminform.form['original_seller'].data)
 
-            for entry_row in inlines_forms[self.inlines.index(EntryRowInline)].formset.forms:
-                if not entry_row.data[entry_row['origin'].html_name]:
-                    entry_row.data[entry_row['origin'].html_name] = original_seller.origin.id
+        #     for entry_row in inlines_forms[self.inlines.index(EntryRowInline)].formset.forms:
+        #         if not entry_row.data[entry_row['origin'].html_name]:
+        #             entry_row.data[entry_row['origin'].html_name] = original_seller.origin.id
 
 admin.site.register(Entry, EntryAdmin)
 
