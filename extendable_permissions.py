@@ -71,7 +71,7 @@ class ExtendablePermissionAdminMixin(object):
         opts = self.opts
         perm = opts.app_label + '.%s_' + opts.object_name.lower()
 
-        if request.user.has_perm(perm % 'view'):
+        if request.user.has_perm(perm % 'change') or request.user.has_perm(perm % 'view'):
             return qs
         elif request.user.has_perm(perm % 'view_own'):
             if hasattr(self, "owner_field"):
