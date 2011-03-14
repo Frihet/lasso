@@ -66,7 +66,15 @@ def contact_pre_save(sender, instance, **kwargs):
     if instance.id is None:
         instance.is_staff = True
     if not instance.username:
+        # Hey, if this whole save is not in a transaction, this WILL have a RACE CONDITION!
         instance.username = re.compile(r"[^a-z0-9]").sub("_", ("%s %s" % (instance.first_name, instance.last_name)).lower())
+        count = ""
+        while User.objects.filter(username = instance.username + str(count)).count() > 0:
+            if count == "":
+                count = 0
+            else:
+                count = count + 1
+        instance.username += str(count)
     if '$' not in instance.password:
         instance.set_password(instance.password)
 pre_save.connect(contact_pre_save, sender=Contact)
