@@ -256,7 +256,7 @@ def costlog(request, *arg, **kw):
     info['print_link_lager_monatuebersicht'] = make_link(group_by = 'entry_row', format = 'pdf', template = 'lager_monatuebersicht')
     info['print_link_lager_inventar_monat'] = make_link(group_by = 'entry_row', format = 'pdf', template = 'inventar_monat')
 
-    if not request.user.has_perm('lasso_warehandling.view_costlog'):
+    if not request.user.has_perm('lasso_warehandling.view_storagelog'):
         info['config_form'].fields['customer'].widget.attrs['disabled'] = 'disabled'
         info['config_form'].fields['entry'].queryset = info['config_form'].fields['entry'].queryset.filter(customer__in = request.user.groups.all())
 
