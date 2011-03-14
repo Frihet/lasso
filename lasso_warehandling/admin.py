@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.db.models.signals import *
 from django import forms
 from extendable_permissions import *
+from django.db.models import Q
 import utils
 import django.forms.util
 import decimal
@@ -221,10 +222,17 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
                 unit_work_row['work_type'].field.queryset = unit_work_row['work_type'].field.queryset.filter(customer = customer)
 
             for withdrawal_row in inlines_forms[self.inlines.index(WithdrawalRowInline)].formset.forms:
-                if not hasattr(withdrawal_row['entry_row'].field, 'orig_queryset'):
-                    withdrawal_row['entry_row'].field.orig_queryset = withdrawal_row['entry_row'].field.queryset
-                #old = getattr(withdrawal_row.instance, "old_units_left", 0)
-                withdrawal_row['entry_row'].field.queryset = withdrawal_row['entry_row'].field.orig_queryset.filter(entry__customer = customer, units_left__gt = 0).order_by("-entry__id", "-id")
+                field = withdrawal_row['entry_row'].field
+                if not hasattr(field, 'orig_queryset'):
+                    field.orig_queryset = field.queryset
+                
+                field.queryset = field.orig_queryset.filter(entry__customer = customer)
+                if withdrawal_row.instance.id is None:
+                    field.queryset = field.queryset.filter(units_left__gt = 0)
+                else:
+                    field.queryset = field.queryset.filter(Q(units_left__gt = 0) | Q(id = withdrawal_row.instance.entry_row.id))
+
+                field.queryset = field.queryset.order_by("-entry__id", "-id")
 
     def set_defaults(self, request, initial):
         if 'responsible' not in initial:
