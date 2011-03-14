@@ -59,7 +59,7 @@ class Contact(User):
     address = models.TextField(blank=True, verbose_name=_("Address"))
     phone = models.CharField(max_length=200, blank=True, verbose_name=_("Phone"))
     fax = models.CharField(max_length=200, blank=True, verbose_name=_("Fax"))
-    organization = models.ForeignKey(Organization, verbose_name=_("Organization"))
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="contacts")
     title = models.CharField(max_length=30, blank=True, verbose_name=_("Title"))
 
 def contact_pre_save(sender, instance, **kwargs):
