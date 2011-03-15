@@ -245,11 +245,13 @@ def costlog(request, *arg, **kw):
             kw['customer'] = customers[0].id
 
     if 'action_lager_monatuebersicht' in params:
+        params['group_by'] = 'entry_row'
         params['format'] = 'pdf'
         params['template'] = 'lager_monatuebersicht'
         del params['action_lager_monatuebersicht']
 
     if 'action_lager_inventar_monat' in params:
+        params['group_by'] = 'entry_row'
         params['format'] = 'pdf'
         params['template'] = 'inventar_monat'
         del params['action_lager_inventar_monat']
