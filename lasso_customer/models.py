@@ -34,6 +34,7 @@ class Organization(Group):
         verbose_name_plural = _('Organizations')
 
     title = models.CharField(max_length=200, blank=True, verbose_name=_("Title"))
+    short_title = models.CharField(max_length=4, blank=True, verbose_name=_("Short title/initials"))
     address = models.TextField(blank=True, verbose_name=_("Address"))
     phone = models.CharField(max_length=200, blank=True, verbose_name=_("Phone"))
     fax = models.CharField(max_length=200, blank=True, verbose_name=_("Fax"))

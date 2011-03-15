@@ -56,7 +56,7 @@ class OrganizationAdminForm(forms.ModelForm):
 class OrganizationAdmin(IntermediateFormHandlingAdminMixin, admin.ModelAdmin):
     inlines = [ContactInline]
     search_fields = ('title',)
-    fields = ('copy_from', 'title', 'address', 'phone', 'fax')
+    fields = ('copy_from', 'title', 'short_title', 'address', 'phone', 'fax')
 
     def cross_verify_forms(self, adminform, inlines_forms):
         if adminform.form['copy_from'].data:

@@ -103,7 +103,6 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
     def calculate_short_storage_log(info):
         last_short = None
         for d in dates:
-            last_long = info['storage_log'].get(d - datetime.timedelta(1), None)
             current_long = info['storage_log'][d]
 
             if (last_short is None or
@@ -334,33 +333,33 @@ def zencode(str):
 def zprint(args,copies,lmarg=50, tmarg=25):
     data = ''
     for job in xrange(0, copies):
-        lheight = 60
+        lheight = 50
         lpos = tmarg
         data += "^XA\n"
         data += "^CI13\n"
 
-        platsize = 200
-        #data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg, tmarg, platsize, platsize, zencode(args['platform']))
+        idsize = 60
+        namesize = 40
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg, tmarg, idsize, idsize, zencode("FLS"))
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg, tmarg + idsize, idsize, idsize, zencode(args['id'] + " / " + args['year'] + " " + args['customer_initials']))
 
         # The barcode
         text = zencode("%(id)s;%(arrival_date)s;%(units)s;%(use_before)s;%(product_description)s" % args)
-        data += "^FO%s,%s\n" % (lmarg + 300, tmarg)
+        data += "^FO%s,%s\n" % (lmarg + 550, tmarg)
         data += "^BQN,N,5,N,N,N\n"
         data +="^FD>;%s^FS\n" % (text,)
 
-        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg, 50, 50, zencode("FLS"))
-        #data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg + 50, 50, 50, zencode("Vecom"))
+        data += "^FO%s,%s^A0N,40,40^FD%s^FS\n" % (lmarg, tmarg + 2*idsize + 50, "-------------------")
+        lpos = tmarg + 2*idsize + 50 + lheight
+        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg, lpos, namesize, namesize, zencode(args['customer_name']))
 
-        data += "^FO%s,%s^A0N,40,40^A0%s,%s^FD%s^FS\n" % (lmarg + 550, tmarg + 150, 50, 50, zencode(args['id']))
+        lpos += lheight
 
-        data += "^FO%s,%s^A0N,40,40^FD%s^FS\n" % (lmarg, tmarg + 200, "-------------------")
-
-        lpos = tmarg + 200 + lheight
-
-        text = zencode("""E. Datum: %(arrival_date)s
-Anz. Kart.: %(units)s
+        text = zencode("""E. Datum:     %(arrival_date)s
+Anz. Kart.:    %(units)s
 Halt. Datum: %(use_before)s
-Art. Bez.: %(product_description)s""" % args)
+Art. Bez.:
+%(product_description)s""" % args)
         for line in text.split("\n"):
             data += "^FO%s,%s^A0N,40,40^A0,%s,%s^FD%s^FS\n" % (lmarg, lpos, lheight-5, lheight-5, line.strip())
             lpos += lheight
@@ -373,7 +372,6 @@ Art. Bez.: %(product_description)s""" % args)
 
     print "==========================================================="
     print data
-    return
     fp = socket.create_connection(settings.LASSO_LABELPRINTING_PRINTER)
     try:
         # Not supported by ZPL emulation mode for Citizen
@@ -402,9 +400,12 @@ def entry_print(request, entry_id, *arg, **kw):
             labels += row_labels
             zprint(
                 {'id': row.id_str,
-                 'arrival_date': entry.arrival_date,
+                 'customer_name': entry.customer.title,
+                 'customer_initials': entry.customer.short_title,
+                 'year': entry.arrival_date.strftime("%Y"),
+                 'arrival_date': entry.arrival_date.strftime("%d.%m.%Y"),
                  'units': row.units,
-                 'use_before': row.use_before,
+                 'use_before': row.use_before.strftime("%d.%m.%Y"),
                  'product_description': row.product_description},
                 row_labels)
         info['messages'] = [_('%(labels)s labels printed') % {'labels': labels}]
