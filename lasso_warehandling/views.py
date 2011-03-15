@@ -55,10 +55,17 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
                 'withdrawal_items': {},
                 'storage_items': {}}
 
+    last_date = datetime.date.today()
+    logs = StorageLog.objects.filter(**storage_filter).order_by("-date")
+    if len(logs):
+        last_date = logs[0].date
+
     dates = []
     for month in months:
         for day in xrange(1, calendar.monthrange(year, month)[1]+1):
-            dates.append(datetime.date(year, month, day) )
+            d = datetime.date(year, month, day)
+            if d <= last_date:
+                dates.append(d)
 
     def setup_full_info():
         res = setup_info()
@@ -94,22 +101,38 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
         return infos
 
     def calculate_short_storage_log(info):
-        last = None
+        last_short = None
         for d in dates:
-            if (last is None or
-                info['storage_log'][d]['entry_items'] or
-                info['storage_log'][d]['work_items'] or
-                info['storage_log'][d]['withdrawal_items']):
+            last_long = info['storage_log'].get(d - datetime.timedelta(1), None)
+            current_long = info['storage_log'][d]
 
-                last = dict((key, dict(value)) for key, value in info['storage_log'][d].iteritems())
-                last['days'] = 0
-                last['start_date'] = d
-                info['short_storage_log'].append(last)
-            else:
-                for key in ('cost', 'total_cost'):
-                    last['sum'][key] += info['storage_log'][d]['sum'][key]
-            last['days'] += 1
-            last['end_date'] = d
+            if (last_short is None or
+                current_long['entry_items']):
+
+                last_short = setup_info()
+                last_short['days'] = 0
+                last_short['start_date'] = d
+                info['short_storage_log'].append(last_short)
+
+            for group in ('sum_work', 'sum_in', 'sum_out'):
+                for key, value in current_long[group].iteritems():
+                    last_short[group][key] += value
+
+            for key in ('units', 'nett_weight', 'gross_weight'):
+                last_short['sum'][key] = current_long['sum'][key]
+            for key in ('cost', 'total_cost'):
+                last_short['sum'][key] += current_long['sum'][key]
+
+            last_short['days'] += 1
+            last_short['end_date'] = d
+
+            if current_long['withdrawal_items']:
+                last_short = None
+
+        if info['short_storage_log'] and info['short_storage_log'][0]['sum']['units'] == 0 and info['short_storage_log'][0]['sum']['total_cost'] == 0:
+            del info['short_storage_log'][0]
+        if info['short_storage_log'] and info['short_storage_log'][-1]['sum']['units'] == 0 and info['short_storage_log'][-1]['sum']['total_cost'] == 0:
+            del info['short_storage_log'][-1]
 
     info = {'dates': dates,
             'total': setup_full_info(),

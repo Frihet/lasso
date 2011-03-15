@@ -160,6 +160,12 @@ class EntryRow(models.Model):
     def id_str(self):
         return "%s.%s" % (self.entry.id, self.id)
 
+    @property
+    def last_log(self):
+        logs = self.logs.order_by("-date")
+        if not len(logs): return None
+        return logs[0]
+
     def log(self, until = None):
         # Note: Don't log today until tomorrow, stuff might be added afterwards!
         # Units left doesn't change until the day after a withdrawal, but on the same day for an entry!
@@ -207,6 +213,10 @@ class EntryRow(models.Model):
                 log_item.price_min_per_day = self.entry.price.price_min_per_day
                 log_item.save()
                 log_items.append(log_item)
+                if units_left == 0:
+                    break
+            if units_left == 0:
+                break
             last_date = next_date
             units_left -= withdrawal_row.units
             if not self.auto_weight:

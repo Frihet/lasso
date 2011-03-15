@@ -84,7 +84,7 @@
       \multicolumn{1}{c}{\em{Brutto}} &
       \multicolumn{1}{c}{\em{Datum}}
     \tabularnewline
-    {% for group in groups %}{% with group.short_storage_log|last as log_item %}
+    {% for group in groups %}{% if group.obj %}{% with group.short_storage_log|last as log_item %}
       {{ group.obj.id_str }} &
       {{ group.obj.entry.arrival_date|date:"Y-m-d" }} &
       {{ group.obj.product_description }} &
@@ -97,9 +97,9 @@
       {{ log_item.sum.units }} &
       {{ log_item.sum.nett_weight|floatformat:-6 }} &
       {{ log_item.sum.gross_weight|floatformat:-6 }} &
-
+      {% if group.obj.last_log.units_left == 0 %}{{ group.obj.last_log.date|date:"Y-m-d" }}{% endif %}
       \tabularnewline
-    {% endwith %}{% endfor %}
+    {% endwith %}{% endif %}{% endfor %}
     \end{longtable}
   \end{small}
 

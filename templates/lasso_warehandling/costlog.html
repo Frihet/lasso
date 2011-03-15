@@ -53,6 +53,7 @@
 	    {% if style == "short" %}
 	      <th>{% trans "Start date" %}</th>
 	      <th>{% trans "End date" %}</th>
+	       <th>{% trans "Days" %}</th>
 	    {% else %}
 	       <th>{% trans "Date" %}</th>
 	    {% endif %}
@@ -62,6 +63,7 @@
 	    <th>{% trans "Transaction details" %}</th>
 	    <th class="align-right">{% trans "Gross saldo" %}</th>
 	    <th class="align-right">{% trans "Nett saldo" %}</th>
+	    <th class="align-right">{% trans "Units saldo" %}</th>
 	    <th class="align-right">{% trans "Entry cost" %}</th>
 	    <th class="align-right">{% trans "Withdrawal cost" %}</th>
 	    <th class="align-right">{% trans "Work cost" %}</th>
@@ -76,6 +78,7 @@
 	      <tr class="{% cycle 'row1' 'row2' %}">
 		<td>{{ log_item.start_date|date:"Y-m-d" }}</td>
 		<td>{{ log_item.end_date|date:"Y-m-d" }}</td>
+		<td>{{ log_item.days }}</td>
 		<td class="align-right">{{ log_item.sum_in.gross_weight|lst|append:log_item.sum_out.gross_weight|sepformat:-6 }}</td>
 		<td class="align-right">{{ log_item.sum_in.nett_weight|lst|append:log_item.sum_out.nett_weight|sepformat:-6 }}</td>
 		<td class="align-right">{{ log_item.sum_in.units|lst|append:log_item.sum_out.units|sepformat:-6 }}</td>
@@ -90,6 +93,7 @@
 		</td>
 		<td class="align-right">{{ log_item.sum.gross_weight|floatformat:"-6" }}</td>
 		<td class="align-right">{{ log_item.sum.nett_weight|floatformat:"-6" }}</td>
+		<td class="align-right">{{ log_item.sum.units }}</td>
 		<td class="align-right">{{ log_item.sum_in.entry_cost|floatformat:"-2" }}</td>
 		<td class="align-right">{{ log_item.sum_out.cost|floatformat:"-2" }}</td>
 		<td class="align-right">{{ log_item.sum_work.cost|floatformat:"-2" }}</td>
@@ -118,6 +122,7 @@
 		  </td>
 		  <td class="align-right">{{ items_for_date.sum.gross_weight|floatformat:"-6" }}</td>
 		  <td class="align-right">{{ items_for_date.sum.nett_weight|floatformat:"-6" }}</td>
+		  <td class="align-right">{{ items_for_date.sum.units }}</td>
 		  <td class="align-right">{{ items_for_date.sum_in.entry_cost|floatformat:"-2" }}</td>
 		  <td class="align-right">{{ items_for_date.sum_out.cost|floatformat:"-2" }}</td>
 		  <td class="align-right">{{ items_for_date.sum_work.cost|floatformat:"-2" }}</td>
@@ -133,11 +138,13 @@
 	  <tr>
 	    {% if style == "short" %}
 	      <th></th>
+	      <th></th>
 	    {% endif %}
 	    <th style="padding-bottom: 20pt">{% trans "Sum" %}</th>
 	    <td class="align-right">{{ group.sum_in.gross_weight|lst|append:group.sum_out.gross_weight|sepformat:-6 }}</td>
 	    <td class="align-right">{{ group.sum_in.nett_weight|lst|append:group.sum_out.nett_weight|sepformat:-6 }}</td>
 	    <td class="align-right">{{ group.sum_in.units|lst|append:group.sum_out.units|sepformat:-6 }}</td>
+	    <td></td>
 	    <td></td>
 	    <td></td>
 	    <td></td>
