@@ -451,9 +451,9 @@ class StorageLog(models.Model):
     @property
     def gross_weight_left(self):
         if  self.entry_row.auto_weight:
-            return self.entry_row.nett_weight_per_unit * self.units_left
+            return self.entry_row.gross_weight_per_unit * self.units_left
         else:
-            return self._nett_weight_left
+            return self._gross_weight_left
 
     def __unicode__(self):
         return u"%s for %s: %s à %s/kg + %s/unit" % (self.date, self.entry_row, self.units_left, self.price_per_kilo_per_day, self.price_per_unit_per_day)
