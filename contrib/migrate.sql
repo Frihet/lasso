@@ -146,3 +146,4 @@ alter table "lasso_warehandling_withdrawal" drop column "price_min_per_withdrawa
 
 
 alter table "lasso_warehandling_withdrawalrow" add column "labels" integer NOT NULL default 0;
+alter table "lasso_customer_organization" add column "short_title" varchar(4) NOT NULL default '';
