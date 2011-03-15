@@ -76,13 +76,13 @@
     \vspace{10pt}\tabularnewline
       Artikelbezeichnung: &
       \multicolumn{5}{p{400pt}}{% templatetag openbrace %}{{ group.obj.product_description }}}
-    \vspace{10pt}\tabularnewline{% with group.short_storage_log|last as log_item %}
+    \vspace{10pt}\tabularnewline
       Anzahl Karton: &
-      {{ log_item.sum.units }} &
+      {{ group.obj.units }} &
       Netto: &
-      {{ log_item.sum.nett_weight|floatformat:-6 }} &
+      {{ group.obj.nett_weight|floatformat:-6 }} &
       Brutto: &
-      {{ log_item.sum.gross_weight|floatformat:-6 }} &{% endwith %}
+      {{ group.obj.gross_weight|floatformat:-6 }} &
     \end{longtable}
 
 
