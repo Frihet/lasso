@@ -65,6 +65,7 @@
 	    <th class="align-right">{% trans "Transaction units" %}</th>
 	    <th>{% trans "Transaction details" %}</th>
 	    <th class="align-right">{% trans "Gross saldo" %}</th>
+	    <th class="align-right">{% trans "Nett saldo" %}</th>
 	    <th class="align-right">{% trans "Entry cost" %}</th>
 	    <th class="align-right">{% trans "Withdrawal cost" %}</th>
 	    <th class="align-right">{% trans "Work cost" %}</th>
@@ -92,6 +93,7 @@
 		  {% endfor %}
 		</td>
 		<td class="align-right">{{ log_item.sum.gross_weight|floatformat:"-6" }}</td>
+		<td class="align-right">{{ log_item.sum.nett_weight|floatformat:"-6" }}</td>
 		<td class="align-right">{{ log_item.sum_in.entry_cost|floatformat:"-2" }}</td>
 		<td class="align-right">{{ log_item.sum_out.cost|floatformat:"-2" }}</td>
 		<td class="align-right">{{ log_item.sum_work.cost|floatformat:"-2" }}</td>
@@ -119,6 +121,7 @@
 		    {% endfor %}
 		  </td>
 		  <td class="align-right">{{ items_for_date.sum.gross_weight|floatformat:"-6" }}</td>
+		  <td class="align-right">{{ items_for_date.sum.nett_weight|floatformat:"-6" }}</td>
 		  <td class="align-right">{{ items_for_date.sum_in.entry_cost|floatformat:"-2" }}</td>
 		  <td class="align-right">{{ items_for_date.sum_out.cost|floatformat:"-2" }}</td>
 		  <td class="align-right">{{ items_for_date.sum_work.cost|floatformat:"-2" }}</td>
@@ -139,6 +142,7 @@
 	    <td class="align-right">{{ group.sum_in.gross_weight|lst|append:group.sum_out.gross_weight|sepformat:-6 }}</td>
 	    <td class="align-right">{{ group.sum_in.nett_weight|lst|append:group.sum_out.nett_weight|sepformat:-6 }}</td>
 	    <td class="align-right">{{ group.sum_in.units|lst|append:group.sum_out.units|sepformat:-6 }}</td>
+	    <td></td>
 	    <td></td>
 	    <td></td>
 	    <td class="align-right">{{ group.sum_in.entry_cost|floatformat:"-2" }}</td>
