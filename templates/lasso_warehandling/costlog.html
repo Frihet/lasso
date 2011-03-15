@@ -30,19 +30,15 @@
 {% block content_title %}<h1>{% trans "Cost listing" %}</h1>{% endblock %}
 
 {% block content %}
-  {% block object-tools %}
-    <ul class="object-tools">
-      <li><a href="{{ print_link_lager_monatuebersicht }}" class="printlink">{% trans "Lager monatübersicht" %}</a></li>
-      <li><a href="{{ print_link_lager_inventar_monat }}" class="printlink">{% trans "Lager inventar monat" %}</a></li>
-    </ul>
-  {% endblock %}
-
   <form method="GET">
     {{ config_form.as_p }}
-    <input type="submit" value="{% trans "Go" %}">
+    <input type="submit" name="action_lager_monatuebersicht" value="{% trans "Lager monatübersicht" %}">
+    <input type="submit" name="action_lager_inventar_monat" value="{% trans "Lager inventar monat" %}">
+    <br><br>
+    <input type="submit" value="{% trans "Show report" %}">
   </form>
 
-
+  <br/>
 
   <div id="changelist" class="module">
     <table cellspacing="0">

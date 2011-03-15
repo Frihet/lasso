@@ -212,6 +212,8 @@ def empty_filters():
 @staff_member_required
 def costlog(request, *arg, **kw):
     oldkw = dict(kw)
+    params = dict(request.GET.iteritems())
+    oldparams = dict(params)
     info = {}
 
     if request.GET:
@@ -242,8 +244,18 @@ def costlog(request, *arg, **kw):
         if 'customer' not in kw or int(kw['customer']) not in [customer.id for customer in customers]:
             kw['customer'] = customers[0].id
 
-    if kw != oldkw:
-        return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw) + '?' + urllib.urlencode(request.GET))
+    if 'action_lager_monatuebersicht' in params:
+        params['format'] = 'pdf'
+        params['template'] = 'lager_monatuebersicht'
+        del params['action_lager_monatuebersicht']
+
+    if 'action_lager_inventar_monat' in params:
+        params['format'] = 'pdf'
+        params['template'] = 'inventar_monat'
+        del params['action_lager_inventar_monat']
+
+    if kw != oldkw or params != oldparams:
+        return HttpResponseRedirect(reverse('lasso_warehandling.views.costlog', kwargs=kw) + '?' + urllib.urlencode(params))
 
     def make_link(**kwargs):
         new_params = dict(request.GET.iteritems())
