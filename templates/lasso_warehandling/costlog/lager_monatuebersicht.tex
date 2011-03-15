@@ -102,7 +102,7 @@
       \tabularnewline
         {% for log_item in group.short_storage_log %}
           {{ log_item.start_date|date:"d" }} - {{ log_item.end_date|date:"d" }} &
-          &
+          {{ log_item.days }} &
           {{ log_item.sum.units }} &
           {{ log_item.sum.nett_weight|floatformat:-6 }} &
           {{ log_item.sum.gross_weight|floatformat:-6 }} &

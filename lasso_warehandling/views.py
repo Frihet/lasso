@@ -102,11 +102,13 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
                 info['storage_log'][d]['withdrawal_items']):
 
                 last = dict((key, dict(value)) for key, value in info['storage_log'][d].iteritems())
+                last['days'] = 0
                 last['start_date'] = d
                 info['short_storage_log'].append(last)
             else:
                 for key in ('cost', 'total_cost'):
                     last['sum'][key] += info['storage_log'][d]['sum'][key]
+            last['days'] += 1
             last['end_date'] = d
 
     info = {'dates': dates,
