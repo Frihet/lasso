@@ -168,9 +168,10 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
 
     # Overwrite wrong sums from above using date based sums...
     def fix_non_date_based_sums(i):
-        last_log_date = max(i['storage_log'].keys())
-        for part in ('units', 'nett_weight', 'gross_weight'):
-            i['sum'][part] = i['storage_log'][last_log_date]['sum'][part]
+        if i['storage_log']:
+            last_log_date = max(i['storage_log'].keys())
+            for part in ('units', 'nett_weight', 'gross_weight'):
+                i['sum'][part] = i['storage_log'][last_log_date]['sum'][part]
 
     def calculate_short_storage_log(info):
         last_short = None
