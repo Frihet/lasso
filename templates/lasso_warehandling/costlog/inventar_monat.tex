@@ -97,7 +97,7 @@
       {{ log_item.sum.units }} &
       {{ log_item.sum.nett_weight|floatformat:-6 }} &
       {{ log_item.sum.gross_weight|floatformat:-6 }} &
-      {% if log_item.end_date.year == group.obj.last_log.date.year and log_item.end_date.month == group.obj.last_log.date.month %}{% if group.obj.last_log.units_left == 0 %}{{ group.obj.last_log.date|date:"Y-m-d" }}{% endif %}{% endif %}
+      {% if log_item.sum.units|asub:log_item.sum_out.units == 0 %}{{ log_item.end_date|date:"m.d.Y" }}{% endif %}
       \tabularnewline
     {% endwith %}{% endif %}{% endfor %}
       \multicolumn{1}{l}{\em{Total:}} &
@@ -113,12 +113,7 @@
       {{ total.sum.nett_weight|floatformat:-6 }} &
       {{ total.sum.gross_weight|floatformat:-6 }} &
       \tabularnewline
-      &
-      &
-      &
-      &
-      &
-      \multicolumn{1}{l}{\em{XXVersicherungskostenXX:}} &
+      \multicolumn{6}{r}{\em{XXVersicherungskostenXX:}} &
       {{ total.orig_sum.insurance_cost|floatformat:-2 }} &
       &
       &

@@ -76,3 +76,7 @@ def sepformat(values, fmt):
     if value2:
         res += "-%s" % (django.template.defaultfilters.floatformat(value2, fmt),)
     return res
+
+@register.filter
+def asub(value1, value2):
+    return value1 - value2
