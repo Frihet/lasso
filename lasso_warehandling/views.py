@@ -198,6 +198,9 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             last_short['days'] += 1
             last_short['end_date'] = d
 
+            for item_type in ('customers', 'entry_items', 'work_items', 'withdrawal_items', 'storage_items'):
+                last_short[item_type].update(current_long[item_type])
+
             if current_long['withdrawal_items']:
                 last_short = None
 
