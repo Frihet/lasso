@@ -53,16 +53,10 @@
 
         \begin{longtable}{p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}}
           Lagerhalter: &
-          {{ group.obj.entry.customer|default_if_none:"-" }} &
-          &
-          &
-          &
+          \multicolumn{5}{p{400pt}}{% templatetag openbrace %}{{ group.obj.entry.customer|default_if_none:"-" }} }
         \vspace{10pt}\tabularnewline
           Lieferant: &
-          {{ group.obj.entry.original_seller|default_if_none:"-" }} &
-          &
-          &
-          &
+          \multicolumn{5}{p{400pt}}{% templatetag openbrace %}{{ group.obj.entry.original_seller|default_if_none:"-" }} }
         \vspace{10pt}\tabularnewline
           Verzollt: &
           {{ group.obj.entry.custom_handling_date|default_if_none:"-" }} &
