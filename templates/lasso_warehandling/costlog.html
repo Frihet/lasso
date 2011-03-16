@@ -46,16 +46,16 @@
         <tbody>
 	  {% if group.obj %}
             <tr>
-              <th colspan="{% if style == "short" %}13{% else %}12{% endif %}">{{ group.obj }}</th>
+              <th colspan="{% if style == "short" %}16{% else %}14{% endif %}">{{ group.obj }}</th>
             </tr>
 	  {% endif %}
 	  <tr>
 	    {% if style == "short" %}
 	      <th>{% trans "Start date" %}</th>
 	      <th>{% trans "End date" %}</th>
-	       <th>{% trans "Days" %}</th>
+	      <th>{% trans "Days" %}</th>
 	    {% else %}
-	       <th>{% trans "Date" %}</th>
+	      <th>{% trans "Date" %}</th>
 	    {% endif %}
 	    <th class="align-right">{% trans "Gross transaction" %}</th>
 	    <th class="align-right">{% trans "Nett transaction" %}</th>
@@ -145,9 +145,9 @@
 	    <td class="align-right">{{ group.sum_in.nett_weight|lst|append:group.sum_out.nett_weight|sepformat:-6 }}</td>
 	    <td class="align-right">{{ group.sum_in.units|lst|append:group.sum_out.units|sepformat:-6 }}</td>
 	    <td></td>
-	    <td></td>
-	    <td></td>
-	    <td></td>
+	    <td class="align-right">{{ group.sum.gross_weight|floatformat:"-6" }}</td>
+	    <td class="align-right">{{ group.sum.nett_weight|floatformat:"-6" }}</td>
+	    <td class="align-right">{{ group.sum.units }}</td>
 	    <td class="align-right">{{ group.sum_in.entry_cost|floatformat:"-2" }}</td>
 	    <td class="align-right">{{ group.sum_out.cost|floatformat:"-2" }}</td>
 	    <td class="align-right">{{ group.sum_work.cost|floatformat:"-2" }}</td>
@@ -157,6 +157,28 @@
 	  </tr>
         </tbody>
       {% endfor %}
+      <tbody>
+	<tr>
+	  {% if style == "short" %}
+	    <th></th>
+	    <th></th>
+	  {% endif %}
+	  <th style="padding-bottom: 20pt">{% trans "Total sum" %}</th>
+	  <td class="align-right">{{ total.sum_in.gross_weight|lst|append:total.sum_out.gross_weight|sepformat:-6 }}</td>
+	  <td class="align-right">{{ total.sum_in.nett_weight|lst|append:total.sum_out.nett_weight|sepformat:-6 }}</td>
+	  <td class="align-right">{{ total.sum_in.units|lst|append:total.sum_out.units|sepformat:-6 }}</td>
+	  <td></td>
+	  <td class="align-right">{{ total.sum.gross_weight|floatformat:"-6" }}</td>
+	  <td class="align-right">{{ total.sum.nett_weight|floatformat:"-6" }}</td>
+	  <td class="align-right">{{ total.sum.units }}</td>
+	  <td class="align-right">{{ total.sum_in.entry_cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ total.sum_out.cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ total.sum_work.cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ total.sum_in.insurance_cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ total.sum.cost|floatformat:"-2" }}</td>
+	  <td class="align-right">{{ total.sum.total_cost|floatformat:"-2" }}</td>
+	</tr>
+      </tbody>
     </table>
   </div>
   

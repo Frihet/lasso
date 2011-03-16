@@ -29,7 +29,13 @@ class CostlogForm(forms.Form):
 
 KWARG_PARAMS = ('year', 'month', 'customer', 'entry')
 
-def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filter, year, months, group_by = None):
+def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filter, year, months, group_by = 'entry_row'):
+    group_by_map = {'all': 0,
+                    'customer': 1,
+                    'entry': 2,
+                    'entry_row': 3}
+    group_by = group_by_map[group_by]
+
     def setup_info():
         return {'sum_work': {'units': 0,
                              'cost':0},
@@ -80,58 +86,25 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
         customer_id = customer and customer.id or None
         entry_id = entry and entry.id or None
         entry_row_id = entry_row and entry_row.id or None
-        if (group_by is None or 'customer' in group_by) and customer_id not in info['per_customer']:
+        if group_by >= group_by_map['customer'] and customer_id not in info['per_customer']:
             info['per_customer'][customer_id] = setup_full_info()
             info['per_customer'][customer_id]['obj'] = customer
-        if (group_by is None or 'entry' in group_by) and entry_id not in info['per_entry']:
+        if group_by >= group_by_map['entry'] and entry_id not in info['per_entry']:
             info['per_entry'][entry_id] = setup_full_info()
             info['per_entry'][entry_id]['obj'] = entry
-        if (group_by is None or 'entry_row' in group_by) and entry_row_id not in info['per_entry_row']:
+        if group_by >= group_by_map['entry_row'] and entry_row_id not in info['per_entry_row']:
             info['per_entry_row'][entry_row_id] = setup_full_info()
             info['per_entry_row'][entry_row_id]['obj'] = entry_row
         infos = ()
-        if group_by is None or 'all' in group_by:
+        if group_by >= group_by_map['all']:
             infos += (info['total'], info['total']['storage_log'][d])
-        if group_by is None or 'customer' in group_by:
+        if group_by >= group_by_map['customer']:
             infos += (info['per_customer'][customer_id], info['per_customer'][customer_id]['storage_log'][d])
-        if group_by is None or 'entry' in group_by:
+        if group_by >= group_by_map['entry']:
             infos += (info['per_entry'][entry_id], info['per_entry'][entry_id]['storage_log'][d])
-        if group_by is None or 'entry_row' in group_by:
+        if group_by >= group_by_map['entry_row']:
             infos += (info['per_entry_row'][entry_row_id], info['per_entry_row'][entry_row_id]['storage_log'][d])
         return infos
-
-    def calculate_short_storage_log(info):
-        last_short = None
-        for d in dates:
-            current_long = info['storage_log'][d]
-
-            if (last_short is None or
-                current_long['entry_items']):
-
-                last_short = setup_info()
-                last_short['days'] = 0
-                last_short['start_date'] = d
-                info['short_storage_log'].append(last_short)
-
-            for group in ('sum_work', 'sum_in', 'sum_out'):
-                for key, value in current_long[group].iteritems():
-                    last_short[group][key] += value
-
-            for key in ('units', 'nett_weight', 'gross_weight'):
-                last_short['sum'][key] = current_long['sum'][key]
-            for key in ('cost', 'total_cost'):
-                last_short['sum'][key] += current_long['sum'][key]
-
-            last_short['days'] += 1
-            last_short['end_date'] = d
-
-            if current_long['withdrawal_items']:
-                last_short = None
-
-        if info['short_storage_log'] and info['short_storage_log'][0]['sum']['units'] == 0 and info['short_storage_log'][0]['sum']['total_cost'] == 0:
-            del info['short_storage_log'][0]
-        if info['short_storage_log'] and info['short_storage_log'][-1]['sum']['units'] == 0 and info['short_storage_log'][-1]['sum']['total_cost'] == 0:
-            del info['short_storage_log'][-1]
 
     info = {'dates': dates,
             'total': setup_full_info(),
@@ -166,26 +139,72 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum_out']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
-    for item in StorageLog.objects.filter(**storage_filter):
+    for item in StorageLog.objects.filter(**storage_filter).order_by("date"):
         for i in get_infos(item.entry_row.entry.customer, item.entry_row.entry, item.entry_row, item.date):
             i['storage_items'][item.id] = item
+            # += is wrong here for the non-date-based sums for units
+            # and weights, see below for how this is then overwritten
+            # :)
             i['sum']['units'] += item.units_left
             i['sum']['nett_weight'] += item.nett_weight_left
             i['sum']['gross_weight'] += item.gross_weight_left
             i['sum']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
-    if group_by is None or 'all' in group_by:
-        calculate_short_storage_log(info['total'])
-    if group_by is None or 'customer' in group_by:
-        for customer, customer_info in info['per_customer'].iteritems():
-            calculate_short_storage_log(customer_info)
-    if group_by is None or 'entry' in group_by:
-        for entry, entry_info in info['per_entry'].iteritems():
-            calculate_short_storage_log(entry_info)
 
-    if group_by is None or 'entry_row' in group_by:
+    # Overwrite wrong sums from above using date based sums...
+    def fix_non_date_based_sums(i):
+        last_log_date = max(i['storage_log'].keys())
+        for part in ('units', 'nett_weight', 'gross_weight'):
+            i['sum'][part] = i['storage_log'][last_log_date]['sum'][part]
+
+    def calculate_short_storage_log(info):
+        last_short = None
+        for d in dates:
+            current_long = info['storage_log'][d]
+
+            if (last_short is None or
+                current_long['entry_items']):
+
+                last_short = setup_info()
+                last_short['days'] = 0
+                last_short['start_date'] = d
+                info['short_storage_log'].append(last_short)
+
+            for group in ('sum_work', 'sum_in', 'sum_out'):
+                for key, value in current_long[group].iteritems():
+                    last_short[group][key] += value
+
+            for key in ('units', 'nett_weight', 'gross_weight'):
+                last_short['sum'][key] = current_long['sum'][key]
+            for key in ('cost', 'total_cost'):
+                last_short['sum'][key] += current_long['sum'][key]
+
+            last_short['days'] += 1
+            last_short['end_date'] = d
+
+            if current_long['withdrawal_items']:
+                last_short = None
+
+        if info['short_storage_log'] and info['short_storage_log'][0]['sum']['units'] == 0 and info['short_storage_log'][0]['sum']['total_cost'] == 0:
+            del info['short_storage_log'][0]
+        if info['short_storage_log'] and info['short_storage_log'][-1]['sum']['units'] == 0 and info['short_storage_log'][-1]['sum']['total_cost'] == 0:
+            del info['short_storage_log'][-1]
+
+    if group_by >= group_by_map['all']:
+        fix_non_date_based_sums(info['total'])
+        calculate_short_storage_log(info['total'])
+    if group_by >= group_by_map['customer']:
+        for customer, customer_info in info['per_customer'].iteritems():
+            fix_non_date_based_sums(customer_info)
+            calculate_short_storage_log(customer_info)
+    if group_by >= group_by_map['entry']:
+        for entry, entry_info in info['per_entry'].iteritems():
+            fix_non_date_based_sums(entry_info)
+            calculate_short_storage_log(entry_info)
+    if group_by >= group_by_map['entry_row']:
         for entry_row, entry_row_info in info['per_entry_row'].iteritems():
+            fix_non_date_based_sums(entry_row_info)
             calculate_short_storage_log(entry_row_info)
 
     return info
@@ -299,7 +318,7 @@ def costlog(request, *arg, **kw):
         info['config_form'].fields['entry'].queryset = info['config_form'].fields['entry'].queryset.filter(customer__in = request.user.groups.all())
 
     if 'year' in kw:
-        info.update(sum_costlog_data(group_by = [group_by], **kw_to_filters(**kw)))
+        info.update(sum_costlog_data(group_by = group_by, **kw_to_filters(**kw)))
 
         if group_by == 'all':
             info['groups'] = [info['total']]

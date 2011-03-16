@@ -97,9 +97,22 @@
       {{ log_item.sum.units }} &
       {{ log_item.sum.nett_weight|floatformat:-6 }} &
       {{ log_item.sum.gross_weight|floatformat:-6 }} &
-      {% if group.obj.last_log.units_left == 0 %}{{ group.obj.last_log.date|date:"Y-m-d" }}{% endif %}
+      {% if log_item.end_date.year == group.obj.last_log.date.year and log_item.end_date.month == group.obj.last_log.date.month %}{% if group.obj.last_log.units_left == 0 %}{{ group.obj.last_log.date|date:"Y-m-d" }}{% endif %}{% endif %}
       \tabularnewline
     {% endwith %}{% endif %}{% endfor %}
+      \em{Total:} &
+      &
+      &
+      X{{ total.obj.units }} &
+      X{{ total.obj.nett_weight|floatformat:-6 }} &
+      X{{ total.obj.gross_weight|floatformat:-6 }} &
+      X{{ total.obj.product_value|floatformat:-6 }} &
+      {{ total.sum_in.gross_weight|aadd:total.sum_out.gross_weight|floatformat:-6 }} &
+      {{ total.sum.cost|floatformat:-2 }} &
+      {{ total.sum.units }} &
+      {{ total.sum.nett_weight|floatformat:-6 }} &
+      {{ total.sum.gross_weight|floatformat:-6 }} &
+      \tabularnewline
     \end{longtable}
   \end{small}
 
