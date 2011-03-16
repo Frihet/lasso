@@ -46,7 +46,17 @@
         <tbody>
 	  {% if group.obj %}
             <tr>
-              <th colspan="{% if style == "short" %}16{% else %}14{% endif %}">{{ group.obj }}</th>
+              <th colspan="{% if style == "short" %}16{% else %}14{% endif %}">
+                {% if group.obj.entry %}
+                  <a href="{% url admin:lasso_warehandling_entry_change group.obj.entry.id %}">{{ group.obj }}</a>
+                {% else %}
+                  {% if group.obj.product_description %}
+                    <a href="{% url admin:lasso_warehandling_entry_change group.obj.id %}">{{ group.obj }}</a>
+		  {% else %}
+                    <a href="{% url admin:lasso_customer_customer_change group.obj.id %}">{{ group.obj }}</a>
+		  {% endif %}
+		{% endif %}
+              </th>
             </tr>
 	  {% endif %}
 	  <tr>

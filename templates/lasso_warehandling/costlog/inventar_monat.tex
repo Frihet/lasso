@@ -55,7 +55,7 @@
   \section*{Inventar {{ month }}/{{ year }} }
 
   \begin{small}
-    \begin{longtable}{@{\hspace{2pt}}I{6}@{\hspace{2pt}}p{50pt}@{\hspace{2pt}}p{110pt}@{\hspace{2pt}}d{3}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}p{50pt}@{\hspace{2pt}}}
+    \begin{longtable}{@{\hspace{2pt}}I{6}@{\hspace{2pt}}p{50pt}@{\hspace{2pt}}p{110pt}@{\hspace{2pt}}d{3}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}p{50pt}@{\hspace{2pt}}}
       \multicolumn{1}{l}{\em{Lager}} &
       \multicolumn{1}{c}{\em{Einlagerung}} &
       \multicolumn{1}{c}{\em{}} &
@@ -91,7 +91,7 @@
       {{ group.obj.units }} &
       {{ group.obj.nett_weight|floatformat:-6 }} &
       {{ group.obj.gross_weight|floatformat:-6 }} &
-      {{ group.obj.product_value|floatformat:-6 }} &
+      {{ group.obj.product_value|floatformat:-2 }} &
       {{ group.sum_in.gross_weight|aadd:group.sum_out.gross_weight|floatformat:-6 }} &
       {{ group.sum.cost|floatformat:-2 }} &
       {{ log_item.sum.units }} &
@@ -100,18 +100,31 @@
       {% if log_item.end_date.year == group.obj.last_log.date.year and log_item.end_date.month == group.obj.last_log.date.month %}{% if group.obj.last_log.units_left == 0 %}{{ group.obj.last_log.date|date:"Y-m-d" }}{% endif %}{% endif %}
       \tabularnewline
     {% endwith %}{% endif %}{% endfor %}
-      \em{Total:} &
+      \multicolumn{1}{l}{\em{Total:}} &
       &
       &
-      X{{ total.obj.units }} &
-      X{{ total.obj.nett_weight|floatformat:-6 }} &
-      X{{ total.obj.gross_weight|floatformat:-6 }} &
-      X{{ total.obj.product_value|floatformat:-6 }} &
+      {{ total.orig_sum.units }} &
+      {{ total.orig_sum.nett_weight|floatformat:-6 }} &
+      {{ total.orig_sum.gross_weight|floatformat:-6 }} &
+      {{ total.orig_sum.product_value|floatformat:-2 }} &
       {{ total.sum_in.gross_weight|aadd:total.sum_out.gross_weight|floatformat:-6 }} &
       {{ total.sum.cost|floatformat:-2 }} &
       {{ total.sum.units }} &
       {{ total.sum.nett_weight|floatformat:-6 }} &
       {{ total.sum.gross_weight|floatformat:-6 }} &
+      \tabularnewline
+      &
+      &
+      &
+      &
+      &
+      \multicolumn{1}{l}{\em{XXVersicherungskostenXX:}} &
+      {{ total.orig_sum.insurance_cost|floatformat:-2 }} &
+      &
+      &
+      &
+      &
+      &
       \tabularnewline
     \end{longtable}
   \end{small}

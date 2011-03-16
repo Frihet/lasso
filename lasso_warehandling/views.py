@@ -49,13 +49,18 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
                             'nett_weight':0,
                             'gross_weight':0,
                             'cost':0},
+                'orig_sum': {'units':0,
+                             'nett_weight':0,
+                             'gross_weight':0,
+                             'insurance_cost': 0,
+                             'product_value': 0},
                 'sum': {'units':0,
                         'nett_weight':0,
                         'gross_weight':0,
                         'cost':0,
                         'total_cost':0},
+                'all_used_entry_items': {},
                 'customers': {},
-                'entries': {},
                 'entry_items': {},
                 'work_items': {},
                 'withdrawal_items': {},
@@ -115,6 +120,7 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
     for item in EntryRow.objects.filter(**entry_filter):
         for i in get_infos(item.entry.customer, item.entry, item, item.entry.arrival_date):
             i['entry_items'][item.id] = item
+            i['all_used_entry_items'][item.id] = item
             i['sum_in']['units'] += item.units
             i['sum_in']['nett_weight'] += item.nett_weight
             i['sum_in']['gross_weight'] += item.gross_weight
@@ -132,6 +138,7 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
 
     for item in WithdrawalRow.objects.filter(**withdrawal_filter):
         for i in get_infos(item.entry_row.entry.customer, item.entry_row.entry, item.entry_row, item.withdrawal.withdrawal_date):
+            i['all_used_entry_items'][item.entry_row.id] = item.entry_row
             i['withdrawal_items'][item.id] = item
             i['sum_out']['units'] += item.units
             i['sum_out']['nett_weight'] += item.nett_weight
@@ -141,6 +148,7 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
 
     for item in StorageLog.objects.filter(**storage_filter).order_by("date"):
         for i in get_infos(item.entry_row.entry.customer, item.entry_row.entry, item.entry_row, item.date):
+            i['all_used_entry_items'][item.entry_row.id] = item.entry_row
             i['storage_items'][item.id] = item
             # += is wrong here for the non-date-based sums for units
             # and weights, see below for how this is then overwritten
@@ -151,6 +159,12 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum']['cost'] += item.cost
             i['sum']['total_cost'] += item.cost
 
+    def orig_sums_from_entry_items(i):
+        i['orig_sum']['units'] = sum(entry_row.units for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['nett_weight'] = sum(entry_row.nett_weight for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['gross_weight'] = sum(entry_row.gross_weight for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['insurance_cost'] = sum(entry_row.insurance_cost for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['product_value'] = sum(entry_row.product_value for entry_row in i['all_used_entry_items'].values())
 
     # Overwrite wrong sums from above using date based sums...
     def fix_non_date_based_sums(i):
@@ -192,18 +206,22 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             del info['short_storage_log'][-1]
 
     if group_by >= group_by_map['all']:
+        orig_sums_from_entry_items(info['total'])
         fix_non_date_based_sums(info['total'])
         calculate_short_storage_log(info['total'])
     if group_by >= group_by_map['customer']:
         for customer, customer_info in info['per_customer'].iteritems():
+            orig_sums_from_entry_items(customer_info)
             fix_non_date_based_sums(customer_info)
             calculate_short_storage_log(customer_info)
     if group_by >= group_by_map['entry']:
         for entry, entry_info in info['per_entry'].iteritems():
+            orig_sums_from_entry_items(entry_info)
             fix_non_date_based_sums(entry_info)
             calculate_short_storage_log(entry_info)
     if group_by >= group_by_map['entry_row']:
         for entry_row, entry_row_info in info['per_entry_row'].iteritems():
+            orig_sums_from_entry_items(entry_row_info)
             fix_non_date_based_sums(entry_row_info)
             calculate_short_storage_log(entry_row_info)
 

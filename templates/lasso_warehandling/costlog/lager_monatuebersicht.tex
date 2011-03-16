@@ -44,90 +44,92 @@
 \fancyfoot[L]{}
 
 \begin{document}
+  {% if not groups %}
+    \section*{NO DATA FOR PERIOD}
+  {% else %}
+    {% for group in groups %}
+      {% if group.obj %}
+        \section*{Lager Nr. {{ group.obj.id_str }} - {{ month }}/{{ year }} }
 
-  {% for group in groups %}
-    {% if group.obj %}
-      \section*{Lager Nr. {{ group.obj.id_str }} - {{ month }}/{{ year }} }
-
-      \begin{longtable}{p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}}
-        Lagerhalter: &
-        {{ group.obj.entry.customer|default_if_none:"-" }} &
-        &
-        &
-        &
-      \vspace{10pt}\tabularnewline
-        Lieferant: &
-        {{ group.obj.entry.original_seller|default_if_none:"-" }} &
-        &
-        &
-        &
-      \vspace{10pt}\tabularnewline
-        Verzollt: &
-        {{ group.obj.entry.custom_handling_date|default_if_none:"-" }} &
-        Einlagerung: &
-        {{ group.obj.entry.arrival_date|default_if_none:"-" }} &
-        Haltbarkeit: &
-        {{ group.obj.use_before|default_if_none:"-" }}
-      \vspace{10pt}\tabularnewline
-        Produkte Nr.: &
-        {{ group.obj.product_nr }} &
-        &
-        &
-        &
-      \vspace{10pt}\tabularnewline
-        Artikelbezeichnung: &
-        \multicolumn{5}{p{400pt}}{% templatetag openbrace %}{{ group.obj.product_description }}}
-      \vspace{10pt}\tabularnewline
-        Anzahl Karton: &
-        {{ group.obj.units }} &
-        Netto: &
-        {{ group.obj.nett_weight|floatformat:-6 }} &
-        Brutto: &
-        {{ group.obj.gross_weight|floatformat:-6 }} &
-      \end{longtable}
-
-
-      \subsection*{Auslagerung}
-      \begin{small}
-        \begin{longtable}{@{\hspace{2pt}}l@{\hspace{2pt}}d{1}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{2}@{\hspace{10pt}}p{30pt}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}}
-          \multicolumn{1}{l}{\em{Datum}} &
-          \multicolumn{1}{c}{\em{Tage}} &
-          \multicolumn{1}{c}{\em{Einheiten}} &
-          \multicolumn{1}{c}{\em{Netto}} &
-          \multicolumn{1}{c}{\em{Brutto}} &
-          \multicolumn{1}{c}{\em{Lagergeld Brutto}} &
-          \multicolumn{1}{c}{\em{Ls-Nr.}} &
-          \multicolumn{1}{c}{\em{Einheiten}} &
-          \multicolumn{1}{c}{\em{Netto}} &
-          \multicolumn{1}{c}{\em{Brutto}}
-        \tabularnewline
-          {% for log_item in group.short_storage_log %}
-            {{ log_item.start_date|date:"d" }} - {{ log_item.end_date|date:"d" }} &
-            {{ log_item.days }} &
-            {{ log_item.sum.units }} &
-            {{ log_item.sum.nett_weight|floatformat:-6 }} &
-            {{ log_item.sum.gross_weight|floatformat:-6 }} &
-            {{ log_item.sum.cost|floatformat:-2 }} &
-            {% for entry in log_item.withdrawal_items.values %}{{ entry.id_str }}{% if not forloop.last %}, {% endif %}{% endfor %} &
-            {{ log_item.sum_out.units }} &
-            {{ log_item.sum_out.nett_weight|floatformat:-6 }} &
-            {{ log_item.sum_out.gross_weight|floatformat:-6 }}
-            \tabularnewline
-          {% endfor %}
-          \multicolumn{2}{l}{\em{Total Ausgänge}} &
+        \begin{longtable}{p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}p{80pt}}
+          Lagerhalter: &
+          {{ group.obj.entry.customer|default_if_none:"-" }} &
           &
           &
           &
-          {{ group.sum.cost|floatformat:-2 }} &
+        \vspace{10pt}\tabularnewline
+          Lieferant: &
+          {{ group.obj.entry.original_seller|default_if_none:"-" }} &
           &
-          {{ group.sum_out.units }} &
-          {{ group.sum_out.nett_weight|floatformat:-6 }} &
-          {{ group.sum_out.gross_weight|floatformat:-6 }} &
+          &
+          &
+        \vspace{10pt}\tabularnewline
+          Verzollt: &
+          {{ group.obj.entry.custom_handling_date|default_if_none:"-" }} &
+          Einlagerung: &
+          {{ group.obj.entry.arrival_date|default_if_none:"-" }} &
+          Haltbarkeit: &
+          {{ group.obj.use_before|default_if_none:"-" }}
+        \vspace{10pt}\tabularnewline
+          Produkte Nr.: &
+          {{ group.obj.product_nr }} &
+          &
+          &
+          &
+        \vspace{10pt}\tabularnewline
+          Artikelbezeichnung: &
+          \multicolumn{5}{p{400pt}}{% templatetag openbrace %}{{ group.obj.product_description }}}
+        \vspace{10pt}\tabularnewline
+          Anzahl Karton: &
+          {{ group.obj.units }} &
+          Netto: &
+          {{ group.obj.nett_weight|floatformat:-6 }} &
+          Brutto: &
+          {{ group.obj.gross_weight|floatformat:-6 }} &
         \end{longtable}
-      \end{small}
 
-      \newpage
-    {% endif %}
-  {% endfor %}
 
+        \subsection*{Auslagerung}
+        \begin{small}
+          \begin{longtable}{@{\hspace{2pt}}l@{\hspace{2pt}}d{1}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{2}@{\hspace{10pt}}p{30pt}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}}
+            \multicolumn{1}{l}{\em{Datum}} &
+            \multicolumn{1}{c}{\em{Tage}} &
+            \multicolumn{1}{c}{\em{Einheiten}} &
+            \multicolumn{1}{c}{\em{Netto}} &
+            \multicolumn{1}{c}{\em{Brutto}} &
+            \multicolumn{1}{c}{\em{Lagergeld Brutto}} &
+            \multicolumn{1}{c}{\em{Ls-Nr.}} &
+            \multicolumn{1}{c}{\em{Einheiten}} &
+            \multicolumn{1}{c}{\em{Netto}} &
+            \multicolumn{1}{c}{\em{Brutto}}
+          \tabularnewline
+            {% for log_item in group.short_storage_log %}
+              {{ log_item.start_date|date:"d" }} - {{ log_item.end_date|date:"d" }} &
+              {{ log_item.days }} &
+              {{ log_item.sum.units }} &
+              {{ log_item.sum.nett_weight|floatformat:-6 }} &
+              {{ log_item.sum.gross_weight|floatformat:-6 }} &
+              {{ log_item.sum.cost|floatformat:-2 }} &
+              {% for entry in log_item.withdrawal_items.values %}{{ entry.id_str }}{% if not forloop.last %}, {% endif %}{% endfor %} &
+              {{ log_item.sum_out.units }} &
+              {{ log_item.sum_out.nett_weight|floatformat:-6 }} &
+              {{ log_item.sum_out.gross_weight|floatformat:-6 }}
+              \tabularnewline
+            {% endfor %}
+            \multicolumn{2}{l}{\em{Total Ausgänge}} &
+            &
+            &
+            &
+            {{ group.sum.cost|floatformat:-2 }} &
+            &
+            {{ group.sum_out.units }} &
+            {{ group.sum_out.nett_weight|floatformat:-6 }} &
+            {{ group.sum_out.gross_weight|floatformat:-6 }} &
+          \end{longtable}
+        \end{small}
+
+        \newpage
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 \end{document}

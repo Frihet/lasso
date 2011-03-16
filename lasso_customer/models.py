@@ -131,7 +131,7 @@ class UnitWorkPrices(models.Model):
         return _("%(customer)s: %(price_per_unit)s for %(work_type)s") % {"customer":self.customer, "price_per_unit":self.price_per_unit, "work_type":self.work_type}
 
 class WarehandlingPrice(models.Model):
-    customer = models.ForeignKey(Customer, verbose_name=_("Customer"))
+    customer = models.ForeignKey(Customer, verbose_name=_("Customer"), related_name="prices")
 
     name = models.CharField(max_length=200, blank=True, verbose_name=_("Name"))
     is_default = models.BooleanField(blank=True, verbose_name=_("Is default"), default=False)
