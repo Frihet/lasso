@@ -86,7 +86,7 @@
     \tabularnewline
     {% for group in groups %}{% if group.obj %}{% with group.short_storage_log|last as log_item %}
       {{ group.obj.id_str }} &
-      {{ group.obj.entry.arrival_date|date:"Y-m-d" }} &
+      {{ group.obj.entry.arrival_date|date:"d.m.Y" }} &
       {{ group.obj.product_description }} &
       {{ group.obj.units }} &
       {{ group.obj.nett_weight|floatformat:-6 }} &
