@@ -160,11 +160,11 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
             i['sum']['total_cost'] += item.cost
 
     def orig_sums_from_entry_items(i):
-        i['orig_sum']['units'] = sum(entry_row.units for entry_row in i['all_used_entry_items'].values())
-        i['orig_sum']['nett_weight'] = sum(entry_row.nett_weight for entry_row in i['all_used_entry_items'].values())
-        i['orig_sum']['gross_weight'] = sum(entry_row.gross_weight for entry_row in i['all_used_entry_items'].values())
-        i['orig_sum']['insurance_cost'] = sum(entry_row.insurance_cost for entry_row in i['all_used_entry_items'].values())
-        i['orig_sum']['product_value'] = sum(entry_row.product_value for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['units'] = sum(entry_row.units or 0 for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['nett_weight'] = sum(entry_row.nett_weight or 0 for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['gross_weight'] = sum(entry_row.gross_weight or 0 for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['insurance_cost'] = sum(entry_row.insurance_cost or 0 for entry_row in i['all_used_entry_items'].values())
+        i['orig_sum']['product_value'] = sum(entry_row.product_value or 0 for entry_row in i['all_used_entry_items'].values())
 
     # Overwrite wrong sums from above using date based sums...
     def fix_non_date_based_sums(i):
