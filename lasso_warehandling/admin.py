@@ -28,6 +28,7 @@ class EntryRowAdminForm(forms.ModelForm):
         if self.instance.pk is not None:
             self.initial['locations'] = [values[0] for values in self.instance.locations.values_list('pk')]
             self.initial['withdrawal_links'] = [row.withdrawal for row in self.instance.withdrawal_rows.all()]
+        self.fields['origin'].show_hidden_initial = True
 
     def save(self, commit=True):
         instance = super(EntryRowAdminForm, self).save(commit)
@@ -115,12 +116,14 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
                 if len(defaults) > 0:
                     adminform.form.data['price'] = defaults[0].id
 
-        # if adminform.form['original_seller'].data:
-        #     original_seller = OriginalSeller.objects.get(id=adminform.form['original_seller'].data)
+        if adminform.form['original_seller'].data or adminform.form.initial.get('original_seller', None) is not None:
+            original_seller = OriginalSeller.objects.get(id=adminform.form['original_seller'].data or adminform.form.initial['original_seller'])
 
-        #     for entry_row in inlines_forms[self.inlines.index(EntryRowInline)].formset.forms:
-        #         if not entry_row.data[entry_row['origin'].html_name]:
-        #             entry_row.data[entry_row['origin'].html_name] = original_seller.origin.id
+            for entry_row in inlines_forms[self.inlines.index(EntryRowInline)].formset.forms:
+                name = entry_row['origin'].html_name
+                if name not in entry_row.data or not entry_row.data[name]:
+                    entry_row.data[name] = original_seller.origin.id
+                entry_row['origin'].field.initial = original_seller.origin.id
 
 admin.site.register(Entry, EntryAdmin)
 
