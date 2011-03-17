@@ -80,3 +80,7 @@ def sepformat(values, fmt):
 @register.filter
 def asub(value1, value2):
     return value1 - value2
+
+@register.filter
+def round5(value):
+    return round(20*value)/20

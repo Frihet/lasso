@@ -107,14 +107,14 @@
       {{ total.orig_sum.nett_weight|floatformat:-6 }} &
       {{ total.orig_sum.gross_weight|floatformat:-6 }} &
       {{ total.orig_sum.product_value|floatformat:-2 }} &
-      {{ total.sum_in.cost|aadd:total.sum_out.cost|floatformat:-2 }} &
-      {{ total.sum.cost|floatformat:-2 }} &
+      {{ total.sum_in.cost|aadd:total.sum_out.cost|round5|floatformat:-2 }} &
+      {{ total.sum.cost|round5|floatformat:-2 }} &
       {{ total.sum.units }} &
       {{ total.sum.nett_weight|floatformat:-6 }} &
       {{ total.sum.gross_weight|floatformat:-6 }} &
       \tabularnewline
       \multicolumn{6}{r}{\em{Versicherungskosten:}} &
-      {{ total.orig_sum.insurance_cost|floatformat:-2 }} &
+      {{ total.orig_sum.insurance_cost|round5|floatformat:-2 }} &
       &
       &
       &
