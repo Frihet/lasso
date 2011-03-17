@@ -28,6 +28,8 @@ class ContactAdminForm(forms.ModelForm):
         if self.instance.pk is not None:
             self.initial['password'] = self.instance.password
             self.initial['username'] = self.instance.username
+        else:
+            self.initial['is_active'] = False
 
     def save(self, commit=True):
         self.instance.password = self.cleaned_data['password']
