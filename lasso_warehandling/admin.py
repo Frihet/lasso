@@ -213,8 +213,8 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
                                               'transporter')
                                    })]
 
-    list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight')
-    search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description')
+    list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight', 'transport_nr')
+    search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description', 'transport_nr')
     group_owner_field = "customer"
 
     def cross_verify_forms(self, adminform, inlines_forms):
