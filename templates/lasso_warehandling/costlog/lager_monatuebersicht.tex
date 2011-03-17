@@ -84,43 +84,43 @@
 
 
         \subsection*{Auslagerung}
-        \begin{small}
-          \begin{longtable}{@{\hspace{2pt}}l@{\hspace{2pt}}d{1}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{2}@{\hspace{10pt}}p{30pt}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}@{\hspace{2pt}}d{6}}
-            \multicolumn{1}{l}{\em{Datum}} &
-            \multicolumn{1}{c}{\em{Tage}} &
-            \multicolumn{1}{c}{\em{Einheiten}} &
-            \multicolumn{1}{c}{\em{Netto}} &
-            \multicolumn{1}{c}{\em{Brutto}} &
-            \multicolumn{1}{c}{\em{Lagergeld Brutto}} &
-            \multicolumn{1}{c}{\em{Ls-Nr.}} &
-            \multicolumn{1}{c}{\em{Einheiten}} &
-            \multicolumn{1}{c}{\em{Netto}} &
-            \multicolumn{1}{c}{\em{Brutto}}
-          \tabularnewline
-            {% for log_item in group.short_storage_log %}
-              {{ log_item.start_date|date:"d" }} - {{ log_item.end_date|date:"d" }} &
-              {{ log_item.days }} &
-              {{ log_item.sum.units }} &
-              {{ log_item.sum.nett_weight|floatformat:-6 }} &
-              {{ log_item.sum.gross_weight|floatformat:-6 }} &
-              {{ log_item.sum.cost|floatformat:-2 }} &
-              {% for entry in log_item.withdrawal_items.values %}{{ entry.id_str }}{% if not forloop.last %}, {% endif %}{% endfor %} &
-              {{ log_item.sum_out.units }} &
-              {{ log_item.sum_out.nett_weight|floatformat:-6 }} &
-              {{ log_item.sum_out.gross_weight|floatformat:-6 }}
-              \tabularnewline
-            {% endfor %}
-            \multicolumn{2}{l}{\em{Total Ausgänge}} &
-            &
-            &
-            &
-            {{ group.sum.cost|floatformat:-2 }} &
-            &
-            {{ group.sum_out.units }} &
-            {{ group.sum_out.nett_weight|floatformat:-6 }} &
-            {{ group.sum_out.gross_weight|floatformat:-6 }} &
-          \end{longtable}
-        \end{small}
+
+        \begin{longtable}{@{\hspace{2pt}}c@{\hspace{2pt}}r@{\hspace{2pt}}r@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{10pt}}c@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}}
+          \multicolumn{1}{l}{\em{Datum}} &
+          \multicolumn{1}{c}{\em{Tage}} &
+          \multicolumn{1}{c}{\em{Einheiten}} &
+          \multicolumn{1}{c}{\em{Netto}} &
+          \multicolumn{1}{c}{\em{Brutto}} &
+          \multicolumn{1}{c}{\em{Lagergeld Brutto}} &
+          \multicolumn{1}{c}{\em{Ls-Nr.}} &
+          \multicolumn{1}{c}{\em{Einheiten}} &
+          \multicolumn{1}{c}{\em{Netto}} &
+          \multicolumn{1}{c}{\em{Brutto}}
+        \tabularnewline
+          {% for log_item in group.short_storage_log %}
+            {{ log_item.start_date|date:"d" }} - {{ log_item.end_date|date:"d" }} &
+            {{ log_item.days }} &
+            {{ log_item.sum.units }} &
+            {{ log_item.sum.nett_weight|floatformat:-6 }} &
+            {{ log_item.sum.gross_weight|floatformat:-6 }} &
+            {{ log_item.sum.cost|floatformat:-2 }} &
+            {% for entry in log_item.withdrawal_items.values %}{{ entry.id_str }}{% if not forloop.last %}, {% endif %}{% endfor %} &
+            {{ log_item.sum_out.units }} &
+            {{ log_item.sum_out.nett_weight|floatformat:-6 }} &
+            {{ log_item.sum_out.gross_weight|floatformat:-6 }}
+            \tabularnewline
+          {% endfor %}
+          \multicolumn{2}{l}{\em{Total Ausgänge}} &
+          &
+          &
+          &
+          {{ group.sum.cost|floatformat:-2 }} &
+          &
+          {{ group.sum_out.units }} &
+          {{ group.sum_out.nett_weight|floatformat:-6 }} &
+          {{ group.sum_out.gross_weight|floatformat:-6 }} &
+        \end{longtable}
+
 
         \newpage
       {% endif %}
