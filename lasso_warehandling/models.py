@@ -63,8 +63,12 @@ class Entry(models.Model):
     def product_description(self):
         return '; '.join(["%s %s %s" % (row.units, row.uom, row.product_description) for row in self.rows.all() if row.product_description])
 
+    @property
+    def id_str(self):
+        return "%s / %s" % (self.id, self.arrival_date.year)
+
     def __unicode__(self):
-        return _(u"%(id)s @ %(arrival_date)s for %(customer)s") % {'id': self.id, 'arrival_date': self.arrival_date, 'customer': self.customer}
+        return _(u"%(id_str)s @ %(arrival_date)s for %(customer)s") % {'id_str': self.id_str, 'arrival_date': self.arrival_date, 'customer': self.customer}
 
 def entry_pre_save(sender, instance, **kwargs):
     if instance.id is None:
@@ -305,8 +309,13 @@ class Withdrawal(models.Model):
     def product_description(self):
         return '; '.join(["%s %s %s" % (row.units, row.entry_row.uom, row.entry_row.product_description) for row in self.rows.all() if row.entry_row.product_description])
 
+    @property
+    def id_str(self):
+        if self.transport_nr: return self.transport_nr
+        return "%s / %s" % (self.id, self.withdrawal_date.year)
+
     def __unicode__(self):
-        return u"%s @ %s" % (self.id, self.withdrawal_date)
+        return u"%s @ %s" % (self.id_str, self.withdrawal_date)
 
 class WithdrawalRow(models.Model):
     class Meta:
@@ -355,6 +364,8 @@ class WithdrawalRow(models.Model):
 
     @property
     def id_str(self):
+        if self.withdrawal.transport_nr:
+            return "%s.%s" % (self.withdrawal.transport_nr, self.id)
         return "%s.%s / %s" % (self.withdrawal.id, self.id, self.withdrawal.withdrawal_date.year)
 
     def __unicode__(self):

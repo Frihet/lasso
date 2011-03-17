@@ -92,7 +92,7 @@
       {{ group.obj.nett_weight|floatformat:-6 }} &
       {{ group.obj.gross_weight|floatformat:-6 }} &
       {{ group.obj.product_value|floatformat:-2 }} &
-      {{ group.sum_in.gross_weight|aadd:group.sum_out.gross_weight|floatformat:-6 }} &
+      {{ group.sum_in.cost|aadd:group.sum_out.cost|floatformat:-2 }} &
       {{ group.sum.cost|floatformat:-2 }} &
       {{ log_item.sum.units }} &
       {{ log_item.sum.nett_weight|floatformat:-6 }} &
@@ -107,7 +107,7 @@
       {{ total.orig_sum.nett_weight|floatformat:-6 }} &
       {{ total.orig_sum.gross_weight|floatformat:-6 }} &
       {{ total.orig_sum.product_value|floatformat:-2 }} &
-      {{ total.sum_in.gross_weight|aadd:total.sum_out.gross_weight|floatformat:-6 }} &
+      {{ total.sum_in.cost|aadd:total.sum_out.cost|floatformat:-2 }} &
       {{ total.sum.cost|floatformat:-2 }} &
       {{ total.sum.units }} &
       {{ total.sum.nett_weight|floatformat:-6 }} &
