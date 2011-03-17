@@ -57,7 +57,8 @@ class EntryRowAdminForm(forms.ModelForm):
 class EntryRowInline(admin.StackedInline):
     form = EntryRowAdminForm
     model = EntryRow
-    fieldsets = [(_('Product'), {'fields': ('use_before',
+    fieldsets = [(_('Product'), {'fields': ('manual_id',
+                                            'use_before',
                                             'product_nr',
                                             'product_description',
                                             'origin')

@@ -101,6 +101,8 @@ class EntryRow(models.Model):
 
     origin = models.ForeignKey(Origin, blank=True, null=True, verbose_name=_("Origin"))
 
+    manual_id = models.CharField(max_length=400, blank=True, verbose_name=_("Manual entry row ID"))
+
     @property
     def cost(self):
         return self.entry_cost + self.insurance_cost
@@ -158,7 +160,8 @@ class EntryRow(models.Model):
 
     @property
     def id_str(self):
-        return "%s.%s" % (self.entry.id, self.id)
+        if self.manual_id: return self.manual_id
+        return "%s.%s / %s" % (self.entry.id, self.id, self.entry.arrival_date.year)
 
     @property
     def last_log(self):
@@ -352,7 +355,7 @@ class WithdrawalRow(models.Model):
 
     @property
     def id_str(self):
-        return "%s.%s" % (self.withdrawal.id, self.id)
+        return "%s.%s / %s" % (self.withdrawal.id, self.id, self.withdrawal.withdrawal_date.year)
 
     def __unicode__(self):
         return _(u"%(id_str)s (%(units)s @ %(withdrawal.withdrawal_date)s from %(entry_row)s)") % {"id_str": self.id_str, "units": self.units, "withdrawal.withdrawal_date": self.withdrawal.withdrawal_date, "entry_row": self.entry_row}
