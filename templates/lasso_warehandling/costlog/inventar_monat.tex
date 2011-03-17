@@ -97,7 +97,7 @@
       {{ log_item.sum.units }} &
       {{ log_item.sum.nett_weight|floatformat:-6 }} &
       {{ log_item.sum.gross_weight|floatformat:-6 }} &
-      {% if log_item.sum.units|asub:log_item.sum_out.units == 0 %}{{ log_item.end_date|date:"m.d.Y" }}{% endif %}
+      {% if log_item.sum.units|asub:log_item.sum_out.units == 0 %}{{ log_item.end_date|date:"d.m.Y" }}{% endif %}
       \tabularnewline
     {% endwith %}{% endif %}{% endfor %}
       \multicolumn{1}{l}{\em{Total:}} &
