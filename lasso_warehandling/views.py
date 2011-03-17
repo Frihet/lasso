@@ -88,6 +88,7 @@ def sum_costlog_data(unit_filter, entry_filter, withdrawal_filter, storage_filte
 
     def get_infos(customer, entry, entry_row, d):
         "Ensure sum-collection-info-dicts exists and return them!"
+        if d > last_date: return ()
         customer_id = customer and customer.id or None
         entry_id = entry and entry.id or None
         entry_row_id = entry_row and entry_row.id or None
