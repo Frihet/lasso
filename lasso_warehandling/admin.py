@@ -238,7 +238,7 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
                                               'transporter')
                                    })]
 
-    list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight', 'transport_nr')
+    list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight', 'id_str')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description', 'transport_nr')
     group_owner_field = "customer"
 
