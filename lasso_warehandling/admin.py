@@ -88,8 +88,8 @@ class EntryAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EntryAdminForm, self).__init__(*args,**kwargs)
-        self.fields['customer'].widget.attrs['class'] = 'autosubmit'
-        self.fields['original_seller'].widget.attrs['class'] = 'autosubmit'
+        self.fields['customer'].widget.widget.attrs['class'] = 'autosubmit'
+        self.fields['original_seller'].widget.widget.attrs['class'] = 'autosubmit'
 
 class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = EntryAdminForm

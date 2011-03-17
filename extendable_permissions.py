@@ -103,8 +103,14 @@ class IntermediateFormHandlingAdminMixin(object):
     def get_form(self, request, *arg, **kw):
         Form = super(IntermediateFormHandlingAdminMixin, self).get_form(request, *arg, **kw)
 
+        # NOTE: {IntermediateForm,BugfixForm}.base_fields =
+        # Form.base_fields is a BUG WORKAROUND for a bug we haven't
+        # really figured out. All fields get the wrong widget if you
+        # don't do this...
+
         if '_intermediate' not in request.POST:
             class BugfixForm(Form): pass
+            BugfixForm.base_fields = Form.base_fields
             return BugfixForm
 
         class IntermediateForm(Form):
@@ -115,6 +121,7 @@ class IntermediateFormHandlingAdminMixin(object):
             def errors(self):
                 return django.forms.util.ErrorDict()
 
+        IntermediateForm.base_fields = Form.base_fields
         return IntermediateForm
 
     def render_change_form(self, request, context, *arg, **kw):
