@@ -102,6 +102,24 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
     search_fields = ('customer__name', 'arrival_date', 'rows__product_description')
     group_owner_field = "customer"
 
+    def nett_weight(self, obj):
+        return "%.2f" % obj.nett_weight
+
+    def gross_weight(self, obj):
+        return "%.2f" % obj.gross_weight
+
+    def product_value(self, obj):
+        return "%.2f" % obj.product_value
+
+    def nett_weight_left(self, obj):
+        return "%.2f" % obj.nett_weight_left
+
+    def gross_weight_left(self, obj):
+        return "%.2f" % obj.gross_weight_left
+
+    def product_value_left(self, obj):
+        return "%.2f" % obj.product_value_left
+
     def cross_verify_forms(self, adminform, inlines_forms):
         if adminform.form['customer'].data or adminform.form.initial.get('customer', None) is not None:
             customer = Customer.objects.get(id=adminform.form['customer'].data or adminform.form.initial['customer'])
