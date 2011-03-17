@@ -103,22 +103,28 @@ class EntryAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMi
     group_owner_field = "customer"
 
     def nett_weight(self, obj):
-        return "%.2f" % obj.nett_weight
+        return "<div class='align-right'>%.2f</div>" % obj.nett_weight
+    nett_weight.allow_tags = True
 
     def gross_weight(self, obj):
-        return "%.2f" % obj.gross_weight
+        return "<div class='align-right'>%.2f</div>" % obj.gross_weight
+    gross_weight.allow_tags = True
 
     def product_value(self, obj):
-        return "%.2f" % obj.product_value
+        return "<div class='align-right'>%.2f</div>" % obj.product_value
+    product_value.allow_tags = True
 
     def nett_weight_left(self, obj):
-        return "%.2f" % obj.nett_weight_left
+        return "<div class='align-right'>%.2f</div>" % obj.nett_weight_left
+    nett_weight_left.allow_tags = True
 
     def gross_weight_left(self, obj):
-        return "%.2f" % obj.gross_weight_left
+        return "<div class='align-right'>%.2f</div>" % obj.gross_weight_left
+    gross_weight_left.allow_tags = True
 
     def product_value_left(self, obj):
-        return "%.2f" % obj.product_value_left
+        return "<div class='align-right'>%.2f</div>" % obj.product_value_left
+    product_value_left.allow_tags = True
 
     def cross_verify_forms(self, adminform, inlines_forms):
         if adminform.form['customer'].data or adminform.form.initial.get('customer', None) is not None:
@@ -235,6 +241,14 @@ class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAd
     list_display_links = list_display = ('id', 'customer', 'withdrawal_date', 'product_description', 'nett_weight', 'gross_weight', 'transport_nr')
     search_fields = ('customer__name', 'withdrawal_date', 'rows__entry_row__product_description', 'transport_nr')
     group_owner_field = "customer"
+
+    def nett_weight(self, obj):
+        return "<div class='align-right'>%.2f</div>" % obj.nett_weight
+    nett_weight.allow_tags = True
+
+    def gross_weight(self, obj):
+        return "<div class='align-right'>%.2f</div>" % obj.gross_weight
+    gross_weight.allow_tags = True
 
     def cross_verify_forms(self, adminform, inlines_forms):
         if adminform.form['customer'].data or adminform.form.initial.get('customer', None) is not None:
