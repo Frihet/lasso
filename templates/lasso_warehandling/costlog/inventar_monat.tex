@@ -55,7 +55,7 @@
   \section*{Inventar {{ month }}/{{ year }} }
 
   \begin{small}
-    \begin{longtable}{@{\hspace{2pt}}I{6}@{\hspace{2pt}}c@{\hspace{2pt}}p{150pt}@{\hspace{2pt}}r@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}c@{\hspace{2pt}}}
+    \begin{longtable}{@{\hspace{2pt}}p{60pt}@{\hspace{2pt}}c@{\hspace{2pt}}p{150pt}@{\hspace{2pt}}r@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}d{2}@{\hspace{2pt}}c@{\hspace{2pt}}}
       \multicolumn{1}{l}{\em{Lager}} &
       \multicolumn{1}{c}{\em{Einlagerung}} &
       \multicolumn{1}{c}{\em{}} &
@@ -84,6 +84,7 @@
       \multicolumn{1}{c}{\em{Brutto}} &
       \multicolumn{1}{c}{\em{Datum}}
     \tabularnewline
+    \hline
     {% for group in groups %}{% if group.obj %}{% with group.short_storage_log|last as log_item %}
       {{ group.obj.id_str }} &
       {{ group.obj.entry.arrival_date|date:"d.m.Y" }} &
@@ -94,12 +95,13 @@
       {{ group.obj.product_value|floatformat:-2 }} &
       {{ group.sum_in.cost|aadd:group.sum_out.cost|floatformat:-2 }} &
       {{ group.sum.cost|floatformat:-2 }} &
-      {{ log_item.sum.units }} &
-      {{ log_item.sum.nett_weight|floatformat:-6 }} &
-      {{ log_item.sum.gross_weight|floatformat:-6 }} &
+      {{ log_item.sum.units|asub:log_item.sum_out.units }} &
+      {{ log_item.sum.nett_weight|asub:log_item.sum_out.nett_weight|floatformat:-6 }} &
+      {{ log_item.sum.gross_weight|asub:log_item.sum_out.gross_weight|floatformat:-6 }} &
       {% if log_item.sum.units|asub:log_item.sum_out.units == 0 %}{{ log_item.end_date|date:"d.m.Y" }}{% endif %}
       \tabularnewline
-    {% endwith %}{% endif %}{% endfor %}
+    {% endwith %}{% endif %}{% endfor %}{% with total.short_storage_log|last as log_item %}
+      \hline
       \multicolumn{1}{l}{\em{Total:}} &
       &
       &
@@ -109,9 +111,9 @@
       {{ total.orig_sum.product_value|floatformat:-2 }} &
       {{ total.sum_in.cost|aadd:total.sum_out.cost|round5|floatformat:-2 }} &
       {{ total.sum.cost|round5|floatformat:-2 }} &
-      {{ total.sum.units }} &
-      {{ total.sum.nett_weight|floatformat:-6 }} &
-      {{ total.sum.gross_weight|floatformat:-6 }} &
+      {{ total.sum.units|asub:log_item.sum_out.units }} &
+      {{ total.sum.nett_weight|asub:log_item.sum_out.nett_weight|floatformat:-6 }} &
+      {{ total.sum.gross_weight|asub:log_item.sum_out.gross_weight|floatformat:-6 }} &
       \tabularnewline
       \multicolumn{6}{r}{\em{Versicherungskosten:}} &
       {{ total.orig_sum.insurance_cost|round5|floatformat:-2 }} &
@@ -120,7 +122,7 @@
       &
       &
       &
-      \tabularnewline
+      \tabularnewline{% endwith %}
     \end{longtable}
   \end{small}
 
