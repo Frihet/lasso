@@ -100,7 +100,7 @@ class OriginalSeller(Organization):
     class Meta:
         verbose_name = _('Original seller')
         verbose_name_plural = _('Original sellers')
-    origin = models.ForeignKey(Origin, verbose_name=_("Default origin"), null=True, blank=True)
+    origin = models.ForeignKey(Origin, verbose_name=_("Default origin"))
 pre_save.connect(organization_pre_save, sender=OriginalSeller)
 post_save.connect(organization_post_save, sender=OriginalSeller)
 
