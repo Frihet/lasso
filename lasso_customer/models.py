@@ -6,6 +6,7 @@ from django.db.models.signals import *
 from lasso_global.models import *
 import utils.modelhelpers
 import re
+import decimal
 
 _name = _("Lasso_Customer")
 _name2 = _("lasso_customer")
@@ -136,17 +137,17 @@ class WarehandlingPrice(models.Model):
     name = models.CharField(max_length=200, blank=True, verbose_name=_("Name"))
     is_default = models.BooleanField(blank=True, verbose_name=_("Is default"), default=False)
 
-    price_per_kilo_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per kilo per day"))
-    price_per_kilo_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per kilo per entry"))
-    price_per_kilo_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per kilo per withdrawal"))
+    price_per_kilo_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Price per kilo per day"))
+    price_per_kilo_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Price per kilo per entry"))
+    price_per_kilo_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Price per kilo per withdrawal"))
 
-    price_per_unit_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per unit per day"))
-    price_per_unit_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per unit per entry"))
-    price_per_unit_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Price per unit per withdrawal"))
+    price_per_unit_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Price per unit per day"))
+    price_per_unit_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Price per unit per entry"))
+    price_per_unit_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Price per unit per withdrawal"))
 
-    price_min_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per day"))
-    price_min_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per entry"))
-    price_min_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=0.0, verbose_name=_("Minimum price per withdrawal"))
+    price_min_per_day = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Minimum price per day"))
+    price_min_per_entry = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Minimum price per entry"))
+    price_min_per_withdrawal = models.DecimalField(max_digits=12, decimal_places=6, default=decimal.Decimal("0.0"), verbose_name=_("Minimum price per withdrawal"))
 
     def __unicode__(self):
         return _("%(name)s entry=%(price_per_kilo_per_entry)s/kg+%(price_per_unit_per_entry)s/unit&min%(price_min_per_entry)s withdrawal=%(price_per_kilo_per_withdrawal)s/kg+%(price_per_unit_per_withdrawal)s/unit&min%(price_min_per_withdrawal)s day=%(price_per_kilo_per_day)s/kg+%(price_per_unit_per_day)s/unit&min%(price_min_per_day)s") % {
