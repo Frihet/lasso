@@ -136,7 +136,9 @@
 
 
       ASSURANCE &
-      {% ifequal withdrawal.insurance 2 %}PAR NOUS{% else %}{% ifequal withdrawal.insurance 1 %}Some wares covered{% else %}PAS PAR NOUS{% endifequal %}{% endifequal %} &
+      {% ifequal withdrawal.insurance 2 %}PAR NOUS{% else %}{% ifequal withdrawal.insurance 1 %}Some wares covered{% else %}NICHT DURCH UNS/
+
+PAS PAR NOUS{% endifequal %}{% endifequal %} &
       TRANSPORTMITTEL/
 
 
@@ -147,7 +149,7 @@
 
 
       COND.LIVRAISON &
-      {{ withdrawal.transport_condition }} &
+      {{ withdrawal.transport_condition|default_if_none:"-" }} &
       &
     \tabularnewline
       LIEFERSCHEIN NR/
@@ -155,7 +157,9 @@
 
       BUL. DE LIVRAISON &
       {{ withdrawal.transport_nr }} &
-      Öffnungzseiten/horaires de livraison &
+      Öffnungzseiten/
+
+      horaires de livraison &
       {{ withdrawal.opening_hours }}
     \tabularnewline
       BESTELL-NR/N\textdegree{} DE COMMANDE &
