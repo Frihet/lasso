@@ -212,7 +212,7 @@ class WithdrawalAdminForm(forms.ModelForm):
             vts = VehicleType.objects.filter(is_default=True)
             if len(vts) > 0:
                 self.initial['vehicle_type'] = vts[0]
-        self.fields['customer'].widget.attrs['class'] = 'autosubmit'
+        self.fields['customer'].widget.widget.attrs['class'] = 'autosubmit'
 
 class WithdrawalAdmin(IntermediateFormHandlingAdminMixin, ExtendablePermissionAdminMixin, admin.ModelAdmin):
     form = WithdrawalAdminForm
