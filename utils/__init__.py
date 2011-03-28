@@ -26,15 +26,25 @@ if not hasattr(django.forms.forms.BaseForm, 'pre_init_validation_baseform_init')
         for name, field in self.fields.items():
             if hasattr(field, 'init_clean'):
                 try:
-                    field.init_clean()
+                    field.init_clean(self)
                 except ValidationError, e:
                     self._errors[name] = self.error_class(e.messages)
         if not self._errors:
             self._errors = None
     django.forms.forms.BaseForm.init_clean = init_clean
 
+    django.forms.models.BaseInlineFormSet.pre_init_validation_baseinlineformset_construct_form = django.forms.models.BaseInlineFormSet._construct_form
+    def _construct_form(self, i, **kwargs):
+        form = self.pre_init_validation_baseinlineformset_construct_form(i, **kwargs)
+        if form._errors and self.fk.name in form._errors:
+            del form._errors[self.fk.name]
+        if not form._errors:
+            form._errors = None
+        return form
+    django.forms.models.BaseInlineFormSet._construct_form = _construct_form
+
 if not hasattr(django.forms.models.ModelChoiceField, 'init_clean'):
-    def init_clean(self):
+    def init_clean(self, form):
         if self.required and self.queryset.count() == 0:
             raise ValidationError(_("You must first create at least one of these before you can save."))
     django.forms.models.ModelChoiceField.init_clean = init_clean
