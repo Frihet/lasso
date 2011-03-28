@@ -18,6 +18,9 @@ def zencode(str):
     return unicode(str).encode('cp850')
 
 def zprint(args,copies,lmarg=50, tmarg=25):
+    if not settings.LASSO_LABELPRINTING_PRINTER:
+        print "%s copies of %s" % (copies, ", ".join("%s=%s" % (name, value) for (name, value) in args.iteritems()))
+        return
     data = ''
     for job in xrange(0, copies):
         lheight = 60
