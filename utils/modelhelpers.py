@@ -1,8 +1,10 @@
 import django.db.models.fields.related
+import django.contrib.admin.util
 
 class SubclasModelMixin(object):
     @classmethod
-    def get_model_subclass_relations(cls):
+    def get_model_subclass_relations(cls, other = None):
+        if other: cls = other
         res = {}
         for name in dir(cls):
             attr = getattr(cls, name)
@@ -11,7 +13,8 @@ class SubclasModelMixin(object):
         return res
 
     @classmethod
-    def get_model_superclass_relations(cls):
+    def get_model_superclass_relations(cls, other = None):
+        if other: cls = other
         res = {}
         for name in dir(cls):
             attr = getattr(cls, name)
@@ -71,3 +74,20 @@ def subclassproxy(fn):
     if is_property:
         proxy = property(proxy)
     return proxy
+
+
+
+django.contrib.admin.util.old_format_callback = django.contrib.admin.util._format_callback
+def _format_callback(obj, user, admin_site, levels_to_root, perms_needed):
+    res = django.contrib.admin.util.old_format_callback(obj, user, admin_site, levels_to_root, perms_needed)
+
+    subclass_key = SubclasModelMixin.get_model_subclass_relations(type(obj))
+    try:
+        subclassobject = getattr(obj, subclass_key.keys()[0], None)
+    except:
+        subclassobject = None
+
+    if subclassobject and obj._meta.verbose_name in perms_needed:
+        perms_needed.remove(obj._meta.verbose_name)
+    return res
+django.contrib.admin.util._format_callback = _format_callback
